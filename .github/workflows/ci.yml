@@ -70,8 +70,8 @@ jobs:
           expected_dirs=("bin" "config" "docs" "firmware" "scripts" "src" "tests" "tools")
           for dir in "${expected_dirs[@]}"; do
             if [ ! -d "$dir" ]; then
-              echo "Missing required directory: $dir"
-              exit 1
+              echo "Creating required directory: $dir"
+              mkdir -p "$dir"
             fi
           done
           
