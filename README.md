@@ -1,5 +1,11 @@
 # STM32 IoT Virtual Development Environment
 
+[![GitHub Stars](https://img.shields.io/github/stars/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/issues)
+[![GitHub License](https://img.shields.io/github/license/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/blob/main/LICENSE)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/fabioeloi/qemu-micropython/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/fabioeloi/qemu-micropython/actions)
+
 This project provides a virtual development environment for STM32 microcontrollers running MicroPython, using QEMU for hardware emulation. It allows developers to build and test IoT applications without physical hardware.
 
 ## Features
