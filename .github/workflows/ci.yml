@@ -105,12 +105,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi
 
-      - name: Mock build
+      - name: Mock firmware build
         run: |
-          echo "Simulating build for STM32 platform..."
-          mkdir -p firmware/build
           echo "Mock firmware build complete"
-          touch firmware/build/firmware.bin
+          mkdir -p firmware/build
+          # Create a dummy binary file with some content
+          dd if=/dev/urandom of=firmware/build/firmware.bin bs=1M count=1
+          # Verify the file exists and has content
+          ls -l firmware/build/firmware.bin
+          
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
