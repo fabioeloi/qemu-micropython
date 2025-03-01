@@ -1,128 +1,45 @@
 """
-MicroPython STM32 IoT Application
----------------------------------
-This is the main application entry point.
+MicroPython QEMU Demo
+Simple test script focused on using UART directly
 """
-import machine
+
 import time
-import network
-from machine import Pin, I2C, SPI
+import machine
+import sys
 
-# Import our custom modules
+# Setup UART (STM32 usually has UART2 on pins A2/A3)
 try:
-    import sensors
-    import iot_client
-except ImportError:
-    print("Custom modules not found. Basic demo only.")
+    uart = machine.UART(2, 115200)  # UART2
+    uart.init(115200, bits=8, parity=None, stop=1)
+    uart_ok = True
+    print("UART initialized successfully")
+except Exception as e:
+    uart_ok = False
+    print("UART initialization failed:", e)
 
-# Board LED pins for STM32F4-Discovery
-leds = {
-    'green': Pin('PD12', Pin.OUT),
-    'orange': Pin('PD13', Pin.OUT),
-    'red': Pin('PD14', Pin.OUT),
-    'blue': Pin('PD15', Pin.OUT)
-}
+def uart_print(msg):
+    """Print to both UART and standard output"""
+    print(msg)  # Standard output
+    if uart_ok:
+        uart.write(msg + '\r\n')  # UART output
 
-def blink_led(led_name, count=3, delay=0.2):
-    """Blink a specific LED"""
-    led = leds.get(led_name)
-    if not led:
-        print(f"LED {led_name} not found")
-        return
-        
-    for _ in range(count):
-        led.on()
-        time.sleep(delay)
-        led.off()
-        time.sleep(delay)
+# Print startup message
+uart_print("MicroPython QEMU Demo starting...")
+uart_print("Python: " + sys.version)
 
-def setup():
-    """Initialize hardware and peripherals"""
-    print("Setting up hardware...")
+# Main application loop
+for i in range(10):
+    uart_print("Counter: {}".format(i))
     
-    # Set up I2C for sensors
+    # Attempt to toggle an LED (may not work in QEMU)
     try:
-        i2c = I2C(1, scl=Pin('PB6'), sda=Pin('PB7'))
-        devices = i2c.scan()
-        if devices:
-            print(f"I2C devices found: {[hex(d) for d in devices]}")
-        else:
-            print("No I2C devices found")
+        led_pin = machine.Pin('A0', machine.Pin.OUT)
+        led_pin.value(i % 2)  # Toggle between 0 and 1
+        uart_print("LED toggled")
     except Exception as e:
-        print(f"I2C setup failed: {e}")
+        uart_print("LED control failed: " + str(e))
     
-    # Set up SPI for additional peripherals
-    try:
-        spi = SPI(1, SPI.MASTER, baudrate=1000000, polarity=0, phase=0)
-        print("SPI initialized")
-    except Exception as e:
-        print(f"SPI setup failed: {e}")
-    
-    # Set up networking if available
-    try:
-        if hasattr(network, 'WLAN'):
-            wlan = network.WLAN(network.STA_IF)
-            wlan.active(True)
-            print("WiFi initialized")
-        elif hasattr(network, 'WIZNET5K'):
-            nic = network.WIZNET5K()
-            print("Ethernet initialized")
-    except Exception as e:
-        print(f"Network setup failed: {e}")
-    
-    # Indicate setup is complete
-    blink_led('green', count=2)
-    print("Setup complete")
+    # Sleep for a moment
+    time.sleep(1)
 
-def main():
-    """Main application loop"""
-    print("\nSTM32 IoT Application Starting...")
-    setup()
-    
-    print("Starting main loop...")
-    count = 0
-    
-    try:
-        while True:
-            # Toggle the blue LED to show the system is running
-            leds['blue'].toggle()
-            
-            # Simulate sensor reading
-            if count % 5 == 0:
-                print(f"Reading sensors... (loop count: {count})")
-                try:
-                    if 'sensors' in globals():
-                        temp = sensors.read_temperature()
-                        humidity = sensors.read_humidity()
-                        print(f"Temperature: {temp}°C, Humidity: {humidity}%")
-                except Exception as e:
-                    print(f"Sensor reading failed: {e}")
-                    blink_led('red')
-            
-            # Simulate IoT data transmission
-            if count % 10 == 0 and count > 0:
-                print("Sending data to IoT platform...")
-                try:
-                    if 'iot_client' in globals():
-                        iot_client.send_telemetry({
-                            'temperature': 25.0 + (count % 10) / 10,
-                            'humidity': 50 + (count % 20),
-                            'uptime': count
-                        })
-                except Exception as e:
-                    print(f"IoT transmission failed: {e}")
-                    blink_led('orange')
-            
-            time.sleep(1)
-            count += 1
-            
-    except KeyboardInterrupt:
-        print("\nApplication stopped by user")
-    finally:
-        # Clean shutdown
-        for led in leds.values():
-            led.off()
-        print("Application shutdown complete")
-
-if __name__ == "__main__":
-    main()
+uart_print("Demo complete!")

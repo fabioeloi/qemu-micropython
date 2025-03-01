@@ -8,9 +8,9 @@ TOOLS_DIR="$PROJECT_DIR/tools"
 QEMU_DIR="$TOOLS_DIR/qemu"
 CONFIG_DIR="$PROJECT_DIR/config"
 BUILD_DIR="$PROJECT_DIR/firmware/build"
-QEMU_CONFIG="$CONFIG_DIR/qemu/stm32f4.cfg"
 FIRMWARE="$BUILD_DIR/firmware.bin"
 BOARD=${1:-"stm32f4-discovery"}
+LOG_FILE="$PROJECT_DIR/qemu_log.txt"
 
 echo "Running MicroPython on QEMU STM32 emulator ($BOARD)..."
 
@@ -39,18 +39,6 @@ if [ ! -f "$FIRMWARE" ]; then
     fi
 fi
 
-# Read QEMU arguments from config file
-QEMU_ARGS=$(cat "$QEMU_CONFIG" 2>/dev/null | grep -v '^#' | tr '\n' ' ')
-if [ -z "$QEMU_ARGS" ]; then
-    echo "QEMU config file not found or empty. Using default configuration."
-    QEMU_ARGS="-M stm32f4-discovery -nographic -monitor null -serial stdio -kernel $FIRMWARE"
-else
-    # Replace firmware.bin with the actual path
-    QEMU_ARGS=$(echo "$QEMU_ARGS" | sed "s|firmware.bin|$FIRMWARE|g")
-fi
-
-# Run QEMU
-echo "Starting QEMU with arguments: $QEMU_ARGS"
 # Look for the qemu executable in different possible locations
 if [ -f "$QEMU_DIR/build/arm-softmmu/qemu-system-arm" ]; then
     QEMU_PATH="$QEMU_DIR/build/arm-softmmu/qemu-system-arm"
@@ -64,6 +52,26 @@ else
     exit 1
 fi
 
-"$QEMU_PATH" $QEMU_ARGS
+# Create a log file for QEMU output
+echo "QEMU output will be logged to $LOG_FILE"
+
+# Kill any existing QEMU instances to avoid conflicts
+pkill -f qemu-system-arm 2>/dev/null || true
+sleep 1
+
+# Run QEMU with enhanced debugging and semihosting
+echo "Starting QEMU with enhanced configuration..."
+"$QEMU_PATH" \
+    -machine olimex-stm32-h405 \
+    -cpu cortex-m4 \
+    -m 128K \
+    -kernel "$FIRMWARE" \
+    -serial stdio \
+    -monitor none \
+    -nographic \
+    -d guest_errors,unimp,semihosting,int \
+    -semihosting-config enable=on,target=native,arg=test \
+    -semihosting \
+    2>&1 | tee "$LOG_FILE"
 
 echo "QEMU session ended."
