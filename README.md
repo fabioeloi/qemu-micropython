@@ -44,9 +44,10 @@ qemu-micropython/
 
 - Git
 - Python 3.x
-- QEMU (version 7.0+ recommended)
-- ARM GCC Toolchain
-- ST-Link utilities (for physical device deployment)
+- ARM GCC Toolchain (arm-none-eabi-gcc)
+- Make
+
+Note: QEMU will be automatically downloaded and built by the setup script.
 
 ### Setup
 
@@ -66,6 +67,7 @@ qemu-micropython/
    - Install required dependencies
    - Clone and build QEMU with STM32 support
    - Clone and prepare MicroPython for STM32
+   - Set up board configurations
 
 ### Building the Firmware
 
@@ -75,11 +77,7 @@ To build the MicroPython firmware with your application:
 ./scripts/build.sh
 ```
 
-By default, this builds for the STM32F4-Discovery board. You can specify a different board:
-
-```bash
-./scripts/build.sh NUCLEO_F446RE
-```
+The script is currently configured to build for the STM32F4DISC board. The build process creates firmware files (which may include firmware0.bin and firmware1.bin for split firmware boards).
 
 ### Running in QEMU
 
@@ -89,7 +87,13 @@ To run your application in the QEMU emulator:
 ./scripts/run_qemu.sh
 ```
 
-This will start QEMU with the appropriate configuration for your target board and load your firmware.
+This will:
+- Check for firmware files in the build directory
+- Handle split firmware files if necessary (combining them for QEMU)
+- Start QEMU with the appropriate configuration for the target board
+- Load your firmware and start execution
+
+Note: We're currently using the olimex-stm32-h405 machine type in QEMU as it has a Cortex-M4 processor similar to the STM32F4 Discovery board.
 
 ### Deploying to Physical Hardware
 
@@ -128,9 +132,20 @@ arm-none-eabi-gdb firmware/build/firmware.elf
 (gdb) continue
 ```
 
+## Troubleshooting
+
+### Common Issues
+
+1. **QEMU machine type errors**: If you encounter errors about unsupported machine types, check the `config/qemu/stm32f4.cfg` file. You may need to modify it to use a different machine type supported by your QEMU build.
+
+2. **Firmware not found**: The build process generates different firmware files depending on the board. For STM32F4DISC, it creates split firmware files (firmware0.bin and firmware1.bin). The run script automatically handles this.
+
+3. **Build failures**: Ensure you have the ARM toolchain (arm-none-eabi-gcc) installed and in your PATH.
+
 ## Limitations
 
 - Not all STM32 peripherals are fully emulated in QEMU
+- We're using olimex-stm32-h405 as a substitute for STM32F4-Discovery in QEMU
 - Timing may differ between emulated and physical environments
 - Some hardware-specific features may require adjustment for accurate simulation
 
