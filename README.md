@@ -18,9 +18,10 @@ This project provides a virtual development environment for STM32 microcontrolle
 
 We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
 - Completed implementation of custom UART driver for QEMU with simulation features
-- Enhanced firmware build and run scripts for better QEMU compatibility
-- Updated QEMU configuration using olimex-stm32-h405 machine type
-- Improved error handling and debugging output
+- Enhanced network simulation with robust device-to-device communication
+- Added comprehensive testing framework for UART features
+- Improved MicroPython bindings for UART testing capabilities
+- Detailed documentation for custom UART driver testing and integration
 
 See our [Version History](#version-history) for more details on releases.
 
