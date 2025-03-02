@@ -149,6 +149,33 @@ arm-none-eabi-gdb firmware/build/firmware.elf
 - Timing may differ between emulated and physical environments
 - Some hardware-specific features may require adjustment for accurate simulation
 
+## Project Roadmap
+
+The project is organized into several milestone releases:
+
+### v1.1.0 - Debugging and QEMU Integration
+
+- GDB integration for step-by-step debugging
+- Custom UART driver optimized for QEMU
+- Better semihosting integration for reliable output
+- Exploration of alternative QEMU machine types for STM32F4
+- Comprehensive unit testing framework
+
+### v1.2.0 - IoT and Simulation Capabilities
+
+- Network simulation for IoT connectivity testing
+- Virtual sensors simulation (temperature, humidity, motion)
+- State snapshots for efficient scenario testing
+- Over-the-air update mechanisms for firmware deployment
+
+### v1.3.0 - Development Infrastructure
+
+- Continuous integration and deployment pipeline
+- Automated testing in virtual environments
+- Documentation improvements
+
+You can track the progress of these features in our [GitHub Project](https://github.com/fabioeloi/qemu-micropython/projects) and [Milestones](https://github.com/fabioeloi/qemu-micropython/milestones).
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
