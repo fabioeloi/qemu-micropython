@@ -5,8 +5,23 @@
 [![GitHub Issues](https://img.shields.io/github/issues/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/issues)
 [![GitHub License](https://img.shields.io/github/license/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/blob/main/LICENSE)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/fabioeloi/qemu-micropython/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/fabioeloi/qemu-micropython/actions)
+[![Latest Release](https://img.shields.io/github/v/release/fabioeloi/qemu-micropython?style=flat-square)](https://github.com/fabioeloi/qemu-micropython/releases)
+[![Roadmap Status](https://img.shields.io/badge/roadmap-status-blue?style=flat-square)](ROADMAP_STATUS.md)
 
 This project provides a virtual development environment for STM32 microcontrollers running MicroPython, using QEMU for hardware emulation. It allows developers to build and test IoT applications without physical hardware.
+
+## Current Status
+
+**Current Release:** v2025.03.02.10 (v1.1.0-beta.1)  
+**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress)  
+**Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
+
+We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
+- Enhanced firmware build and run scripts for better QEMU compatibility
+- Updated QEMU configuration using olimex-stm32-h405 machine type
+- Improved error handling and debugging output
+
+See our [Version History](#version-history) for more details on releases.
 
 ## Features
 
@@ -153,32 +168,54 @@ arm-none-eabi-gdb firmware/build/firmware.elf
 
 The project is organized into several milestone releases:
 
-### v1.1.0 - Debugging and QEMU Integration
+### v1.1.0 - Debugging and QEMU Integration (In Progress)
 
-- GDB integration for step-by-step debugging
-- Custom UART driver optimized for QEMU
-- Better semihosting integration for reliable output
-- Exploration of alternative QEMU machine types for STM32F4
-- Comprehensive unit testing framework
+- GDB integration for step-by-step debugging (25% complete)
+- Custom UART driver optimized for QEMU (planned)
+- Better semihosting integration for reliable output (50% complete)
+- Exploration of alternative QEMU machine types for STM32F4 (40% complete)
+- Comprehensive unit testing framework (planned)
 
-### v1.2.0 - IoT and Simulation Capabilities
+**Target completion:** Q2 2025
+
+### v1.2.0 - IoT and Simulation Capabilities (Planned)
 
 - Network simulation for IoT connectivity testing
 - Virtual sensors simulation (temperature, humidity, motion)
 - State snapshots for efficient scenario testing
 - Over-the-air update mechanisms for firmware deployment
 
-### v1.3.0 - Development Infrastructure
+**Target completion:** Q4 2025
 
-- Continuous integration and deployment pipeline
+### v1.3.0 - Development Infrastructure (Partially In Progress)
+
+- Continuous integration and deployment pipeline (30% complete)
 - Automated testing in virtual environments
-- Documentation improvements
+- Documentation improvements (35% complete)
 
-You can track the progress of these features in our [GitHub Project](https://github.com/fabioeloi/qemu-micropython/projects) and [Milestones](https://github.com/fabioeloi/qemu-micropython/milestones).
+**Target completion:** Q1 2026
+
+You can track the detailed progress of these features in our [Roadmap Status](ROADMAP_STATUS.md) document, [GitHub Project](https://github.com/fabioeloi/qemu-micropython/projects) and [Milestones](https://github.com/fabioeloi/qemu-micropython/milestones).
+
+## Version History
+
+We use a dual versioning system:
+- **Date-based versions** (vYYYY.MM.DD.build) for automated builds and incremental releases
+- **Semantic versions** (v1.x.y) for major milestone completions
+
+For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPING.md).
+
+### Major Releases
+
+- **v1.0.0** (March 1, 2025): Initial release with documentation and testing tools
+- **v1.1.0-alpha** (March 1, 2025): Early work on debugging and QEMU integration
+- **v1.1.0-beta.1** (March 2, 2025): Continued improvements to debugging capabilities
+
+For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. For release notes, please follow our [Release Notes Template](RELEASE_TEMPLATE.md).
 
 ## License
 

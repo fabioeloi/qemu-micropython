@@ -1,0 +1,80 @@
+name: Release Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (date-based, e.g., v2025.03.15.11)'
+        required: true
+      semantic_version:
+        description: 'Semantic version (e.g., v1.1.0-beta.2)'
+        required: true
+      milestone:
+        description: 'Associated milestone (e.g., v1.1.0)'
+        required: true
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup GitHub CLI
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+      
+      - name: Update VERSION_MAPPING.md
+        run: |
+          sed -i "s/| TBD               | ${{ github.event.inputs.semantic_version }}/" VERSION_MAPPING.md
+          sed -i "s/^| ${{ github.event.inputs.version }}.*$/| ${{ github.event.inputs.version }} | ${{ github.event.inputs.semantic_version }} | ${{ github.event.inputs.milestone }} | Debugging and QEMU integration/" VERSION_MAPPING.md
+      
+      - name: Generate release notes from template
+        run: |
+          export RELEASE_NOTES_FILE="release_notes.md"
+          cp .github/RELEASE_TEMPLATE.md $RELEASE_NOTES_FILE
+          
+          # Replace placeholders
+          sed -i "s/\[VERSION\]/${{ github.event.inputs.version }}/g" $RELEASE_NOTES_FILE
+          sed -i "s/\[SEMANTIC VERSION\]/${{ github.event.inputs.semantic_version }}/g" $RELEASE_NOTES_FILE
+          sed -i "s/\[YYYY-MM-DD\]/$(date +%Y-%m-%d)/g" $RELEASE_NOTES_FILE
+          sed -i "s/\[Reference to roadmap milestone\]/${{ github.event.inputs.milestone }}/g" $RELEASE_NOTES_FILE
+          
+          # Get last release tag for changelog
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          if [ -z "$LAST_TAG" ]; then
+            LAST_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          sed -i "s|\[Link to compare changes\]|https://github.com/fabioeloi/qemu-micropython/compare/${LAST_TAG}...${{ github.event.inputs.version }}|g" $RELEASE_NOTES_FILE
+
+      - name: Update README with latest version
+        run: |
+          sed -i "s/^**Current Release:.*$/**Current Release:** ${{ github.event.inputs.version }} (${{ github.event.inputs.semantic_version }})/g" README.md
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add VERSION_MAPPING.md README.md
+          git commit -m "Update version information for release ${{ github.event.inputs.version }}"
+          git push
+      
+      - name: Create Release Notes PR
+        run: |
+          echo "Release notes prepared. Please complete the release notes and then create the release."
+          echo "Release notes file: $RELEASE_NOTES_FILE"
+          cat $RELEASE_NOTES_FILE
+      
+      - name: Upload release notes as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-notes
+          path: release_notes.md
+  
+  # Future enhancement: Add a second job that creates the actual GitHub release
+  # after the release notes have been completed and reviewed 
