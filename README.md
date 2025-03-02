@@ -12,11 +12,12 @@ This project provides a virtual development environment for STM32 microcontrolle
 
 ## Current Status
 
-**Current Release:** v2025.03.02.10 (v1.1.0-beta.1)  
-**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress)  
+**Current Release:** v2025.03.03.11 (v1.1.0-beta.2)  
+**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~60% complete)  
 **Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
 
 We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
+- Completed implementation of custom UART driver for QEMU with simulation features
 - Enhanced firmware build and run scripts for better QEMU compatibility
 - Updated QEMU configuration using olimex-stm32-h405 machine type
 - Improved error handling and debugging output
@@ -210,6 +211,7 @@ For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPI
 - **v1.0.0** (March 1, 2025): Initial release with documentation and testing tools
 - **v1.1.0-alpha** (March 1, 2025): Early work on debugging and QEMU integration
 - **v1.1.0-beta.1** (March 2, 2025): Continued improvements to debugging capabilities
+- **v1.1.0-beta.2** (March 3, 2025): Completed implementation of custom UART driver for QEMU with simulation features
 
 For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
 
