@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-03-03T12:31:59.603700",
+  "total_tests": 4,
+  "passed_tests": 3,
+  "total_duration": 60.76318001747131,
+  "results": [
+    {
+      "name": "Basic Connection",
+      "passed": true,
+      "duration": 0.2766847610473633,
+      "expected": "['r0', 'r1', 'r2', 'pc']",
+      "actual": "GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nType \"show copying\" and \"show warranty\" for details.\nThis GDB was configured as \"--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi\".\nType \"show configuration\" for configuration details.\nFor bug reporting instructions, please see:\n<https://bugs.linaro.org/>.\nFind the GDB manual and other documentation resources online at:\n    <http://www.gnu.org/software/gdb/documentation/>.\n\nFor help, type \"help\".\nType \"apropos word\" to search for commands related to \"word\".\n0x08020118 in Reset_Handler ()\nr0             0x0                 0\nr1             0x0                 0\nr2             0x0                 0\nr3             0x0                 0\nr4             0x0                 0\nr5             0x0                 0\nr6             0x0                 0\nr7             0x0                 0\nr8             0x0                 0\nr9             0x0                 0\nr10            0x0                 0\nr11            0x0                 0\nr12            0x0                 0\nsp             0x2001fff8          0x2001fff8\nlr             0xffffffff          -1\npc             0x8020118           0x8020118 <Reset_Handler>\nxpsr           0x41000000          1090519040\nmsp            0x2001fff8          537001976\npsp            0x0                 0\nprimask        0x0                 0\ncontrol        0x0                 0\nbasepri        0x0                 0\nfaultmask      0x0                 0\n$1 = 0x8020118\n[Inferior 1 (process 1) detached]\n",
+      "notes": ""
+    },
+    {
+      "name": "Breakpoint Test",
+      "passed": true,
+      "duration": 0.24079012870788574,
+      "expected": "['Breakpoint 1', 'SystemInit']",
+      "actual": "GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nType \"show copying\" and \"show warranty\" for details.\nThis GDB was configured as \"--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi\".\nType \"show configuration\" for configuration details.\nFor bug reporting instructions, please see:\n<https://bugs.linaro.org/>.\nFind the GDB manual and other documentation resources online at:\n    <http://www.gnu.org/software/gdb/documentation/>.\n\nFor help, type \"help\".\nType \"apropos word\" to search for commands related to \"word\".\nboardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49\n49\t        for (volatile uint delay = 0; delay < 10000000; delay++) {\nBreakpoint 1 at 0x8020004: file ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c, line 172.\nNum     Type           Disp Enb Address    What\n1       breakpoint     keep y   0x08020004 in SystemInit \n                                           at ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c:172\n\nBreakpoint 1, SystemInit () at ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c:172\n172\t    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */\nr0             0x0                 0\nr1             0x20000578          536872312\nr2             0x20000578          536872312\nr3             0x20000030          536870960\nr4             0xe000ed00          -536810240\nr5             0x0                 0\nr6             0x0                 0\nr7             0x0                 0\nr8             0x0                 0\nr9             0x0                 0\nr10            0x0                 0\nr11            0x0                 0\nr12            0x0                 0\nsp             0x2001ffe0          0x2001ffe0\nlr             0x804975f           134518623\npc             0x8020004           0x8020004 <SystemInit>\nxpsr           0x61000000          1627389952\nmsp            0x2001ffe0          537001952\npsp            0x0                 0\nprimask        0x0                 0\ncontrol        0x0                 0\nbasepri        0x0                 0\nfaultmask      0x0                 0\n[Inferior 1 (process 1) detached]\n",
+      "notes": ""
+    },
+    {
+      "name": "Examine Memory",
+      "passed": true,
+      "duration": 0.24003314971923828,
+      "expected": "['0x2001', 'SystemInit']",
+      "actual": "GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nType \"show copying\" and \"show warranty\" for details.\nThis GDB was configured as \"--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi\".\nType \"show configuration\" for configuration details.\nFor bug reporting instructions, please see:\n<https://bugs.linaro.org/>.\nFind the GDB manual and other documentation resources online at:\n    <http://www.gnu.org/software/gdb/documentation/>.\n\nFor help, type \"help\".\nType \"apropos word\" to search for commands related to \"word\".\nboardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49\n49\t        for (volatile uint delay = 0; delay < 10000000; delay++) {\nBreakpoint 1 at 0x8020004: file ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c, line 172.\n\nBreakpoint 1, SystemInit () at ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c:172\n172\t    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */\n0x2001ffe0:\t0x00000000\t0x20000578\t0x00000000\t0x00000000\nr0             0x0                 0\nr1             0x20000578          536872312\nr2             0x20000578          536872312\nr3             0x20000030          536870960\nr4             0xe000ed00          -536810240\nr5             0x0                 0\nr6             0x0                 0\nr7             0x0                 0\nr8             0x0                 0\nr9             0x0                 0\nr10            0x0                 0\nr11            0x0                 0\nr12            0x0                 0\nsp             0x2001ffe0          0x2001ffe0\nlr             0x804975f           134518623\npc             0x8020004           0x8020004 <SystemInit>\nxpsr           0x61000000          1627389952\nmsp            0x2001ffe0          537001952\npsp            0x0                 0\nprimask        0x0                 0\ncontrol        0x0                 0\nbasepri        0x0                 0\nfaultmask      0x0                 0\n[Inferior 1 (process 1) detached]\n",
+      "notes": ""
+    },
+    {
+      "name": "Python State",
+      "passed": false,
+      "duration": 60.005671977996826,
+      "expected": "['mp_execute_bytecode', 'variables']",
+      "actual": "Timeout after 60s",
+      "notes": ""
+    }
+  ]
+}

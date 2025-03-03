@@ -1,0 +1,44 @@
+2025-03-03 12:31:59,603 - INFO - Setting up test environment...
+2025-03-03 12:32:00,621 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 12:32:00,627 - INFO - QEMU process started successfully
+2025-03-03 12:32:02,628 - INFO - Test environment ready
+2025-03-03 12:32:02,628 - INFO - 
+Running test: Basic Connection
+2025-03-03 12:32:02,629 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:02,905 - INFO - Test Basic Connection: ✅ PASS (0.28s)
+2025-03-03 12:32:02,905 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 12:32:02,905 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:03,146 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:32:03,146 - INFO - 
+Running test: Examine Memory
+2025-03-03 12:32:03,146 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:03,386 - INFO - Test Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:32:03,387 - INFO - 
+Running test: Python State
+2025-03-03 12:32:03,387 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:33:03,391 - ERROR - GDB command timed out after 60 seconds
+2025-03-03 12:33:03,392 - INFO - Test Python State: ❌ FAIL (60.01s)
+2025-03-03 12:33:03,392 - ERROR - Test failed with output:
+Timeout after 60s
+2025-03-03 12:33:03,393 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/test_results.json
+2025-03-03 12:33:03,393 - INFO - 
+Test Summary:
+2025-03-03 12:33:03,393 - INFO - =============
+2025-03-03 12:33:03,393 - INFO - Total Tests: 4
+2025-03-03 12:33:03,393 - INFO - Passed Tests: 3
+2025-03-03 12:33:03,393 - INFO - Failed Tests: 1
+2025-03-03 12:33:03,393 - INFO - Total Duration: 60.76s
+2025-03-03 12:33:03,393 - INFO - 
+Detailed Results:
+2025-03-03 12:33:03,393 - INFO - Basic Connection: ✅ PASS (0.28s)
+2025-03-03 12:33:03,393 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:33:03,393 - INFO - Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:33:03,393 - INFO - Python State: ❌ FAIL (60.01s)
+2025-03-03 12:33:03,393 - INFO -   Expected: ['mp_execute_bytecode', 'variables']
+2025-03-03 12:33:03,393 - INFO -   Actual: Timeout after 60s
+2025-03-03 12:33:03,393 - INFO - 
+Cleaning up test environment...
+2025-03-03 12:33:03,397 - INFO - QEMU process stopped
+2025-03-03 12:33:03,411 - INFO - Cleanup complete

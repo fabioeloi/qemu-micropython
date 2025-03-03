@@ -1,0 +1,52 @@
+Release v2025.03.03.11 (v1.1.0-beta.2): Custom UART Driver Implementation
+
+This commit updates project tracking to reflect the completion of the custom UART driver implementation:
+
+- Update ROADMAP_STATUS.md to mark custom UART driver as 100% complete
+- Update milestones and progress on related features (network simulation, testing)
+- Create release notes for v2025.03.03.11 (v1.1.0-beta.2)
+- Update README with latest version and progress information
+- Update VERSION_MAPPING.md with new release entry
+
+The custom UART driver represents a significant milestone in the v1.1.0 roadmap, enabling enhanced simulation capabilities for testing MicroPython IoT applications in QEMU. Overall milestone completion is now at approximately 60%. 
+
+Improve GDB Integration and Testing Framework
+
+This commit enhances the GDB integration and testing framework with several key improvements:
+
+1. Debug Script Improvements:
+   - Added better error handling and logging
+   - Improved QEMU startup parameters
+   - Added support for ELF file debugging
+   - Enhanced process management and cleanup
+
+2. GDB Initialization:
+   - Added better error messages
+   - Improved Python helpers
+   - Enhanced connection handling
+   - Added additional debugging commands
+
+3. Test Framework Enhancements:
+   - Added comprehensive logging
+   - Improved error handling
+   - Added test result tracking
+   - Added JSON report generation
+   - Fixed output decoding issues
+   - Updated test timeouts
+   - Made tests more robust and reliable
+
+4. Documentation:
+   - Added detailed GDB debugging guide
+   - Added troubleshooting information
+   - Added best practices
+   - Added common debug scenarios
+
+Test Results:
+- Basic Connection: ✅ PASS
+- Breakpoint Test: ✅ PASS
+- Examine Memory: ✅ PASS
+- Python State: ✅ PASS
+
+The GDB integration is now at approximately 60% completion, with improved reliability
+and better debugging capabilities. Next steps will focus on completing Python-level
+debugging features and enhancing exception handling. 

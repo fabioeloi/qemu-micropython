@@ -6,7 +6,7 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 60% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, and Python helpers |
+| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 60% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
 | Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
 | Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
@@ -54,6 +54,10 @@ Based on current progress and priorities, the adjusted timeline is:
   - Created test script for debugging verification
   - Added custom GDB commands for Python state inspection
   - Improved debugging infrastructure with Python-level support
+  - Added comprehensive test framework with automated testing
+  - Added detailed GDB debugging guide and documentation
+  - Fixed issues with test timeouts and error handling
+  - Improved reliability of debugging features
 - **v2025.03.03.11 Release**: Completed full implementation of custom UART driver
   - Implemented comprehensive custom UART driver with advanced simulation features
   - Created Python bindings for UART testing features

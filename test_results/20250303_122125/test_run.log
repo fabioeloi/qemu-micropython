@@ -1,0 +1,49 @@
+2025-03-03 12:21:25,907 - INFO - Setting up test environment...
+2025-03-03 12:21:26,929 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 12:21:26,935 - INFO - QEMU process started successfully
+2025-03-03 12:21:28,940 - INFO - Test environment ready
+2025-03-03 12:21:28,941 - INFO - 
+Running test: Basic Connection
+2025-03-03 12:21:28,942 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:21:29,206 - INFO - Test Basic Connection: ✅ PASS (0.26s)
+2025-03-03 12:21:29,206 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 12:21:29,206 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:21:59,211 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:21:59,212 - INFO - Test Breakpoint Test: ❌ FAIL (30.01s)
+2025-03-03 12:21:59,212 - INFO - 
+Running test: Examine Memory
+2025-03-03 12:21:59,212 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:22:29,218 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:22:29,218 - INFO - Test Examine Memory: ❌ FAIL (30.01s)
+2025-03-03 12:22:29,218 - INFO - 
+Running test: Python State
+2025-03-03 12:22:29,219 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:22:59,224 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:22:59,224 - INFO - Test Python State: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/test_results.json
+2025-03-03 12:22:59,225 - INFO - 
+Test Summary:
+2025-03-03 12:22:59,225 - INFO - =============
+2025-03-03 12:22:59,225 - INFO - Total Tests: 4
+2025-03-03 12:22:59,225 - INFO - Passed Tests: 1
+2025-03-03 12:22:59,225 - INFO - Failed Tests: 3
+2025-03-03 12:22:59,225 - INFO - Total Duration: 90.28s
+2025-03-03 12:22:59,225 - INFO - 
+Detailed Results:
+2025-03-03 12:22:59,225 - INFO - Basic Connection: ✅ PASS (0.26s)
+2025-03-03 12:22:59,225 - INFO - Breakpoint Test: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['Breakpoint 1']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - Examine Memory: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['0x2001fff8']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - Python State: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['Local variables', 'Global variables']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - 
+Cleaning up test environment...
+2025-03-03 12:22:59,226 - ERROR - Error reading QEMU output: 'str' object has no attribute 'decode'
+2025-03-03 12:22:59,229 - INFO - QEMU process stopped
+2025-03-03 12:22:59,244 - INFO - Cleanup complete

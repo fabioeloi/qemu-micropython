@@ -1,0 +1,328 @@
+Command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+Stdout:
+GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+Stderr:
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="26" type="int"/><reg name="psp" bitsize="32" regnum="27" type="int"/><reg name="primask" bitsize="32" regnum="28" type="int"/><reg name="control" bitsize="32" regnum="29" type="int"/><reg name="basepri" bitsize="32" regnum="30" type="int"/><reg name="faultmask" bitsize="32" regnum="31" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qOffsets#4b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 020000001100000000000000b50c2d0001000000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408a095040800000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495a0,4#68
+  [remote] Received Ack
+  [remote] Packet received: 019bb342
+  [remote] Sending packet: $p1a#02
+  [remote] Received Ack
+  [remote] Packet received: 70ff0120
+  [remote] packet_ok: Packet p (fetch-register) is supported
+  [remote] Sending packet: $p1b#03
+  [remote] Received Ack
+  [remote] Packet received: 00000000
+  [remote] Sending packet: $m2001ff40,40#f0
+  [remote] Received Ack
+  [remote] Packet received: 0000000090ee040801000000f9ffffff02000000110000000000000044d82a00001400009f950408b89504080000008180969800b50c2d0000000000d9000208
+  [remote] Sending packet: $m80200d8,4#63
+  [remote] Received Ack
+  [remote] Packet received: 119b109a
+  [remote] Sending packet: $m2001ffc0,40#1f
+  [remote] Received Ack
+  [remote] Packet received: 08000000500100000200000007000000000000000000000000000000a79704080000000078050020000000000000000000000000ffffffff0000000000000000
+  [remote] Sending packet: $qSymbol::#5b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qSymbol (symbol-lookup) is NOT supported
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $m8020100,40#58
+[remote] Received Ack
+[remote] Packet received: 0448e7e715b030bd003802400070004090ee0408a2ee04080446dff82cd00b490b4a0c4b03e051f8040b42f8040b9a42f9d300200849094a01e041f8040b9142
+[remote] Sending packet: $m802014a,4#5d
+[remote] Received Ack
+[remote] Packet received: 0120dc10
+[remote] Sending packet: $m802014e,4#61
+[remote] Received Ack
+[remote] Packet received: 06080000
+[remote] Sending packet: $m8020150,4#2d
+[remote] Received Ack
+[remote] Packet received: 00000020
+[remote] Sending packet: $m8020156,4#33
+[remote] Received Ack
+[remote] Packet received: 00203000
+[remote] Sending packet: $m8020124,2#2c
+[remote] Received Ack
+[remote] Packet received: 03e0
+[remote] Sending packet: $Z0,8020124,2#75
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] packet_ok: Packet Z0 (software-breakpoint) is supported
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] wait: enter
+  [remote] Packet received: T05thread:p01.01;
+[remote] wait: exit
+[remote] Sending packet: $g#67
+[remote] Received Ack
+[remote] Packet received: 00000000dc1006080000002030000020000000000000000000000000000000000000000000000000000000000000000000000000f8ff0120ffffffff2401020800000041
+[remote] Sending packet: $qfThreadInfo#bb
+[remote] Received Ack
+[remote] Packet received: mp01.01
+[remote] Sending packet: $qsThreadInfo#c8
+[remote] Received Ack
+[remote] Packet received: l
+[remote] Sending packet: $z0,8020124,2#95
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $m8020124,4#2e
+[remote] Received Ack
+[remote] Packet received: 03e051f8
+[remote] Sending packet: $m8020124,2#2c
+[remote] Received Ack
+[remote] Packet received: 03e0
+[remote] Sending packet: $p1a#02
+[remote] Received Ack
+[remote] Packet received: f8ff0120
+[remote] Sending packet: $p1b#03
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8020100,40#58
+[remote] Received Ack
+[remote] Packet received: 0448e7e715b030bd003802400070004090ee0408a2ee04080446dff82cd00b490b4a0c4b03e051f8040b42f8040b9a42f9d300200849094a01e041f8040b9142
+[remote] Sending packet: $m802014a,4#5d
+[remote] Received Ack
+[remote] Packet received: 0120dc10
+[remote] Sending packet: $m802014e,4#61
+[remote] Received Ack
+[remote] Packet received: 06080000
+[remote] Sending packet: $m8020150,4#2d
+[remote] Received Ack
+[remote] Packet received: 00000020
+[remote] Sending packet: $m8020156,4#33
+[remote] Received Ack
+[remote] Packet received: 00203000
+[remote] Sending packet: $p1c#04
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1d#05
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1e#06
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1f#07
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8000000,4#25
+[remote] Received Ack
+[remote] Packet received: f8ff0120
+[remote] Sending packet: $m8000004,4#29
+[remote] Received Ack
+[remote] Packet received: 19010208
+[remote] Sending packet: $m8000008,4#2d
+[remote] Received Ack
+[remote] Packet received: c39a0408
+[remote] Sending packet: $m800000c,4#58
+[remote] Received Ack
+[remote] Packet received: b19a0408
+[remote] Sending packet: $m8000010,4#26
+[remote] Received Ack
+[remote] Packet received: c59a0408
+[remote] Sending packet: $m8000014,4#2a
+[remote] Received Ack
+[remote] Packet received: d19a0408
+[remote] Sending packet: $m8000018,4#2e
+[remote] Received Ack
+[remote] Packet received: dd9a0408
+[remote] Sending packet: $m800001c,4#59
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8000020,4#27
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8000024,4#2b
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8000028,4#2f
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m800002c,4#5a
+[remote] Received Ack
+[remote] Packet received: e99a0408
+[remote] Sending packet: $m8000030,4#28
+[remote] Received Ack
+[remote] Packet received: eb9a0408
+[remote] Sending packet: $m8000034,4#2c
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m8000038,4#30
+[remote] Received Ack
+[remote] Packet received: ed9d0408
+[remote] Sending packet: $m800003c,4#5b
+[remote] Received Ack
+[remote] Packet received: 059e0408
+[remote] Sending packet: $m20000000,4#4f
+[remote] Received Ack
+[remote] Packet received: 0024f400
+[remote] Sending packet: $m20000004,4#53
+[remote] Received Ack
+[remote] Packet received: 6d70792d
+[remote] Sending packet: $m20000008,4#57
+[remote] Received Ack
+[remote] Packet received: 73746d33
+[remote] Sending packet: $m2000000c,4#82
+[remote] Received Ack
+[remote] Packet received: 32000000
+[remote] Sending packet: $m20000010,4#50
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000014,4#54
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000018,4#58
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m2000001c,4#83
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000020,4#51
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000024,4#55
+[remote] Received Ack
+[remote] Packet received: 00585800
+[remote] Sending packet: $m20000028,4#59
+[remote] Received Ack
+[remote] Packet received: ffffffff
+[remote] Sending packet: $m2000002c,4#84
+[remote] Received Ack
+[remote] Packet received: 0000803f
+[remote] Sending packet: $m20000030,4#52
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000034,4#56
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m20000038,4#5a
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m2000003c,4#85
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $D;1#b0
+[remote] Received Ack
+[remote] Packet received: OK
+

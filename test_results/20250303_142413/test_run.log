@@ -1,0 +1,39 @@
+2025-03-03 14:24:13,137 - INFO - Setting up test environment...
+2025-03-03 14:24:14,158 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 14:24:14,163 - INFO - QEMU process started successfully
+2025-03-03 14:24:16,168 - INFO - Test environment ready
+2025-03-03 14:24:16,168 - INFO - 
+Running test: Basic Connection
+2025-03-03 14:24:16,169 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:16,563 - INFO - Test Basic Connection: ✅ PASS (0.40s)
+2025-03-03 14:24:16,564 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 14:24:16,564 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:16,807 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 14:24:16,807 - INFO - 
+Running test: Examine Memory
+2025-03-03 14:24:16,807 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:17,042 - INFO - Test Examine Memory: ✅ PASS (0.24s)
+2025-03-03 14:24:17,043 - INFO - 
+Running test: Python State
+2025-03-03 14:24:17,043 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:17,276 - INFO - Test Python State: ✅ PASS (0.23s)
+2025-03-03 14:24:17,277 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/test_results.json
+2025-03-03 14:24:17,277 - INFO - 
+Test Summary:
+2025-03-03 14:24:17,277 - INFO - =============
+2025-03-03 14:24:17,277 - INFO - Total Tests: 4
+2025-03-03 14:24:17,277 - INFO - Passed Tests: 4
+2025-03-03 14:24:17,277 - INFO - Failed Tests: 0
+2025-03-03 14:24:17,277 - INFO - Total Duration: 1.11s
+2025-03-03 14:24:17,277 - INFO - 
+Detailed Results:
+2025-03-03 14:24:17,277 - INFO - Basic Connection: ✅ PASS (0.40s)
+2025-03-03 14:24:17,277 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 14:24:17,277 - INFO - Examine Memory: ✅ PASS (0.24s)
+2025-03-03 14:24:17,277 - INFO - Python State: ✅ PASS (0.23s)
+2025-03-03 14:24:17,277 - INFO - 
+Cleaning up test environment...
+2025-03-03 14:24:17,281 - INFO - QEMU process stopped
+2025-03-03 14:24:17,295 - INFO - Cleanup complete

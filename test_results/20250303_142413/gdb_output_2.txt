@@ -1,0 +1,195 @@
+Command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+Stdout:
+GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+SysTick_Handler () at systick.c:52
+52	    systick_dispatch_t f = systick_dispatch_table[uw_tick & (SYSTICK_DISPATCH_NUM_SLOTS - 1)];
+Breakpoint 1 at 0x8020004: file ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c, line 172.
+
+Breakpoint 1, SystemInit () at ../../lib/stm32lib/CMSIS/STM32F4xx/Source/Templates/system_stm32f4xx.c:172
+172	    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+0x2001ffe0:	0x00000000	0x20000578	0x00000000	0x00000000
+r0             0x0                 0
+r1             0x20000578          536872312
+r2             0x20000578          536872312
+r3             0x20000030          536870960
+r4             0xe000ed00          -536810240
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001ffe0          0x2001ffe0
+lr             0x804975f           134518623
+pc             0x8020004           0x8020004 <SystemInit>
+xpsr           0x61000000          1627389952
+msp            0x2001ffe0          537001952
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+[Inferior 1 (process 1) detached]
+
+Stderr:
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="26" type="int"/><reg name="psp" bitsize="32" regnum="27" type="int"/><reg name="primask" bitsize="32" regnum="28" type="int"/><reg name="control" bitsize="32" regnum="29" type="int"/><reg name="basepri" bitsize="32" regnum="30" type="int"/><reg name="faultmask" bitsize="32" regnum="31" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qOffsets#4b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 02000000110000000100000007000100af000000000000008096980000000000000000000000000000000000000000000014000048ff0120f9ffffff189e04080f000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8049e18,4#70
+  [remote] Received Ack
+  [remote] Packet received: 094b53f8
+  [remote] Sending packet: $qSymbol::#5b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qSymbol (symbol-lookup) is NOT supported
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $m8020000,40#57
+[remote] Received Ack
+[remote] Packet received: fee700000f49d1f8883043f47003c1f888300d4b1a68002042f001021a6098601a6822f0847222f480321a60074a5a601a6822f480221a60d8604ff000638b60
+[remote] Sending packet: $m8020044,4#2f
+[remote] Received Ack
+[remote] Packet received: 00ed00e0
+[remote] Sending packet: $m8020044,4#2f
+[remote] Received Ack
+[remote] Packet received: 00ed00e0
+[remote] Sending packet: $m8020004,2#29
+[remote] Received Ack
+[remote] Packet received: 0f49
+[remote] Sending packet: $Z0,8020004,2#72
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] packet_ok: Packet Z0 (software-breakpoint) is supported
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] wait: enter
+  [remote] Packet received: T05thread:p01.01;
+[remote] wait: exit
+[remote] Sending packet: $g#67
+[remote] Received Ack
+[remote] Packet received: 0000000078050020780500203000002000ed00e00000000000000000000000000000000000000000000000000000000000000000e0ff01205f9704080400020800000061
+[remote] Sending packet: $qfThreadInfo#bb
+[remote] Received Ack
+[remote] Packet received: mp01.01
+[remote] Sending packet: $qsThreadInfo#c8
+[remote] Received Ack
+[remote] Packet received: l
+[remote] Sending packet: $z0,8020004,2#92
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $m8020004,4#2b
+[remote] Received Ack
+[remote] Packet received: 0f49d1f8
+[remote] Sending packet: $m2001ffe0,4#f1
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m2001ffe4,4#f5
+[remote] Received Ack
+[remote] Packet received: 78050020
+[remote] Sending packet: $m2001ffe8,4#f9
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $m2001ffec,4#24
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1a#02
+[remote] Received Ack
+[remote] Packet received: e0ff0120
+[remote] packet_ok: Packet p (fetch-register) is supported
+[remote] Sending packet: $p1b#03
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1c#04
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1d#05
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1e#06
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1f#07
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $D;1#b0
+[remote] Received Ack
+[remote] Packet received: OK
+

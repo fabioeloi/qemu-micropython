@@ -1,0 +1,18 @@
+set pagination off
+set confirm off
+set debug remote 1
+file /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf
+target remote :1234
+set confirm off
+set pagination off
+set print pretty on
+set print array on
+set print array-indexes on
+set python print-stack full
+monitor system_reset
+break mp_execute_bytecode
+continue
+bt
+mpy-locals
+mpy-globals
+quit

@@ -1,0 +1,213 @@
+2025-03-03 13:03:02,592 - INFO - Setting up test environment...
+2025-03-03 13:03:03,637 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 13:03:03,644 - INFO - QEMU process started successfully
+2025-03-03 13:03:05,649 - INFO - Test environment ready
+2025-03-03 13:03:05,650 - INFO - 
+Running test: Basic Connection
+2025-03-03 13:03:05,650 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:05,967 - INFO - Test Basic Connection: ✅ PASS (0.32s)
+2025-03-03 13:03:05,967 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 13:03:05,967 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,207 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 13:03:06,208 - INFO - 
+Running test: Examine Memory
+2025-03-03 13:03:06,208 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,453 - INFO - Test Examine Memory: ✅ PASS (0.25s)
+2025-03-03 13:03:06,453 - INFO - 
+Running test: Python State
+2025-03-03 13:03:06,454 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,700 - ERROR - Expected output not found: 0x08000000
+2025-03-03 13:03:06,700 - ERROR - Actual output: GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,700 - INFO - Test Python State: ❌ FAIL (0.25s)
+2025-03-03 13:03:06,700 - ERROR - Test failed with output:
+GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,701 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/test_results.json
+2025-03-03 13:03:06,701 - INFO - 
+Test Summary:
+2025-03-03 13:03:06,701 - INFO - =============
+2025-03-03 13:03:06,701 - INFO - Total Tests: 4
+2025-03-03 13:03:06,701 - INFO - Passed Tests: 3
+2025-03-03 13:03:06,701 - INFO - Failed Tests: 1
+2025-03-03 13:03:06,701 - INFO - Total Duration: 1.05s
+2025-03-03 13:03:06,701 - INFO - 
+Detailed Results:
+2025-03-03 13:03:06,701 - INFO - Basic Connection: ✅ PASS (0.32s)
+2025-03-03 13:03:06,701 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 13:03:06,701 - INFO - Examine Memory: ✅ PASS (0.25s)
+2025-03-03 13:03:06,701 - INFO - Python State: ❌ FAIL (0.25s)
+2025-03-03 13:03:06,701 - INFO -   Expected: ['Reset_Handler', '0x08000000', '0x20000000']
+2025-03-03 13:03:06,701 - INFO -   Actual: GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,701 - INFO - 
+Cleaning up test environment...
+2025-03-03 13:03:06,712 - INFO - QEMU process stopped
+2025-03-03 13:03:06,725 - INFO - Cleanup complete

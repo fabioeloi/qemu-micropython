@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-03-03T12:21:25.907106",
+  "total_tests": 4,
+  "passed_tests": 1,
+  "total_duration": 90.2828118801117,
+  "results": [
+    {
+      "name": "Basic Connection",
+      "passed": true,
+      "duration": 0.2647860050201416,
+      "expected": "['r0', 'r1', 'r2']",
+      "actual": "GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git\nCopyright (C) 2024 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nType \"show copying\" and \"show warranty\" for details.\nThis GDB was configured as \"--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi\".\nType \"show configuration\" for configuration details.\nFor bug reporting instructions, please see:\n<https://bugs.linaro.org/>.\nFind the GDB manual and other documentation resources online at:\n    <http://www.gnu.org/software/gdb/documentation/>.\n\nFor help, type \"help\".\nType \"apropos word\" to search for commands related to \"word\".\n0x08020118 in Reset_Handler ()\nr0             0x0                 0\nr1             0x0                 0\nr2             0x0                 0\nr3             0x0                 0\nr4             0x0                 0\nr5             0x0                 0\nr6             0x0                 0\nr7             0x0                 0\nr8             0x0                 0\nr9             0x0                 0\nr10            0x0                 0\nr11            0x0                 0\nr12            0x0                 0\nsp             0x2001fff8          0x2001fff8\nlr             0xffffffff          -1\npc             0x8020118           0x8020118 <Reset_Handler>\nxpsr           0x41000000          1090519040\nmsp            0x2001fff8          537001976\npsp            0x0                 0\nprimask        0x0                 0\ncontrol        0x0                 0\nbasepri        0x0                 0\nfaultmask      0x0                 0\n[Inferior 1 (process 1) detached]\n",
+      "notes": ""
+    },
+    {
+      "name": "Breakpoint Test",
+      "passed": false,
+      "duration": 30.005895137786865,
+      "expected": "['Breakpoint 1']",
+      "actual": "Timeout after 30s",
+      "notes": ""
+    },
+    {
+      "name": "Examine Memory",
+      "passed": false,
+      "duration": 30.006402730941772,
+      "expected": "['0x2001fff8']",
+      "actual": "Timeout after 30s",
+      "notes": ""
+    },
+    {
+      "name": "Python State",
+      "passed": false,
+      "duration": 30.005728006362915,
+      "expected": "['Local variables', 'Global variables']",
+      "actual": "Timeout after 30s",
+      "notes": ""
+    }
+  ]
+}

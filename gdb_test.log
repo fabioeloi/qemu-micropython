@@ -1,0 +1,527 @@
+GDB stdout:
+GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x08020118 in Reset_Handler ()
+r0             0x0                 0
+r1             0x0                 0
+r2             0x0                 0
+r3             0x0                 0
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020118           0x8020118 <Reset_Handler>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+[Inferior 1 (process 1) detached]
+
+GDB stderr:
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="26" type="int"/><reg name="psp" bitsize="32" regnum="27" type="int"/><reg name="primask" bitsize="32" regnum="28" type="int"/><reg name="control" bitsize="32" regnum="29" type="int"/><reg name="basepri" bitsize="32" regnum="30" type="int"/><reg name="faultmask" bitsize="32" regnum="31" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qOffsets#4b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f8ff0120ffffffff1801020800000041
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8020118,4#31
+  [remote] Received Ack
+  [remote] Packet received: 0446dff8
+  [remote] Sending packet: $m8020118,2#2f
+  [remote] Received Ack
+  [remote] Packet received: 0446
+  [remote] Sending packet: $qSymbol::#5b
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qSymbol (symbol-lookup) is NOT supported
+[remote] start_remote_1: exit
+[remote] Sending packet: $p1a#02
+[remote] Received Ack
+[remote] Packet received: f8ff0120
+[remote] packet_ok: Packet p (fetch-register) is supported
+[remote] Sending packet: $p1b#03
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1c#04
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1d#05
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1e#06
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $p1f#07
+[remote] Received Ack
+[remote] Packet received: 00000000
+[remote] Sending packet: $D;1#b0
+[remote] Received Ack
+[remote] Packet received: OK
+
+2025-03-03 12:21:25,907 - INFO - Setting up test environment...
+2025-03-03 12:21:26,929 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 12:21:26,935 - INFO - QEMU process started successfully
+2025-03-03 12:21:28,940 - INFO - Test environment ready
+2025-03-03 12:21:28,941 - INFO - 
+Running test: Basic Connection
+2025-03-03 12:21:28,942 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:21:29,206 - INFO - Test Basic Connection: ✅ PASS (0.26s)
+2025-03-03 12:21:29,206 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 12:21:29,206 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:21:59,211 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:21:59,212 - INFO - Test Breakpoint Test: ❌ FAIL (30.01s)
+2025-03-03 12:21:59,212 - INFO - 
+Running test: Examine Memory
+2025-03-03 12:21:59,212 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:22:29,218 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:22:29,218 - INFO - Test Examine Memory: ❌ FAIL (30.01s)
+2025-03-03 12:22:29,218 - INFO - 
+Running test: Python State
+2025-03-03 12:22:29,219 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/gdb_commands.txt
+2025-03-03 12:22:59,224 - ERROR - GDB command timed out after 30 seconds
+2025-03-03 12:22:59,224 - INFO - Test Python State: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_122125/test_results.json
+2025-03-03 12:22:59,225 - INFO - 
+Test Summary:
+2025-03-03 12:22:59,225 - INFO - =============
+2025-03-03 12:22:59,225 - INFO - Total Tests: 4
+2025-03-03 12:22:59,225 - INFO - Passed Tests: 1
+2025-03-03 12:22:59,225 - INFO - Failed Tests: 3
+2025-03-03 12:22:59,225 - INFO - Total Duration: 90.28s
+2025-03-03 12:22:59,225 - INFO - 
+Detailed Results:
+2025-03-03 12:22:59,225 - INFO - Basic Connection: ✅ PASS (0.26s)
+2025-03-03 12:22:59,225 - INFO - Breakpoint Test: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['Breakpoint 1']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - Examine Memory: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['0x2001fff8']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - Python State: ❌ FAIL (30.01s)
+2025-03-03 12:22:59,225 - INFO -   Expected: ['Local variables', 'Global variables']
+2025-03-03 12:22:59,225 - INFO -   Actual: Timeout after 30s
+2025-03-03 12:22:59,225 - INFO - 
+Cleaning up test environment...
+2025-03-03 12:22:59,226 - ERROR - Error reading QEMU output: 'str' object has no attribute 'decode'
+2025-03-03 12:22:59,229 - INFO - QEMU process stopped
+2025-03-03 12:22:59,244 - INFO - Cleanup complete
+2025-03-03 12:31:59,603 - INFO - Setting up test environment...
+2025-03-03 12:32:00,621 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 12:32:00,627 - INFO - QEMU process started successfully
+2025-03-03 12:32:02,628 - INFO - Test environment ready
+2025-03-03 12:32:02,628 - INFO - 
+Running test: Basic Connection
+2025-03-03 12:32:02,629 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:02,905 - INFO - Test Basic Connection: ✅ PASS (0.28s)
+2025-03-03 12:32:02,905 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 12:32:02,905 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:03,146 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:32:03,146 - INFO - 
+Running test: Examine Memory
+2025-03-03 12:32:03,146 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:32:03,386 - INFO - Test Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:32:03,387 - INFO - 
+Running test: Python State
+2025-03-03 12:32:03,387 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/gdb_commands.txt
+2025-03-03 12:33:03,391 - ERROR - GDB command timed out after 60 seconds
+2025-03-03 12:33:03,392 - INFO - Test Python State: ❌ FAIL (60.01s)
+2025-03-03 12:33:03,392 - ERROR - Test failed with output:
+Timeout after 60s
+2025-03-03 12:33:03,393 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_123159/test_results.json
+2025-03-03 12:33:03,393 - INFO - 
+Test Summary:
+2025-03-03 12:33:03,393 - INFO - =============
+2025-03-03 12:33:03,393 - INFO - Total Tests: 4
+2025-03-03 12:33:03,393 - INFO - Passed Tests: 3
+2025-03-03 12:33:03,393 - INFO - Failed Tests: 1
+2025-03-03 12:33:03,393 - INFO - Total Duration: 60.76s
+2025-03-03 12:33:03,393 - INFO - 
+Detailed Results:
+2025-03-03 12:33:03,393 - INFO - Basic Connection: ✅ PASS (0.28s)
+2025-03-03 12:33:03,393 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:33:03,393 - INFO - Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:33:03,393 - INFO - Python State: ❌ FAIL (60.01s)
+2025-03-03 12:33:03,393 - INFO -   Expected: ['mp_execute_bytecode', 'variables']
+2025-03-03 12:33:03,393 - INFO -   Actual: Timeout after 60s
+2025-03-03 12:33:03,393 - INFO - 
+Cleaning up test environment...
+2025-03-03 12:33:03,397 - INFO - QEMU process stopped
+2025-03-03 12:33:03,411 - INFO - Cleanup complete
+2025-03-03 12:45:05,316 - INFO - Setting up test environment...
+2025-03-03 12:45:06,339 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 12:45:06,344 - INFO - QEMU process started successfully
+2025-03-03 12:45:08,345 - INFO - Test environment ready
+2025-03-03 12:45:08,345 - INFO - 
+Running test: Basic Connection
+2025-03-03 12:45:08,346 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_124505/gdb_commands.txt
+2025-03-03 12:45:08,642 - INFO - Test Basic Connection: ✅ PASS (0.30s)
+2025-03-03 12:45:08,642 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 12:45:08,642 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_124505/gdb_commands.txt
+2025-03-03 12:45:08,885 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:45:08,885 - INFO - 
+Running test: Examine Memory
+2025-03-03 12:45:08,885 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_124505/gdb_commands.txt
+2025-03-03 12:45:09,125 - INFO - Test Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:45:09,125 - INFO - 
+Running test: Python State
+2025-03-03 12:45:09,125 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_124505/gdb_commands.txt
+2025-03-03 12:46:09,130 - ERROR - GDB command timed out after 60 seconds
+2025-03-03 12:46:09,131 - INFO - Test Python State: ❌ FAIL (60.01s)
+2025-03-03 12:46:09,131 - ERROR - Test failed with output:
+Timeout after 60s
+2025-03-03 12:46:09,132 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_124505/test_results.json
+2025-03-03 12:46:09,132 - INFO - 
+Test Summary:
+2025-03-03 12:46:09,132 - INFO - =============
+2025-03-03 12:46:09,132 - INFO - Total Tests: 4
+2025-03-03 12:46:09,132 - INFO - Passed Tests: 3
+2025-03-03 12:46:09,132 - INFO - Failed Tests: 1
+2025-03-03 12:46:09,132 - INFO - Total Duration: 60.79s
+2025-03-03 12:46:09,132 - INFO - 
+Detailed Results:
+2025-03-03 12:46:09,132 - INFO - Basic Connection: ✅ PASS (0.30s)
+2025-03-03 12:46:09,132 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 12:46:09,132 - INFO - Examine Memory: ✅ PASS (0.24s)
+2025-03-03 12:46:09,132 - INFO - Python State: ❌ FAIL (60.01s)
+2025-03-03 12:46:09,132 - INFO -   Expected: ['mp_init', 'Program received signal']
+2025-03-03 12:46:09,132 - INFO -   Actual: Timeout after 60s
+2025-03-03 12:46:09,132 - INFO - 
+Cleaning up test environment...
+2025-03-03 12:46:09,136 - INFO - QEMU process stopped
+2025-03-03 12:46:09,150 - INFO - Cleanup complete
+2025-03-03 13:03:02,592 - INFO - Setting up test environment...
+2025-03-03 13:03:03,637 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 13:03:03,644 - INFO - QEMU process started successfully
+2025-03-03 13:03:05,649 - INFO - Test environment ready
+2025-03-03 13:03:05,650 - INFO - 
+Running test: Basic Connection
+2025-03-03 13:03:05,650 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:05,967 - INFO - Test Basic Connection: ✅ PASS (0.32s)
+2025-03-03 13:03:05,967 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 13:03:05,967 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,207 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 13:03:06,208 - INFO - 
+Running test: Examine Memory
+2025-03-03 13:03:06,208 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,453 - INFO - Test Examine Memory: ✅ PASS (0.25s)
+2025-03-03 13:03:06,453 - INFO - 
+Running test: Python State
+2025-03-03 13:03:06,454 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/gdb_commands.txt
+2025-03-03 13:03:06,700 - ERROR - Expected output not found: 0x08000000
+2025-03-03 13:03:06,700 - ERROR - Actual output: GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,700 - INFO - Test Python State: ❌ FAIL (0.25s)
+2025-03-03 13:03:06,700 - ERROR - Test failed with output:
+GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,701 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_130302/test_results.json
+2025-03-03 13:03:06,701 - INFO - 
+Test Summary:
+2025-03-03 13:03:06,701 - INFO - =============
+2025-03-03 13:03:06,701 - INFO - Total Tests: 4
+2025-03-03 13:03:06,701 - INFO - Passed Tests: 3
+2025-03-03 13:03:06,701 - INFO - Failed Tests: 1
+2025-03-03 13:03:06,701 - INFO - Total Duration: 1.05s
+2025-03-03 13:03:06,701 - INFO - 
+Detailed Results:
+2025-03-03 13:03:06,701 - INFO - Basic Connection: ✅ PASS (0.32s)
+2025-03-03 13:03:06,701 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 13:03:06,701 - INFO - Examine Memory: ✅ PASS (0.25s)
+2025-03-03 13:03:06,701 - INFO - Python State: ❌ FAIL (0.25s)
+2025-03-03 13:03:06,701 - INFO -   Expected: ['Reset_Handler', '0x08000000', '0x20000000']
+2025-03-03 13:03:06,701 - INFO -   Actual: GNU gdb (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 15.2.90.20241130-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=aarch64-apple-darwin20.6.0 --target=arm-none-eabi".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.linaro.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+0x080495a0 in boardctrl_fatal_error (msg=<optimized out>) at boardctrl.c:49
+49	        for (volatile uint delay = 0; delay < 10000000; delay++) {
+Breakpoint 1 at 0x8020124
+
+Breakpoint 1, 0x08020124 in Reset_Handler ()
+#0  0x08020124 in Reset_Handler ()
+r0             0x0                 0
+r1             0x80610dc           134615260
+r2             0x20000000          536870912
+r3             0x20000030          536870960
+r4             0x0                 0
+r5             0x0                 0
+r6             0x0                 0
+r7             0x0                 0
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+sp             0x2001fff8          0x2001fff8
+lr             0xffffffff          -1
+pc             0x8020124           0x8020124 <Reset_Handler+12>
+xpsr           0x41000000          1090519040
+msp            0x2001fff8          537001976
+psp            0x0                 0
+primask        0x0                 0
+control        0x0                 0
+basepri        0x0                 0
+faultmask      0x0                 0
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x08020124 <Reset_Handler+12>
+	breakpoint already hit 1 time
+0x8000000:	0x2001fff8	0x08020119	0x08049ac3	0x08049ab1
+0x8000010:	0x08049ac5	0x08049ad1	0x08049add	0x00000000
+0x8000020:	0x00000000	0x00000000	0x00000000	0x08049ae9
+0x8000030:	0x08049aeb	0x00000000	0x08049ded	0x08049e05
+0x20000000 <SystemCoreClock>:	0x00f42400	0x2d79706d	0x336d7473	0x00000032
+0x20000010 <mod_network_hostname_data+12>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x20000020 <mod_network_hostname_data+28>:	0x00000000	0x00585800	0xffffffff	0x3f800000
+0x20000030 <mp_state_ctx>:	0x00000000	0x00000000	0x00000000	0x00000000
+[Inferior 1 (process 1) detached]
+
+2025-03-03 13:03:06,701 - INFO - 
+Cleaning up test environment...
+2025-03-03 13:03:06,712 - INFO - QEMU process stopped
+2025-03-03 13:03:06,725 - INFO - Cleanup complete
+2025-03-03 14:24:13,137 - INFO - Setting up test environment...
+2025-03-03 14:24:14,158 - INFO - Starting QEMU: qemu-system-arm -machine netduino2 -cpu cortex-m3 -m 128K -nographic -kernel /Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.elf -s -S -d guest_errors,unimp,exec,in_asm -D /Users/fabiosilva/CursorProjects/qemu-micropython/qemu_test.log -semihosting-config enable=on,target=native -semihosting
+2025-03-03 14:24:14,163 - INFO - QEMU process started successfully
+2025-03-03 14:24:16,168 - INFO - Test environment ready
+2025-03-03 14:24:16,168 - INFO - 
+Running test: Basic Connection
+2025-03-03 14:24:16,169 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:16,563 - INFO - Test Basic Connection: ✅ PASS (0.40s)
+2025-03-03 14:24:16,564 - INFO - 
+Running test: Breakpoint Test
+2025-03-03 14:24:16,564 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:16,807 - INFO - Test Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 14:24:16,807 - INFO - 
+Running test: Examine Memory
+2025-03-03 14:24:16,807 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:17,042 - INFO - Test Examine Memory: ✅ PASS (0.24s)
+2025-03-03 14:24:17,043 - INFO - 
+Running test: Python State
+2025-03-03 14:24:17,043 - INFO - Running GDB with command: arm-none-eabi-gdb -x /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/gdb_commands.txt
+2025-03-03 14:24:17,276 - INFO - Test Python State: ✅ PASS (0.23s)
+2025-03-03 14:24:17,277 - INFO - 
+Test results saved to /Users/fabiosilva/CursorProjects/qemu-micropython/test_results/20250303_142413/test_results.json
+2025-03-03 14:24:17,277 - INFO - 
+Test Summary:
+2025-03-03 14:24:17,277 - INFO - =============
+2025-03-03 14:24:17,277 - INFO - Total Tests: 4
+2025-03-03 14:24:17,277 - INFO - Passed Tests: 4
+2025-03-03 14:24:17,277 - INFO - Failed Tests: 0
+2025-03-03 14:24:17,277 - INFO - Total Duration: 1.11s
+2025-03-03 14:24:17,277 - INFO - 
+Detailed Results:
+2025-03-03 14:24:17,277 - INFO - Basic Connection: ✅ PASS (0.40s)
+2025-03-03 14:24:17,277 - INFO - Breakpoint Test: ✅ PASS (0.24s)
+2025-03-03 14:24:17,277 - INFO - Examine Memory: ✅ PASS (0.24s)
+2025-03-03 14:24:17,277 - INFO - Python State: ✅ PASS (0.23s)
+2025-03-03 14:24:17,277 - INFO - 
+Cleaning up test environment...
+2025-03-03 14:24:17,281 - INFO - QEMU process stopped
+2025-03-03 14:24:17,295 - INFO - Cleanup complete

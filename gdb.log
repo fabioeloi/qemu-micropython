@@ -1,0 +1,1073 @@
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x08020118 in ?? ()
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmpfss70gfq.gdb:6: Error in sourced command file:
+No symbol table is loaded.  Use the "file" command.
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x08020118 in ?? ()
+No symbol table is loaded.  Use the "file" command.
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x080495b8 in ?? ()
+No symbol table is loaded.  Use the "file" command.
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x080495a0 in ?? ()
+No symbol table is loaded.  Use the "file" command.
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x080495b8 in ?? ()
+No symbol table is loaded.  Use the "file" command.
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 0100000011000000000000009345730008160000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408a095040800000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495a0,4#68
+  [remote] Received Ack
+  [remote] Packet received: 019bb342
+  [remote] Sending packet: $m80495a0,2#66
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495a0 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 02000000110000000000000063da0700dd050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408a095040800000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495a0,4#68
+  [remote] Received Ack
+  [remote] Packet received: 019bb342
+  [remote] Sending packet: $m80495a0,2#66
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495a0 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 01000000110000000000000054ee8500d0050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408a095040800000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495a0,4#68
+  [remote] Received Ack
+  [remote] Packet received: 019bb342
+  [remote] Sending packet: $m80495a0,2#66
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495a0 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 020000001100000000000000a29c5e00d1050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408b895040800000081
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495b8,4#71
+  [remote] Received Ack
+  [remote] Packet received: 019b0133
+  [remote] Sending packet: $m80495b8,2#6f
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495b8 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 0100000011000000000000001f8c6a00d0050000000000008096980000000000000000000000000000000000000000000014000050ff0120f9ffffff049e04080f000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8049e04,4#6b
+  [remote] Received Ack
+  [remote] Packet received: 0d4b10b5
+  [remote] Sending packet: $m8049e04,2#69
+  [remote] Received Ack
+  [remote] Packet received: 0d4b
+0x08049e04 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+warning: unrecognized item "timeout" in "qSupported" response
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+[remote] start_remote_1: exit
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmpzm2a1ouv.gdb:6: Error in sourced command file:
+Remote replied unexpectedly to 'vMustReplyEmpty': timeout
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+warning: unrecognized item "timeout" in "qSupported" response
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+[remote] start_remote_1: exit
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmp4cyym3pi.gdb:6: Error in sourced command file:
+Remote replied unexpectedly to 'vMustReplyEmpty': timeout
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+warning: unrecognized item "timeout" in "qSupported" response
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] Sending packet: $vCont?#49
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+  [remote] getpkt: Timed out.
+Ignoring packet error, continuing...
+[remote] start_remote_1: exit
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmp8y89t4nr.gdb:6: Error in sourced command file:
+Remote replied unexpectedly to 'vMustReplyEmpty': timeout
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f8ff0120ffffffff1801020800000041
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8020118,4#31
+  [remote] Received Ack
+  [remote] Packet received: 0446dff8
+  [remote] Sending packet: $m8020118,2#2f
+  [remote] Received Ack
+  [remote] Packet received: 0446
+0x08020118 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 0100000011000000000000007802400090050000000000008096980000000000000000000000000000000000000000000014000050ff0120f9ffffff049e04080f000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8049e04,4#6b
+  [remote] Received Ack
+  [remote] Packet received: 0d4b10b5
+  [remote] Sending packet: $m8049e04,2#69
+  [remote] Received Ack
+  [remote] Packet received: 0d4b
+0x08049e04 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 0200000011000000000000007977230085050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408a095040800000001
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495a0,4#68
+  [remote] Received Ack
+  [remote] Packet received: 019bb342
+  [remote] Sending packet: $m80495a0,2#66
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495a0 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 020000001100000000000000d0d29000b9050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408b895040800000081
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495b8,4#71
+  [remote] Received Ack
+  [remote] Packet received: 019b0133
+  [remote] Sending packet: $m80495b8,2#6f
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495b8 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 0100000011000000000000000c5a1600bc050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408b895040800000081
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495b8,4#71
+  [remote] Received Ack
+  [remote] Packet received: 019b0133
+  [remote] Sending packet: $m80495b8,2#6f
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495b8 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f8ff0120ffffffff1801020800000041
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m8020118,4#31
+  [remote] Received Ack
+  [remote] Packet received: 0446dff8
+  [remote] Sending packet: $m8020118,2#2f
+  [remote] Received Ack
+  [remote] Packet received: 0446
+0x08020118 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+[remote] start_remote_1: enter
+  [remote] Sending packet: $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;QThreadOptions+;no-resumed+;memory-tagging+#e7
+  [remote] Received Ack
+  [remote] Packet received: PacketSize=1000;qXfer:features:read+;vContSupported+;multiprocess+
+  [remote] packet_ok: Packet qSupported (supported-packets) is supported
+  [remote] Sending packet: $vCont?#49
+  [remote] Received Ack
+  [remote] Packet received: vCont;c;C;s;S
+  [remote] packet_ok: Packet vCont (verbose-resume) is supported
+  [remote] Sending packet: $vMustReplyEmpty#3a
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] Sending packet: $Hgp0.0#ad
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] Sending packet: $qXfer:features:read:target.xml:0,ffb#79
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE target SYSTEM "gdb-target.dtd"><target><architecture>arm</architecture><xi:include href="arm-m-profile.xml"/><xi:include href="arm-vfp.xml"/><xi:include href="system-registers.xml"/><xi:include href="arm-m-system.xml"/></target>
+  [remote] Sending packet: $qXfer:features:read:arm-m-profile.xml:0,ffb#ea
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.m-profile">\n  <reg name="r0" bitsize="32"/>\n  <reg name="r1" bitsize="32"/>\n  <reg name="r2" bitsize="32"/>\n  <reg name="r3" bitsize="32"/>\n  <reg name="r4" bi [457 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:arm-vfp.xml:0,ffb#ab
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?>\n<!-- Copyright (C) 2008 Free Software Foundation, Inc.\n\n     Copying and distribution of this file, with or without modification,\n     are permitted in any medium without royalty provided the copyright\n     notice and this notice are preserved.  -->\n<!DOCTYPE feature SYSTEM "gdb-target.dtd">\n<feature name="org.gnu.gdb.arm.vfp">\n  <reg name="d0" bitsize="64" type="float"/>\n  <reg name="d1" bitsize="64" type="float"/>\n  <reg name="d2" bitsize="64" type="float"/>\n  <reg name="d3" bitsize [639 bytes omitted]
+  [remote] Sending packet: $qXfer:features:read:system-registers.xml:0,ffb#9c
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.qemu.gdb.arm.sys.regs"></feature>
+  [remote] Sending packet: $qXfer:features:read:arm-m-system.xml:0,ffb#9e
+  [remote] Received Ack
+  [remote] Packet received: l<?xml version="1.0"?><!DOCTYPE feature SYSTEM "gdb-target.dtd"><feature name="org.gnu.gdb.arm.m-system"><reg name="msp" bitsize="32" regnum="43" type="int"/><reg name="psp" bitsize="32" regnum="44" type="int"/><reg name="primask" bitsize="32" regnum="45" type="int"/><reg name="control" bitsize="32" regnum="46" type="int"/><reg name="basepri" bitsize="32" regnum="47" type="int"/><reg name="faultmask" bitsize="32" regnum="48" type="int"/></feature>
+  [remote] Sending packet: $qTStatus#49
+  [remote] Received Ack
+  [remote] Packet received: 
+  [remote] packet_ok: Packet qTStatus (trace-status) is NOT supported
+  [remote] Sending packet: $?#3f
+  [remote] Received Ack
+  [remote] Packet received: T05thread:p01.01;
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $qAttached:1#fa
+  [remote] Received Ack
+  [remote] Packet received: 1
+  [remote] packet_ok: Packet qAttached (query-attached) is supported
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+  [remote] Sending packet: $Hc-1#09
+  [remote] Received Ack
+  [remote] Packet received: OK
+  [remote] wait: enter
+  [remote] wait: exit
+  [remote] Sending packet: $g#67
+  [remote] Received Ack
+  [remote] Packet received: 030000001100000000000000fe577300b2050000000000008096980000000000000000000000000000000000000000000014000070ff01209f950408b895040800000081
+  [remote] Sending packet: $qfThreadInfo#bb
+  [remote] Received Ack
+  [remote] Packet received: mp01.01
+  [remote] Sending packet: $qsThreadInfo#c8
+  [remote] Received Ack
+  [remote] Packet received: l
+  [remote] Sending packet: $m80495b8,4#71
+  [remote] Received Ack
+  [remote] Packet received: 019b0133
+  [remote] Sending packet: $m80495b8,2#6f
+  [remote] Received Ack
+  [remote] Packet received: 019b
+0x080495b8 in ?? ()
+[remote] start_remote_1: exit
+[remote] Sending packet: $qRcmd,73797374656d5f7265736574#86
+[remote] Received Ack
+[remote] Packet received: OK
+No symbol table is loaded.  Use the "file" command.
+[remote] Sending packet: $vCont;c:p1.-1#0f
+[remote] Received Ack
+[remote] wait: enter
+[remote] wait: exit
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmp1dajp3nz.gdb:6: Error in sourced command file:
+"/Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.bin": not in executable format: file format not recognized
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmpa531g91k.gdb:6: Error in sourced command file:
+"/Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.bin": not in executable format: file format not recognized
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmp67_5f0xw.gdb:6: Error in sourced command file:
+"/Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.bin": not in executable format: file format not recognized
+/var/folders/q2/bn2ytycj21j_hpqdyqwzyx3c0000gn/T/tmpw41ow70h.gdb:6: Error in sourced command file:
+"/Users/fabiosilva/CursorProjects/qemu-micropython/firmware/build/firmware.bin": not in executable format: file format not recognized
+/Users/fabiosilva/CursorProjects/qemu-micropython/scripts/micropython_gdb.py:2: Error in sourced command file:
+Undefined command: "".  Try "help".
+Remote debugging using localhost:1234
+0x08020118 in Reset_Handler ()
+Already logging to /Users/fabiosilva/CursorProjects/qemu-micropython/gdb.log.
+Remote communication error.  Target disconnected: error while reading: Connection reset by peer.
