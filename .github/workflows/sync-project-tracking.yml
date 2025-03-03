@@ -1,0 +1,170 @@
+name: Sync Project Tracking
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'ROADMAP_STATUS.md'
+      - 'VERSION_MAPPING.md'
+      - 'README.md'
+
+jobs:
+  sync-tracking:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for git log
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install PyGithub gitpython
+
+    - name: Analyze changes and update tracking
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cat > sync_tracking.py << 'EOL'
+        import os
+        import re
+        from github import Github
+        from git import Repo
+        import json
+
+        # Initialize GitHub client
+        g = Github(os.environ['GITHUB_TOKEN'])
+        repo = g.get_repo(os.environ['GITHUB_REPOSITORY'])
+
+        # Get the latest commit
+        git_repo = Repo('.')
+        latest_commit = git_repo.head.commit
+
+        def extract_progress(content, section):
+            """Extract progress percentage from markdown content"""
+            pattern = rf"{section}.*?(\d+)%"
+            match = re.search(pattern, content, re.DOTALL)
+            return int(match.group(1)) if match else None
+
+        def update_issue_progress(issue_number, progress):
+            """Update issue with progress information"""
+            issue = repo.get_issue(issue_number)
+            body = issue.body or ""
+            
+            # Check if progress has changed
+            current_progress = extract_progress(body, "Current Status")
+            if current_progress != progress:
+                comment = f"Progress Update: {progress}% complete\n\nAutomatically updated based on latest changes."
+                issue.create_comment(comment)
+
+        # Read ROADMAP_STATUS.md
+        with open('ROADMAP_STATUS.md', 'r') as f:
+            roadmap_content = f.read()
+
+        # Map of feature keywords to issue numbers
+        feature_mapping = {
+            'UART driver': 2,
+            'GDB integration': 1,
+            'semihosting': 3,
+            'QEMU machine': 4,
+            'testing framework': 8,
+            'network simulation': 5,
+            'virtual sensors': 7,
+            'state snapshots': 9,
+            'OTA update': 10,
+            'CI/CD': 6,
+            'automated testing': 11,
+            'documentation': 12,
+            'project tracking': 13
+        }
+
+        # Extract changed files from commit
+        changed_files = [item.a_path for item in latest_commit.diff('HEAD~1')]
+
+        # Analyze changes and update relevant issues
+        for file in changed_files:
+            # Extract relevant section from ROADMAP_STATUS.md based on changed files
+            if file.startswith('src/custom_uart'):
+                progress = extract_progress(roadmap_content, 'Custom UART driver')
+                if progress:
+                    update_issue_progress(2, progress)
+            elif file.startswith('src/network'):
+                progress = extract_progress(roadmap_content, 'Network simulation')
+                if progress:
+                    update_issue_progress(5, progress)
+            # Add more file patterns and their corresponding issues
+
+        # Create a tracking update comment on the sync process issue
+        sync_issue = repo.get_issue(13)
+        sync_issue.create_comment(f"""
+        Automatic Tracking Sync Report
+        
+        Commit: {latest_commit.hexsha}
+        Changed files: {len(changed_files)}
+        
+        Files analyzed:
+        {chr(10).join(f"- {file}" for file in changed_files)}
+        
+        Progress updates applied based on ROADMAP_STATUS.md changes.
+        """)
+        EOL
+
+        python sync_tracking.py
+
+    - name: Check for milestone updates
+      run: |
+        cat > check_milestones.py << 'EOL'
+        import os
+        from github import Github
+        from datetime import datetime, timezone
+
+        g = Github(os.environ['GITHUB_TOKEN'])
+        repo = g.get_repo(os.environ['GITHUB_REPOSITORY'])
+
+        # Get all open milestones
+        milestones = repo.get_milestones(state='open')
+
+        # Check each milestone's progress
+        for milestone in milestones:
+            total_issues = milestone.open_issues + milestone.closed_issues
+            if total_issues > 0:
+                progress = (milestone.closed_issues / total_issues) * 100
+                
+                # Create a progress update comment if significant change
+                if progress % 10 == 0:  # Update on every 10% progress
+                    for issue in repo.get_issues(milestone=milestone):
+                        if "tracking" in issue.title.lower():
+                            issue.create_comment(f"""
+                            Milestone Progress Update: {milestone.title}
+                            
+                            Current Progress: {progress:.1f}%
+                            Open Issues: {milestone.open_issues}
+                            Closed Issues: {milestone.closed_issues}
+                            Due Date: {milestone.due_on.strftime('%Y-%m-%d')}
+                            """)
+        EOL
+
+        python check_milestones.py
+
+    - name: Update documentation if needed
+      if: success()
+      run: |
+        # Check if we need to update any documentation
+        if git diff --name-only HEAD~1 | grep -q "src/"; then
+          echo "Source changes detected, checking documentation..."
+          # Add logic to verify and potentially update documentation
+        fi 
