@@ -126,6 +126,8 @@ jobs:
         python sync_tracking.py
 
     - name: Check for milestone updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cat > check_milestones.py << 'EOL'
         import os
