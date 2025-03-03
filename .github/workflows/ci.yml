@@ -5,159 +5,106 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read # Default permission for all jobs
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for git log
+        symlinks: true  # Handle symlinks properly
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings
-          flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.git,__pycache__,build,dist
+        # exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.git,__pycache__,build,dist
 
-      - name: Validate MicroPython code
-        run: |
-          python -c "
-          import os
-          import sys
-          import py_compile
-          
-          errors = 0
-          for root, dirs, files in os.walk('src'):
-              for file in files:
-                  if file.endswith('.py'):
-                      path = os.path.join(root, file)
-                      print(f'Checking {path}')
-                      try:
-                          py_compile.compile(path, doraise=True)
-                      except Exception as e:
-                          print(f'Error in {path}: {e}')
-                          errors += 1
-          
-          if errors > 0:
-              print(f'Found {errors} errors in Python files')
-              sys.exit(1)
-          else:
-              print('All Python files are valid')
-          "
+    - name: Run tests
+      run: |
+        # Run Python tests
+        python -m pytest tests/ -v
 
-      - name: Validate shell scripts
-        run: |
-          for script in scripts/*.sh; do
-            echo "Checking $script"
-            bash -n "$script"
-          done
-
-      - name: Check file structure
-        run: |
-          expected_dirs=("bin" "config" "docs" "firmware" "scripts" "src" "tests" "tools")
-          for dir in "${expected_dirs[@]}"; do
-            if [ ! -d "$dir" ]; then
-              echo "Creating required directory: $dir"
-              mkdir -p "$dir"
-            fi
-          done
-          
-          if [ ! -f "README.md" ]; then
-            echo "Missing README.md file"
-            exit 1
-          fi
-          
-          if [ ! -f "src/main.py" ]; then
-            echo "Missing main.py file"
-            exit 1
-          fi
-
-  mock-build:
+  build:
     runs-on: ubuntu-latest
     needs: validate
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for git log
+        symlinks: true  # Handle symlinks properly
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi
+        sudo apt-get install -y qemu-system-arm
 
-      - name: Install ARM toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi
+    - name: Build firmware
+      run: |
+        ./scripts/build.sh
 
-      - name: Mock firmware build
-        run: |
-          echo "Mock firmware build complete"
-          mkdir -p firmware/build
-          # Create a dummy binary file with some content
-          dd if=/dev/urandom of=firmware/build/firmware.bin bs=1M count=1
-          # Verify the file exists and has content
-          ls -l firmware/build/firmware.bin
-          
+    - name: Run QEMU tests
+      run: |
+        # Run GDB integration tests
+        python3 tests/test_gdb_integration.py
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: firmware/build/
-          retention-days: 7
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: firmware
+        path: |
+          firmware/build/firmware.elf
+          firmware/build/firmware.bin
+          firmware/build/firmware.hex
+          test_results/
+        if-no-files-found: error
 
   release:
     runs-on: ubuntu-latest
-    needs: mock-build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: write # This is required for creating releases
+    needs: build
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'Release v')
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for git log
+        symlinks: true  # Handle symlinks properly
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: firmware
-          path: firmware/build/
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: firmware
 
-      - name: Create Release Tag
-        id: tag
-        run: |
-          CURRENT_DATE=$(date +'%Y.%m.%d')
-          TAG_NAME="v${CURRENT_DATE}.${GITHUB_RUN_NUMBER}"
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_OUTPUT
-          echo "Tagged as ${TAG_NAME}"
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.tag.outputs.TAG_NAME }}
-          name: Release ${{ steps.tag.outputs.TAG_NAME }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          files: |
-            firmware/build/firmware.bin
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Extract version from commit message
+        VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'Release v\K[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+        SEMANTIC_VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP '\(v\K[0-9]+\.[0-9]+\.[0-9]+-[a-z]+\.[0-9]+\)')
+        
+        # Create release
+        gh release create "v$VERSION" \
+          --title "Release v$VERSION (v$SEMANTIC_VERSION)" \
+          --notes-file latest_release_notes.md \
+          firmware/build/firmware.elf \
+          firmware/build/firmware.bin \
+          firmware/build/firmware.hex \
+          --draft=false \
+          --prerelease=true
