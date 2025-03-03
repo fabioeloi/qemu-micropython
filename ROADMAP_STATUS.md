@@ -6,10 +6,10 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | - | 25% | High | Initial integration started in v2025.03.01.8 with script improvements |
+| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 60% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, and Python helpers |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
-| Better semihosting integration | In Progress | v2025.03.01.8 | 50% | Medium | Basic integration complete, needs better MicroPython support |
-| Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | Medium | Initial configuration with olimex-stm32-h405 complete |
+| Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
+| Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
 | Comprehensive unit testing framework | In Progress | v2025.03.03.11 | 65% | Medium | UART testing framework completed with network and device-to-device simulation capabilities |
 
 ## v1.2.0 Milestone: IoT and Simulation Capabilities
@@ -47,6 +47,13 @@ Based on current progress and priorities, the adjusted timeline is:
 ## Recent Progress Updates
 
 ### March 2025 Update
+- **v2025.03.04.13 Release**: Added comprehensive GDB integration
+  - Implemented GDB initialization with MicroPython support
+  - Created debug script for QEMU-GDB integration
+  - Added Python helper for MicroPython debugging
+  - Created test script for debugging verification
+  - Added custom GDB commands for Python state inspection
+  - Improved debugging infrastructure with Python-level support
 - **v2025.03.03.11 Release**: Completed full implementation of custom UART driver
   - Implemented comprehensive custom UART driver with advanced simulation features
   - Created Python bindings for UART testing features

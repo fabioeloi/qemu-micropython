@@ -1,0 +1,101 @@
+# GDB initialization file for QEMU-MicroPython debugging
+
+# Connect to QEMU's GDB server
+target remote localhost:1234
+
+# Load debug symbols
+file firmware/build/firmware.elf
+
+# Set up Python pretty-printers
+python
+import os
+import sys
+
+# Add custom pretty printers for MicroPython objects
+class MpyObjectPrinter:
+    def __init__(self, val):
+        self.val = val
+
+    def to_string(self):
+        # Extract MicroPython object type and value
+        type_name = self.val['type']['name'].string()
+        if type_name == "str":
+            return f'mp_obj_str("{self.val["str"]}")'
+        elif type_name == "int":
+            return f'mp_obj_int({self.val["value"]})'
+        return f'mp_obj({type_name})'
+
+def register_printers(obj):
+    if obj is None:
+        obj = gdb
+    obj.pretty_printers.append(lookup_function)
+
+def lookup_function(val):
+    if str(val.type).startswith("mp_obj_"):
+        return MpyObjectPrinter(val)
+    return None
+
+register_printers(None)
+end
+
+# Custom GDB commands for MicroPython debugging
+define mpy_bt
+    # Print MicroPython backtrace
+    print "MicroPython backtrace:"
+    print "===================="
+    call mp_print_backtrace()
+end
+document mpy_bt
+Print MicroPython backtrace showing Python-level call stack
+end
+
+define mpy_locals
+    # Print local variables in current Python frame
+    print "Local variables:"
+    print "==============="
+    call mp_print_locals()
+end
+document mpy_locals
+Print local variables in the current Python frame
+end
+
+define mpy_globals
+    # Print global variables
+    print "Global variables:"
+    print "================"
+    call mp_print_globals()
+end
+document mpy_globals
+Print global variables in the current context
+end
+
+define mpy_stack
+    # Print Python stack contents
+    print "Python stack:"
+    print "============"
+    call mp_print_stack()
+end
+document mpy_stack
+Print contents of the Python stack
+end
+
+# Set up common breakpoints
+break mp_execute_bytecode
+break mp_raise
+
+# Configure output
+set print pretty on
+set print array on
+set print array-indexes on
+set python print-stack full
+
+# Show version and configuration info
+show version
+show configuration
+
+# Ready to debug
+echo \nGDB configured for MicroPython debugging. Available commands:\n
+echo mpy_bt     - Show MicroPython backtrace\n
+echo mpy_locals - Show local variables\n
+echo mpy_globals - Show global variables\n
+echo mpy_stack  - Show Python stack\n 
