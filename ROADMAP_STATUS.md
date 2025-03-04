@@ -168,3 +168,6 @@ The following documents and scripts are available for release preparation:
 - [v1.1.0 Release Notes Template](docs/release_notes/v1.1.0_template.md) - Template for v1.1.0 final release notes
 - [prepare_final_release.sh](scripts/prepare_final_release.sh) - Script for preparing the final v1.1.0 release
 - [plan_v1.2.0_milestone.sh](scripts/plan_v1.2.0_milestone.sh) - Script for planning the v1.2.0 milestone
+## Project Status Summary
+
+For a comprehensive overview of the project's current status, accomplishments, and future plans, please refer to the [Project Status Summary](docs/project_status_summary.md) document.
