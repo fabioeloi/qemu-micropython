@@ -171,4 +171,7 @@ The following documents and scripts are available for release preparation:
 - [create_v1.2.0_issues.sh](scripts/create_v1.2.0_issues.sh) - Script for creating GitHub issues for the v1.2.0 milestone
 ## Project Status Summary
 
-For a comprehensive overview of the project's current status, accomplishments, and future plans, please refer to the [Project Status Summary](docs/project_status_summary.md) document.
+For a comprehensive overview of the project's current status, accomplishments, and future plans, please refer to the following documents:
+
+- [Project Status Summary](docs/project_status_summary.md) - Comprehensive overview of the project's current status
+- [Final Summary](docs/final_summary.md) - Summary of v1.1.0 completion and v1.2.0 planning
