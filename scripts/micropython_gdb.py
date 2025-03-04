@@ -12,6 +12,49 @@ import sys
 import os
 from typing import Optional, Dict, List, Any
 
+# ANSI color codes for terminal output
+class Colors:
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    
+    # Foreground colors
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    
+    # Background colors
+    BG_BLACK = "\033[40m"
+    BG_RED = "\033[41m"
+    BG_GREEN = "\033[42m"
+    BG_YELLOW = "\033[43m"
+    BG_BLUE = "\033[44m"
+    BG_MAGENTA = "\033[45m"
+    BG_CYAN = "\033[46m"
+    BG_WHITE = "\033[47m"
+    
+    @staticmethod
+    def colorize(text, color, bold=False):
+        """Apply color to text"""
+        if not is_color_enabled():
+            return text
+        bold_code = Colors.BOLD if bold else ""
+        return f"{color}{bold_code}{text}{Colors.RESET}"
+
+# Check if color output is enabled
+def is_color_enabled():
+    """Check if color output is enabled in GDB"""
+    try:
+        return gdb.parameter("color") != "off"
+    except:
+        # If we can't determine, default to enabled
+        return True
+
 class MicroPythonHelper:
     def __init__(self):
         self.mp_state_ctx = None
@@ -19,6 +62,8 @@ class MicroPythonHelper:
         self.current_frame = None
         self.exception_breakpoints = {}
         self.last_exception = None
+        self.exception_history = []  # Track exception history
+        self.max_history = 10  # Maximum number of exceptions to track
 
     def get_mp_state(self) -> None:
         """Get MicroPython state from GDB"""
@@ -208,12 +253,33 @@ class MicroPythonHelper:
             if not exc:
                 return None
             
-            return {
-                "type": self.get_obj_type(exc),
-                "value": self.format_mp_obj(exc),
-                "traceback": self.get_exception_traceback(exc)
+            # Get exception details
+            exc_type = self.get_obj_type(exc)
+            exc_value = self.format_mp_obj(exc)
+            traceback = self.get_exception_traceback(exc)
+            
+            # Get exception attributes
+            attributes = self.get_exception_attributes(exc)
+            
+            # Get local variables at exception point
+            locals_dict = self.get_locals()
+            
+            # Create exception info dictionary
+            exception_info = {
+                "type": exc_type,
+                "value": exc_value,
+                "traceback": traceback,
+                "attributes": attributes,
+                "locals": locals_dict,
+                "address": str(exc.address)
             }
-        except:
+            
+            # Store in history
+            self.add_to_exception_history(exception_info)
+            
+            return exception_info
+        except Exception as e:
+            print(f"Error getting exception info: {e}")
             return None
 
     def get_exception_traceback(self, exc_obj: gdb.Value) -> List[str]:
@@ -229,6 +295,104 @@ class MicroPythonHelper:
         except:
             frames.append("<error getting traceback>")
         return frames
+
+    def get_exception_attributes(self, exc_obj: gdb.Value) -> Dict[str, str]:
+        """Get attributes of an exception object"""
+        attributes = {}
+        try:
+            # Get the exception args
+            args_obj = exc_obj["args"]
+            if args_obj:
+                attributes["args"] = self.format_mp_obj(args_obj)
+            
+            # Try to get common exception attributes
+            common_attrs = ["message", "errno", "strerror", "filename", "lineno", "offset", "text"]
+            for attr in common_attrs:
+                try:
+                    # This is a simplification - in reality, we'd need to search the exception's
+                    # locals dictionary for these attributes
+                    attr_val = exc_obj[attr]
+                    if attr_val:
+                        attributes[attr] = self.format_mp_obj(attr_val)
+                except:
+                    pass
+        except:
+            pass
+        
+        return attributes
+
+    def add_to_exception_history(self, exception_info: Dict[str, Any]) -> None:
+        """Add exception to history"""
+        # Check if this exception is already in history (by address)
+        for exc in self.exception_history:
+            if exc.get("address") == exception_info.get("address"):
+                return
+        
+        # Add to history
+        self.exception_history.append(exception_info)
+        
+        # Trim history if needed
+        if len(self.exception_history) > self.max_history:
+            self.exception_history.pop(0)
+
+    def format_exception_display(self, exc_info: Dict[str, Any], detailed: bool = False) -> str:
+        """Format exception information for display with colors and structure"""
+        if not exc_info:
+            return Colors.colorize("No active exception", Colors.YELLOW)
+        
+        # Format the exception header
+        header = Colors.colorize(f"Exception: {exc_info['type']}", Colors.RED, bold=True)
+        value = Colors.colorize(exc_info['value'], Colors.YELLOW)
+        
+        # Format the traceback
+        traceback_header = Colors.colorize("Traceback (most recent call last):", Colors.CYAN, bold=True)
+        traceback_lines = []
+        for frame in exc_info['traceback']:
+            # Extract file and line information
+            match = re.match(r'  File "(.*)", line (\d+)', frame)
+            if match:
+                file_name, line_num = match.groups()
+                # Highlight the file and line number
+                formatted_frame = f"  File \"{Colors.colorize(file_name, Colors.GREEN)}\", line {Colors.colorize(line_num, Colors.MAGENTA)}"
+                traceback_lines.append(formatted_frame)
+            else:
+                traceback_lines.append(frame)
+        
+        # Format attributes if available and detailed mode is on
+        attributes_section = ""
+        if detailed and exc_info.get('attributes'):
+            attributes_header = Colors.colorize("\nException Attributes:", Colors.CYAN, bold=True)
+            attributes_lines = []
+            for key, value in exc_info['attributes'].items():
+                attributes_lines.append(f"  {Colors.colorize(key, Colors.GREEN)}: {value}")
+            attributes_section = f"{attributes_header}\n" + "\n".join(attributes_lines)
+        
+        # Format locals if available and detailed mode is on
+        locals_section = ""
+        if detailed and exc_info.get('locals'):
+            locals_header = Colors.colorize("\nLocal Variables at Exception Point:", Colors.CYAN, bold=True)
+            locals_lines = []
+            for key, value in exc_info['locals'].items():
+                locals_lines.append(f"  {Colors.colorize(key, Colors.GREEN)}: {value}")
+            locals_section = f"{locals_header}\n" + "\n".join(locals_lines)
+        
+        # Combine all sections
+        return f"{header}: {value}\n{traceback_header}\n" + "\n".join(traceback_lines) + attributes_section + locals_section
+
+    def navigate_exception_history(self, index: int = -1) -> Dict[str, Any]:
+        """Navigate through exception history"""
+        if not self.exception_history:
+            return None
+        
+        # Ensure index is within bounds
+        if index < -len(self.exception_history) or index >= len(self.exception_history):
+            index = -1  # Default to most recent
+        
+        # Convert negative indices
+        if index < 0:
+            index = len(self.exception_history) + index
+        
+        return self.exception_history[index]
 
 class MPLocalsCommand(gdb.Command):
     """Print local variables in current Python frame"""
@@ -299,9 +463,9 @@ class MPCatchCommand(gdb.Command):
                 bp.condition += " && !mp_state_ctx.thread.state.exc_state.handler"
             
             self.mpy.exception_breakpoints[exc_type] = bp
-            print(f"Will break on {catch_type} {exc_type} exceptions")
+            print(Colors.colorize(f"Will break on {catch_type} {exc_type} exceptions", Colors.GREEN))
         except Exception as e:
-            print(f"Error setting exception breakpoint: {e}")
+            print(Colors.colorize(f"Error setting exception breakpoint: {e}", Colors.RED))
 
 class MPExceptInfoCommand(gdb.Command):
     """Show information about the current exception"""
@@ -311,16 +475,33 @@ class MPExceptInfoCommand(gdb.Command):
         self.mpy = mpy
     
     def invoke(self, arg: str, from_tty: bool) -> None:
-        exc_info = self.mpy.get_exception_info()
-        if not exc_info:
-            print("No active exception")
-            return
+        args = arg.split()
+        detailed = "-d" in args or "--detailed" in args
         
-        print(f"Exception Type: {exc_info['type']}")
-        print(f"Exception Value: {exc_info['value']}")
-        print("\nTraceback:")
-        for frame in exc_info['traceback']:
-            print(frame)
+        # Check if we're navigating history
+        index = -1
+        for i, a in enumerate(args):
+            if a.startswith("-i") or a.startswith("--index"):
+                if i + 1 < len(args) and args[i + 1].isdigit():
+                    index = int(args[i + 1])
+                    break
+                elif "=" in a:
+                    idx_str = a.split("=")[1]
+                    if idx_str.isdigit():
+                        index = int(idx_str)
+                        break
+        
+        # Get exception info
+        if index != -1:
+            exc_info = self.mpy.navigate_exception_history(index)
+            if not exc_info:
+                print(Colors.colorize(f"No exception at index {index} in history", Colors.YELLOW))
+                return
+        else:
+            exc_info = self.mpy.get_exception_info()
+        
+        # Display formatted exception
+        print(self.mpy.format_exception_display(exc_info, detailed))
 
 class MPExceptBTCommand(gdb.Command):
     """Show exception backtrace"""
@@ -332,10 +513,10 @@ class MPExceptBTCommand(gdb.Command):
     def invoke(self, arg: str, from_tty: bool) -> None:
         exc_info = self.mpy.get_exception_info()
         if not exc_info:
-            print("No active exception")
+            print(Colors.colorize("No active exception", Colors.YELLOW))
             return
         
-        print("Exception Traceback:")
+        print(Colors.colorize("Exception Traceback:", Colors.CYAN, bold=True))
         for frame in exc_info['traceback']:
             print(frame)
 
@@ -347,20 +528,121 @@ class MPExceptVarsCommand(gdb.Command):
         self.mpy = mpy
     
     def invoke(self, arg: str, from_tty: bool) -> None:
-        frame = self.mpy.get_current_frame()
-        if not frame:
-            print("No active frame")
+        exc_info = self.mpy.get_exception_info()
+        if not exc_info or not exc_info.get('locals'):
+            print(Colors.colorize("No local variables at exception point", Colors.YELLOW))
             return
         
-        print("Local variables at exception point:")
-        locals_dict = frame["locals"]
-        for i in range(int(locals_dict["map"]["alloc"])):
-            key = locals_dict["map"]["table"][i]["key"]
-            value = locals_dict["map"]["table"][i]["value"]
-            if key:
-                name = self.mpy.format_mp_obj(key)
-                val = self.mpy.format_mp_obj(value)
-                print(f"  {name} = {val}")
+        print(Colors.colorize("Local variables at exception point:", Colors.CYAN, bold=True))
+        for name, value in exc_info['locals'].items():
+            print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
+
+class MPExceptNavigateCommand(gdb.Command):
+    """Navigate through exception frames"""
+    
+    def __init__(self, mpy: MicroPythonHelper):
+        super().__init__("mpy-except-navigate", gdb.COMMAND_USER)
+        self.mpy = mpy
+    
+    def invoke(self, arg: str, from_tty: bool) -> None:
+        exc_info = self.mpy.get_exception_info()
+        if not exc_info:
+            print(Colors.colorize("No active exception", Colors.YELLOW))
+            return
+        
+        args = arg.split()
+        if not args:
+            print("Usage: mpy-except-navigate <frame_number>")
+            print("Available frames:")
+            for i, frame in enumerate(exc_info['traceback']):
+                print(f"  {i}: {frame}")
+            return
+        
+        try:
+            frame_num = int(args[0])
+            if frame_num < 0 or frame_num >= len(exc_info['traceback']):
+                print(Colors.colorize(f"Invalid frame number: {frame_num}", Colors.RED))
+                return
+            
+            # Display the selected frame
+            frame = exc_info['traceback'][frame_num]
+            print(Colors.colorize(f"Frame {frame_num}:", Colors.CYAN, bold=True))
+            print(frame)
+            
+            # TODO: In a real implementation, we would navigate to this frame
+            # and show variables at that point in the traceback
+            print(Colors.colorize("Note: Frame navigation is limited in the current implementation", Colors.YELLOW))
+        except ValueError:
+            print(Colors.colorize(f"Invalid frame number: {args[0]}", Colors.RED))
+
+class MPExceptHistoryCommand(gdb.Command):
+    """Show exception history"""
+    
+    def __init__(self, mpy: MicroPythonHelper):
+        super().__init__("mpy-except-history", gdb.COMMAND_USER)
+        self.mpy = mpy
+    
+    def invoke(self, arg: str, from_tty: bool) -> None:
+        if not self.mpy.exception_history:
+            print(Colors.colorize("No exceptions in history", Colors.YELLOW))
+            return
+        
+        print(Colors.colorize("Exception History:", Colors.CYAN, bold=True))
+        for i, exc in enumerate(self.mpy.exception_history):
+            print(f"{i}: {Colors.colorize(exc['type'], Colors.RED)}: {Colors.colorize(exc['value'], Colors.YELLOW)}")
+
+class MPExceptVisualizeCommand(gdb.Command):
+    """Visualize exception information"""
+    
+    def __init__(self, mpy: MicroPythonHelper):
+        super().__init__("mpy-except-visualize", gdb.COMMAND_USER)
+        self.mpy = mpy
+    
+    def invoke(self, arg: str, from_tty: bool) -> None:
+        exc_info = self.mpy.get_exception_info()
+        if not exc_info:
+            print(Colors.colorize("No active exception", Colors.YELLOW))
+            return
+        
+        # Create a visual representation of the exception
+        width = 80
+        print("╔" + "═" * (width - 2) + "╗")
+        print("║" + Colors.colorize(" EXCEPTION VISUALIZATION ", Colors.RED, bold=True).center(width - 2) + "║")
+        print("╠" + "═" * (width - 2) + "╣")
+        
+        # Exception type and value
+        type_line = f" Type: {Colors.colorize(exc_info['type'], Colors.RED, bold=True)}"
+        print("║" + type_line.ljust(width - 2) + "║")
+        value_line = f" Value: {Colors.colorize(exc_info['value'], Colors.YELLOW)}"
+        print("║" + value_line.ljust(width - 2) + "║")
+        print("╠" + "═" * (width - 2) + "╣")
+        
+        # Traceback
+        print("║" + Colors.colorize(" TRACEBACK ", Colors.CYAN, bold=True).center(width - 2) + "║")
+        print("╠" + "─" * (width - 2) + "╣")
+        for frame in exc_info['traceback']:
+            # Wrap long frames
+            while len(frame) > width - 4:
+                print("║ " + frame[:width - 4] + " ║")
+                frame = "  " + frame[width - 4:]
+            print("║ " + frame.ljust(width - 4) + " ║")
+        print("╠" + "═" * (width - 2) + "╣")
+        
+        # Attributes if available
+        if exc_info.get('attributes'):
+            print("║" + Colors.colorize(" ATTRIBUTES ", Colors.CYAN, bold=True).center(width - 2) + "║")
+            print("╠" + "─" * (width - 2) + "╣")
+            for key, value in exc_info['attributes'].items():
+                attr_line = f" {Colors.colorize(key, Colors.GREEN)}: {value}"
+                # Wrap long attributes
+                while len(attr_line) > width - 4:
+                    print("║ " + attr_line[:width - 4] + " ║")
+                    attr_line = "  " + attr_line[width - 4:]
+                print("║ " + attr_line.ljust(width - 4) + " ║")
+            print("╠" + "═" * (width - 2) + "╣")
+        
+        # Close the box
+        print("╚" + "═" * (width - 2) + "╝")
 
 def register_micropython_commands():
     """Register MicroPython-specific GDB commands"""
@@ -373,9 +655,21 @@ def register_micropython_commands():
         MPExceptInfoCommand(mpy)
         MPExceptBTCommand(mpy)
         MPExceptVarsCommand(mpy)
+        MPExceptNavigateCommand(mpy)
+        MPExceptHistoryCommand(mpy)
+        MPExceptVisualizeCommand(mpy)
         print("MicroPython GDB helpers loaded successfully")
+        print(Colors.colorize("Enhanced exception handling commands available:", Colors.GREEN))
+        print("  mpy-catch <type> [all|uncaught] - Configure exception catching")
+        print("  mpy-except-info [-d|--detailed] [-i N|--index=N] - Show exception information")
+        print("  mpy-except-bt - Show exception backtrace")
+        print("  mpy-except-vars - Show variables at exception point")
+        print("  mpy-except-navigate <frame_number> - Navigate through exception frames")
+        print("  mpy-except-history - Show exception history")
+        print("  mpy-except-visualize - Visual representation of exception")
     except Exception as e:
         print(f"Error registering MicroPython commands: {e}")
+        traceback.print_exc()
 
 if __name__ == '__main__':
     register_micropython_commands()

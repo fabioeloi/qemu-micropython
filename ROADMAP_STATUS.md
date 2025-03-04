@@ -6,11 +6,11 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 85% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. |
+| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 90% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Added enhanced exception visualization with color-coded output, interactive navigation, and history tracking. |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
 | Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
 | Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
-| Comprehensive unit testing framework | In Progress | v2025.03.04.13 | 80% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. |
+| Comprehensive unit testing framework | In Progress | v2025.03.04.13 | 85% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. |
 
 ## v1.2.0 Milestone: IoT and Simulation Capabilities
 
@@ -26,14 +26,14 @@ This document tracks the implementation status of each roadmap item across relea
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
 | CI/CD pipeline for automated testing | In Progress | Multiple releases | 30% | Medium | Basic GitHub Actions workflow implemented for releases |
-| Automated testing in virtual environments | In Progress | v2025.03.04.13 | 45% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests. Added GDB exception handling tests. |
-| Documentation improvements | In Progress | v2025.03.04.13 | 90% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added. Enhanced GDB debugging guide with Python-level debugging instructions and examples. Added exception handling documentation. |
+| Automated testing in virtual environments | In Progress | v2025.03.04.13 | 50% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests. Added GDB exception handling tests. Added exception visualization testing. |
+| Documentation improvements | In Progress | v2025.03.04.13 | 95% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added. Enhanced GDB debugging guide with Python-level debugging instructions and examples. Added exception handling documentation. Added detailed exception visualization documentation. |
 
 ## Timeline Adjustment
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~80% completion
+- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~85% completion
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 
@@ -47,6 +47,17 @@ Based on current progress and priorities, the adjusted timeline is:
 ## Recent Progress Updates
 
 ### March 2025 Update
+- **v2025.03.04.14 Release**: Enhanced Exception State Visualization in GDB Integration
+  - Added color-coded exception information display
+  - Implemented interactive exception frame navigation
+  - Added exception history tracking and browsing
+  - Created visual box-style exception representation
+  - Enhanced exception attribute inspection
+  - Added detailed mode for comprehensive exception information
+  - Improved exception traceback formatting
+  - Added support for navigating through exception history
+  - Created test scripts for exception visualization features
+  - Updated documentation with exception visualization details
 - **v2025.03.04.13 Release**: Enhanced GDB integration with exception handling
   - Implemented comprehensive exception handling in GDB integration
   - Added exception breakpoint system with type filtering

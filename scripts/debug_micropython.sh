@@ -13,6 +13,32 @@ FIRMWARE="$BUILD_DIR/firmware.elf"  # Use ELF file directly for better debugging
 GDB_PORT=1234
 LOG_FILE="$PROJECT_DIR/debug_log.txt"
 GDB_LOG="$PROJECT_DIR/gdb.log"
+GDB_INIT="$CONFIG_DIR/gdb/gdbinit"  # Use only this gdbinit file
+START_GDB=true
+GDB_SCRIPT=""
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-gdb)
+            START_GDB=false
+            shift
+            ;;
+        -x|--script)
+            if [[ $# -gt 1 ]]; then
+                GDB_SCRIPT="$2"
+                shift 2
+            else
+                echo "Error: -x|--script requires a script file"
+                exit 1
+            fi
+            ;;
+        *)
+            # Unknown option
+            shift
+            ;;
+    esac
+done
 
 # Check dependencies
 if ! command -v arm-none-eabi-gdb &> /dev/null; then
@@ -41,11 +67,35 @@ if [ ! -f "$FIRMWARE" ]; then
     exit 1
 fi
 
+# Check if Python GDB helper exists
+PYTHON_HELPER="$PROJECT_DIR/scripts/micropython_gdb.py"
+if [ ! -f "$PYTHON_HELPER" ]; then
+    echo "Warning: MicroPython GDB helper not found at $PYTHON_HELPER"
+    echo "Some debugging features may not be available"
+    echo "Creating a minimal helper file..."
+    cat > "$PYTHON_HELPER" <<EOL
+"""Minimal MicroPython GDB helper"""
+import gdb
+print("Minimal MicroPython GDB helper loaded")
+print("For full functionality, please implement micropython_gdb.py")
+
+class DummyCommand(gdb.Command):
+    """Dummy command implementation"""
+    def __init__(self, name):
+        super(DummyCommand, self).__init__(name, gdb.COMMAND_USER)
+    def invoke(self, arg, from_tty):
+        print(f"Command {self.name} not implemented")
+
+# Create dummy implementations for expected commands
+DummyCommand("mp_print_backtrace")
+DummyCommand("mp_print_locals")
+DummyCommand("mp_print_globals")
+DummyCommand("mp_print_stack")
+EOL
+fi
+
 # Create debug directory if it doesn't exist
 mkdir -p "$PROJECT_DIR/debug"
-
-# Copy GDB init file to debug directory
-cp "$CONFIG_DIR/gdb/gdbinit" "$PROJECT_DIR/debug/.gdbinit"
 
 # Function to check if port is available
 check_port() {
@@ -110,27 +160,48 @@ for i in {1..5}; do
     echo -n "."
 done
 
+# If --no-gdb option was provided, don't start GDB
+if [ "$START_GDB" = false ]; then
+    echo "QEMU is running with GDB server on port $GDB_PORT"
+    echo "Not starting GDB as requested with --no-gdb option"
+    echo "Press Ctrl+C to terminate QEMU"
+    
+    # Wait for QEMU to exit
+    wait $QEMU_PID
+    exit 0
+fi
+
 echo "Starting GDB with MicroPython helpers..."
 
-# Load Python GDB helpers
-PYTHON_HELPER="$PROJECT_DIR/scripts/micropython_gdb.py"
-if [ ! -f "$PYTHON_HELPER" ]; then
-    echo "Warning: MicroPython GDB helper not found at $PYTHON_HELPER"
-    echo "Some debugging features may not be available"
+# Prepare GDB command line
+GDB_CMD=(
+    arm-none-eabi-gdb
+    -x "$GDB_INIT"
+    -ex "set logging file $GDB_LOG"
+    -ex "set logging on"
+    -ex "source $PYTHON_HELPER"
+    -ex "target remote localhost:$GDB_PORT"
+    -ex "monitor system_reset"
+    -ex "set confirm off"
+    -ex "set pagination off"
+)
+
+# Add script if provided
+if [ -n "$GDB_SCRIPT" ]; then
+    if [ -f "$GDB_SCRIPT" ]; then
+        echo "Using GDB script: $GDB_SCRIPT"
+        GDB_CMD+=(-x "$GDB_SCRIPT")
+    else
+        echo "Warning: GDB script not found: $GDB_SCRIPT"
+    fi
 fi
+
+# Add firmware
+GDB_CMD+=("$FIRMWARE")
 
 # Start GDB with our init file and Python helpers
 cd "$PROJECT_DIR"
-arm-none-eabi-gdb \
-    -x debug/.gdbinit \
-    -ex "set logging file $GDB_LOG" \
-    -ex "set logging on" \
-    -ex "source $PYTHON_HELPER" \
-    -ex "target remote localhost:$GDB_PORT" \
-    -ex "monitor system_reset" \
-    -ex "set confirm off" \
-    -ex "set pagination off" \
-    "$FIRMWARE"
+"${GDB_CMD[@]}"
 
 # Clean up QEMU when GDB exits
 kill $QEMU_PID 2>/dev/null || true
@@ -138,4 +209,4 @@ kill $QEMU_PID 2>/dev/null || true
 echo "Debug session ended."
 echo "Debug logs available at:"
 echo "  QEMU log: $LOG_FILE"
-echo "  GDB log:  $GDB_LOG" 
+echo "  GDB log:  $GDB_LOG"
