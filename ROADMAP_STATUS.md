@@ -144,3 +144,18 @@ Based on current progress and priorities, the adjusted timeline is:
 For detailed summaries of each milestone, please refer to the following documents:
 
 - [v1.1.0 Milestone Summary](docs/milestone_v1.1.0_summary.md) - Debugging and QEMU Integration
+
+## Milestone Planning
+
+For detailed planning of upcoming milestones, please refer to the following documents:
+
+- [v1.2.0 Milestone Plan](docs/milestone_v1.2.0_plan.md) - IoT and Simulation Capabilities
+
+## Release Preparation
+
+The following documents and scripts are available for release preparation:
+
+- [v1.1.0 Final Checklist](docs/v1.1.0_final_checklist.md) - Checklist for v1.1.0 final release
+- [v1.1.0 Release Notes Template](docs/release_notes/v1.1.0_template.md) - Template for v1.1.0 final release notes
+- [prepare_final_release.sh](scripts/prepare_final_release.sh) - Script for preparing the final v1.1.0 release
+- [plan_v1.2.0_milestone.sh](scripts/plan_v1.2.0_milestone.sh) - Script for planning the v1.2.0 milestone
