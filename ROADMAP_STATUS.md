@@ -6,11 +6,11 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 60% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework |
+| GDB integration for step-by-step debugging | In Progress | v2025.03.04.13 | 85% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
 | Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
 | Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
-| Comprehensive unit testing framework | In Progress | v2025.03.03.11 | 65% | Medium | UART testing framework completed with network and device-to-device simulation capabilities |
+| Comprehensive unit testing framework | In Progress | v2025.03.04.13 | 80% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. |
 
 ## v1.2.0 Milestone: IoT and Simulation Capabilities
 
@@ -26,33 +26,50 @@ This document tracks the implementation status of each roadmap item across relea
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
 | CI/CD pipeline for automated testing | In Progress | Multiple releases | 30% | Medium | Basic GitHub Actions workflow implemented for releases |
-| Automated testing in virtual environments | In Progress | v2025.03.03.11 | 40% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests |
-| Documentation improvements | In Progress | v2025.03.03.11 | 75% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added |
+| Automated testing in virtual environments | In Progress | v2025.03.04.13 | 45% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests. Added GDB exception handling tests. |
+| Documentation improvements | In Progress | v2025.03.04.13 | 90% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added. Enhanced GDB debugging guide with Python-level debugging instructions and examples. Added exception handling documentation. |
 
 ## Timeline Adjustment
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~60% completion
+- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~80% completion
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 
 ## Current Focus Areas
 
 1. Complete GDB integration for debugging (v1.1.0)
-2. Extend network simulation capabilities (v1.2.0)
-3. Enhance documentation for current features (v1.3.0)
+2. Enhance exception handling in GDB integration (v1.1.0)
+3. Extend network simulation capabilities (v1.2.0)
 4. Improve unit testing capabilities (v1.1.0)
 
 ## Recent Progress Updates
 
 ### March 2025 Update
-- **v2025.03.04.13 Release**: Added comprehensive GDB integration
+- **v2025.03.04.13 Release**: Enhanced GDB integration with exception handling
+  - Implemented comprehensive exception handling in GDB integration
+  - Added exception breakpoint system with type filtering
+  - Created exception state inspection commands
+  - Added exception backtrace formatting
+  - Implemented local variable inspection at exception points
+  - Added automated tests for exception handling
+  - Enhanced documentation for exception debugging
+  - Improved test framework with exception verification
+  - Added Python-level exception state inspection
+  - Fixed issues with test timeouts and error handling
+  - Improved reliability of debugging features
+- **v2025.03.04.12 Release**: Added comprehensive GDB integration
   - Implemented GDB initialization with MicroPython support
   - Created debug script for QEMU-GDB integration
   - Added Python helper for MicroPython debugging
   - Created test script for debugging verification
   - Added custom GDB commands for Python state inspection
+  - Added Python-level debugging with stack trace, variable inspection, and exception handling
+  - Enhanced breakpoint support with Python function name resolution
+  - Added local variable inspection across function frames
+  - Implemented module globals inspection capability
+  - Improved Python value stack inspection with type information
   - Improved debugging infrastructure with Python-level support
   - Added comprehensive test framework with automated testing
   - Added detailed GDB debugging guide and documentation
@@ -75,4 +92,4 @@ Based on current progress and priorities, the adjusted timeline is:
 - Improved QEMU configuration using olimex-stm32-h405 machine type
 - Enhanced build scripts to handle split firmware files
 - Updated README with better setup and troubleshooting information
-- Added better error handling and debugging output 
+- Added better error handling and debugging output

@@ -38,6 +38,12 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 - `mpy-globals` - Show global variables
 - `mpy-stack` - Show Python stack contents
 
+### Exception Handling Commands
+- `mpy-catch` - Configure exception catching and breakpoints
+- `mpy-except-info` - Show exception details
+- `mpy-except-bt` - Show exception backtrace
+- `mpy-except-vars` - Show variables at exception point
+
 ## Debugging Workflow
 
 1. **Starting a Debug Session**
@@ -60,6 +66,9 @@ This guide provides detailed instructions for debugging MicroPython firmware run
    
    # Break at C function
    break SystemInit
+   
+   # Break on exception
+   mpy-catch ValueError
    ```
 
 3. **Examining State**
@@ -78,6 +87,9 @@ This guide provides detailed instructions for debugging MicroPython firmware run
    
    # Examine memory
    x/4wx $sp  # Show 4 words at stack pointer
+   
+   # Show exception information
+   mpy-except-info
    ```
 
 4. **Stepping Through Code**
@@ -128,6 +140,75 @@ break SystemInit
 break mp_init
 ```
 
+### 4. Debugging Exceptions
+```gdb
+# Break on all ZeroDivisionError exceptions
+mpy-catch ZeroDivisionError all
+
+# Break only on uncaught ValueError exceptions
+mpy-catch ValueError uncaught
+
+# When exception occurs, examine it
+mpy-except-info
+mpy-except-bt
+mpy-except-vars
+
+# Continue execution
+continue
+```
+
+## Exception Handling
+
+### Configuring Exception Breakpoints
+
+The `mpy-catch` command allows you to set breakpoints that trigger when specific exceptions occur:
+
+```gdb
+# Syntax: mpy-catch <exception_type> [all|uncaught]
+mpy-catch ValueError           # Break on uncaught ValueError (default)
+mpy-catch ZeroDivisionError all  # Break on all ZeroDivisionError exceptions
+```
+
+### Examining Exceptions
+
+When an exception breakpoint is hit, you can use these commands to examine the exception:
+
+```gdb
+# Show exception type and value
+mpy-except-info
+
+# Show exception traceback
+mpy-except-bt
+
+# Show local variables at exception point
+mpy-except-vars
+```
+
+### Exception Debugging Workflow
+
+1. Set up exception breakpoints at the start of your debugging session:
+   ```gdb
+   mpy-catch ValueError
+   mpy-catch ZeroDivisionError all
+   ```
+
+2. Run your program:
+   ```gdb
+   continue
+   ```
+
+3. When an exception occurs, GDB will stop. Examine the exception:
+   ```gdb
+   mpy-except-info
+   mpy-except-bt
+   mpy-except-vars
+   ```
+
+4. After examining the exception, you can:
+   - Fix the issue and restart
+   - Continue execution to see if the exception is handled
+   - Set additional breakpoints to investigate further
+
 ## Error Handling
 
 ### Common Issues and Solutions
@@ -151,6 +232,11 @@ break mp_init
    - Ensure you're at a Python execution point
    - Check if MicroPython helpers are loaded
    - Try reloading Python state: `mpy-reload`
+
+5. **Exception Breakpoints Not Triggering**
+   - Verify exception type name is correct
+   - Check if exception is being caught before GDB can break
+   - Try using `mpy-catch <exception> all` to catch all instances
 
 ## Advanced Features
 
@@ -200,6 +286,12 @@ call mp_heap_info()
    - Combine C-level and Python-level debugging
    - Keep track of both execution contexts
 
+4. **Exception Handling**
+   - Set breakpoints on specific exception types
+   - Examine the exception state when breakpoints trigger
+   - Check local variables at the exception point
+   - Use the traceback to understand the exception path
+
 ## Troubleshooting
 
 ### Debug Log Analysis
@@ -213,6 +305,7 @@ Check these logs for:
 - Memory access violations
 - System state changes
 - Python execution trace
+- Exception information
 
 ### Common Error Messages
 
@@ -227,6 +320,10 @@ Check these logs for:
 3. **"Remote connection closed"**
    - Cause: QEMU crashed or connection lost
    - Solution: Check QEMU status and restart debug session
+
+4. **"No active exception"**
+   - Cause: Trying to examine exception when none exists
+   - Solution: Set exception breakpoints and continue until one occurs
 
 ## Additional Resources
 

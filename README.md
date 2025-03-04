@@ -12,16 +12,18 @@ This project provides a virtual development environment for STM32 microcontrolle
 
 ## Current Status
 
-**Current Release:** v2025.03.03.11 (v1.1.0-beta.2)  
-**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~60% complete)  
+**Current Release:** v2025.03.04.13 (v1.1.0-beta.4)  
+**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~80% complete)  
 **Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
 
 We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
+- Added comprehensive GDB integration with MicroPython debugging support
+- Implemented Python-level debugging with stack trace, variable inspection, and exception handling
+- Enhanced breakpoint support with Python function name resolution and memory inspection
+- Added comprehensive exception handling capabilities with type filtering and state inspection
 - Completed implementation of custom UART driver for QEMU with simulation features
 - Enhanced network simulation with robust device-to-device communication
-- Added comprehensive testing framework for UART features
-- Improved MicroPython bindings for UART testing capabilities
-- Detailed documentation for custom UART driver testing and integration
+- Added comprehensive debugging guide and documentation
 
 See our [Version History](#version-history) for more details on releases.
 
@@ -141,13 +143,26 @@ The repository includes a sample IoT application that demonstrates:
 
 ## Debugging
 
-When running in QEMU, you can attach GDB for debugging:
+When running in QEMU, you can use our enhanced debugging capabilities:
 
 ```bash
-arm-none-eabi-gdb firmware/build/firmware.elf
-(gdb) target remote localhost:1234
-(gdb) continue
+# Start a debugging session with full MicroPython support
+./scripts/debug_micropython.sh
 ```
+
+This will:
+- Launch QEMU with the firmware in debug mode
+- Start GDB with MicroPython helper scripts
+- Set up common breakpoints and configurations
+- Enable Python-level debugging
+
+Our debugging environment provides:
+- Python stack tracing and inspection
+- Variable and object examination
+- Exception analysis
+- Custom MicroPython GDB commands
+
+See our [GDB Debugging Guide](docs/GDB_DEBUGGING_GUIDE.md) for detailed instructions.
 
 ## Troubleshooting
 
@@ -172,11 +187,11 @@ The project is organized into several milestone releases:
 
 ### v1.1.0 - Debugging and QEMU Integration (In Progress)
 
-- GDB integration for step-by-step debugging (25% complete)
-- Custom UART driver optimized for QEMU (planned)
+- GDB integration for step-by-step debugging (80% complete)
+- Custom UART driver optimized for QEMU (100% complete)
 - Better semihosting integration for reliable output (50% complete)
 - Exploration of alternative QEMU machine types for STM32F4 (40% complete)
-- Comprehensive unit testing framework (planned)
+- Comprehensive unit testing framework (75% complete)
 
 **Target completion:** Q2 2025
 
@@ -213,6 +228,7 @@ For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPI
 - **v1.1.0-alpha** (March 1, 2025): Early work on debugging and QEMU integration
 - **v1.1.0-beta.1** (March 2, 2025): Continued improvements to debugging capabilities
 - **v1.1.0-beta.2** (March 3, 2025): Completed implementation of custom UART driver for QEMU with simulation features
+- **v1.1.0-beta.4** (March 4, 2025): Comprehensive GDB integration with MicroPython debugging support
 
 For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
 
