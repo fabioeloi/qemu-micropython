@@ -12,8 +12,8 @@ This project provides a virtual development environment for STM32 microcontrolle
 
 ## Current Status
 
-**Current Release:** v2025.03.04.13 (v1.1.0-beta.4)  
-**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~80% complete)  
+**Current Release:** v2025.03.04.17 (v1.1.0-beta.5)  
+**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~99% complete)  
 **Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
 
 We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
@@ -21,6 +21,8 @@ We are currently focusing on improving debugging capabilities and QEMU integrati
 - Implemented Python-level debugging with stack trace, variable inspection, and exception handling
 - Enhanced breakpoint support with Python function name resolution and memory inspection
 - Added comprehensive exception handling capabilities with type filtering and state inspection
+- Enhanced exception visualization with color-coded output and interactive navigation
+- Created comprehensive documentation for exception handling commands and workflows
 - Completed implementation of custom UART driver for QEMU with simulation features
 - Enhanced network simulation with robust device-to-device communication
 - Added comprehensive debugging guide and documentation
@@ -229,6 +231,7 @@ For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPI
 - **v1.1.0-beta.1** (March 2, 2025): Continued improvements to debugging capabilities
 - **v1.1.0-beta.2** (March 3, 2025): Completed implementation of custom UART driver for QEMU with simulation features
 - **v1.1.0-beta.4** (March 4, 2025): Comprehensive GDB integration with MicroPython debugging support
+- **v1.1.0-beta.5** (March 5, 2025): Enhanced exception visualization with color-coded output and interactive navigation
 
 For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
 

@@ -6,11 +6,11 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | v2025.03.04.16 | 98% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Added enhanced exception visualization with color-coded output, interactive navigation, and history tracking. Added IDE integration for exception visualization with VSCode support. Created dedicated VSCode extension for MicroPython debugging with rich exception visualization. |
+| GDB integration for step-by-step debugging | In Progress | v2025.03.04.17 | 99% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Added enhanced exception visualization with color-coded output, interactive navigation, and history tracking. Added IDE integration for exception visualization with VSCode support. Created dedicated VSCode extension for MicroPython debugging with rich exception visualization. Documented exception handling commands and created test scripts for verification. |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
 | Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
 | Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
-| Comprehensive unit testing framework | In Progress | v2025.03.04.16 | 95% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. Added IDE integration testing for exception visualization. Added VSCode extension testing. |
+| Comprehensive unit testing framework | In Progress | v2025.03.04.17 | 97% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. Added IDE integration testing for exception visualization. Added VSCode extension testing. Created test scripts for exception visualization verification. |
 
 ## v1.2.0 Milestone: IoT and Simulation Capabilities
 
@@ -26,14 +26,14 @@ This document tracks the implementation status of each roadmap item across relea
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
 | CI/CD pipeline for automated testing | In Progress | Multiple releases | 30% | Medium | Basic GitHub Actions workflow implemented for releases |
-| Automated testing in virtual environments | In Progress | v2025.03.04.16 | 70% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests. Added GDB exception handling tests. Added exception visualization testing. Added IDE integration testing for VSCode. Added VSCode extension testing. |
-| Documentation improvements | In Progress | v2025.03.04.16 | 100% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added. Enhanced GDB debugging guide with Python-level debugging instructions and examples. Added exception handling documentation. Added detailed exception visualization documentation. Added IDE integration documentation for VSCode, PyCharm, and Eclipse. Added VSCode extension documentation. |
+| Automated testing in virtual environments | In Progress | v2025.03.04.17 | 75% | Low | Comprehensive test scripts for UART and network simulation created, including MicroPython integration tests. Added GDB exception handling tests. Added exception visualization testing. Added IDE integration testing for VSCode. Added VSCode extension testing. Created test scripts for exception visualization verification. |
+| Documentation improvements | Completed | v2025.03.04.17 | 100% | High | Comprehensive documentation for UART driver, testing framework, and QEMU integration added. Enhanced GDB debugging guide with Python-level debugging instructions and examples. Added exception handling documentation. Added detailed exception visualization documentation. Added IDE integration documentation for VSCode, PyCharm, and Eclipse. Added VSCode extension documentation. Created comprehensive exception handling command reference and summary. |
 
 ## Timeline Adjustment
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~98% completion
+- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~99% completion
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 
@@ -47,6 +47,17 @@ Based on current progress and priorities, the adjusted timeline is:
 ## Recent Progress Updates
 
 ### March 2025 Update
+- **v2025.03.04.17 Release**: Enhanced Exception Handling Documentation and Testing
+  - Created comprehensive exception handling command reference
+  - Documented exception visualization workflow and best practices
+  - Added detailed summary of exception handling capabilities
+  - Created test scripts for exception visualization verification
+  - Implemented test cases for various exception types
+  - Added documentation for IDE integration with exception handling
+  - Created example GDB scripts for exception handling testing
+  - Identified and documented challenges in QEMU-based exception testing
+  - Improved test framework for exception handling verification
+  - Completed documentation for exception handling features
 - **v2025.03.04.16 Release**: Added VSCode Extension for MicroPython Debugging
   - Created dedicated VSCode extension for MicroPython debugging
   - Implemented rich exception visualization in VSCode

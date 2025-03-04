@@ -1,0 +1,91 @@
+# Exception Visualization Commands for MicroPython GDB Debugging
+
+## Basic Exception Catching
+
+To set up exception catching for specific exception types:
+
+```
+mpy-catch ZeroDivisionError all    # Break on all ZeroDivisionError exceptions
+mpy-catch IndexError uncaught      # Break only on uncaught IndexError exceptions
+mpy-catch AttributeError           # Same as 'uncaught'
+```
+
+## Examining Exceptions
+
+When an exception breakpoint is hit, use these commands to examine the exception:
+
+```
+mpy-except-info                    # Show basic exception information
+mpy-except-info -d                 # Show detailed exception information
+mpy-except-bt                      # Show exception traceback
+mpy-except-vars                    # Show variables at exception point
+```
+
+## Navigating Exception Frames
+
+To navigate through exception frames:
+
+```
+mpy-except-navigate                # Navigate to the exception point
+mpy-except-navigate 0              # Navigate to frame 0 (exception point)
+mpy-except-navigate 1              # Navigate to frame 1 (caller of exception point)
+```
+
+## Exception History
+
+To view and navigate exception history:
+
+```
+mpy-except-history                 # Show exception history
+mpy-except-info -i 0               # Show information for the most recent exception
+mpy-except-info -i 1               # Show information for the second most recent exception
+```
+
+## Visual Representation
+
+For a visual representation of the exception:
+
+```
+mpy-except-visualize               # Show visual representation of the exception
+```
+
+## Example Workflow
+
+1. Set up exception catching:
+   ```
+   mpy-catch ZeroDivisionError all
+   ```
+
+2. Run the program:
+   ```
+   continue
+   ```
+
+3. When an exception is caught, examine it:
+   ```
+   mpy-except-info
+   mpy-except-bt
+   mpy-except-vars
+   ```
+
+4. Navigate through the exception frames:
+   ```
+   mpy-except-navigate 0
+   ```
+
+5. Continue execution:
+   ```
+   continue
+   ```
+
+6. After multiple exceptions, view the history:
+   ```
+   mpy-except-history
+   mpy-except-info -i 1
+   ```
+
+## Notes
+
+- These commands require the MicroPython GDB helper script to be loaded
+- Exception catching works best when the firmware is built with debug symbols
+- Some commands may not work if the MicroPython state is not accessible 
