@@ -158,6 +158,7 @@ For detailed summaries of each milestone, please refer to the following document
 For detailed planning of upcoming milestones, please refer to the following documents:
 
 - [v1.2.0 Milestone Plan](docs/milestone_v1.2.0_plan.md) - IoT and Simulation Capabilities
+- [v1.1.0 to v1.2.0 Transition](docs/v1.1.0_to_v1.2.0_transition.md) - Transition plan between milestones
 
 ## Release Preparation
 
