@@ -33,7 +33,7 @@ This document tracks the implementation status of each roadmap item across relea
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~99% completion
+- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~99% completion, expected to be fully completed by end of March 2025
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 

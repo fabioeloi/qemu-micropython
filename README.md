@@ -189,11 +189,11 @@ The project is organized into several milestone releases:
 
 ### v1.1.0 - Debugging and QEMU Integration (In Progress)
 
-- GDB integration for step-by-step debugging (80% complete)
+- GDB integration for step-by-step debugging (99% complete)
 - Custom UART driver optimized for QEMU (100% complete)
 - Better semihosting integration for reliable output (50% complete)
 - Exploration of alternative QEMU machine types for STM32F4 (40% complete)
-- Comprehensive unit testing framework (75% complete)
+- Comprehensive unit testing framework (97% complete)
 
 **Target completion:** Q2 2025
 
