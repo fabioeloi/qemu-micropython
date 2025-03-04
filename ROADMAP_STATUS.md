@@ -58,6 +58,7 @@ Based on current progress and priorities, the adjusted timeline is:
   - Identified and documented challenges in QEMU-based exception testing
   - Improved test framework for exception handling verification
   - Completed documentation for exception handling features
+  - Created detailed release notes documenting all exception handling enhancements
 - **v2025.03.04.16 Release**: Added VSCode Extension for MicroPython Debugging
   - Created dedicated VSCode extension for MicroPython debugging
   - Implemented rich exception visualization in VSCode
