@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Script to create the plan_v1.2.0_milestone.sh script
+# This is a workaround for the limitation of not being able to create large scripts directly
+
+cat > scripts/plan_v1.2.0_milestone.sh << 'EOF'
+#!/bin/bash
+
 # Script to plan the v1.2.0 milestone
 # This script automates the process of planning for the v1.2.0 milestone
 
@@ -129,3 +135,8 @@ echo "3. Create GitHub issues for the v1.2.0 milestone using the templates"
 echo "4. Begin implementation of the v1.2.0 features"
 echo ""
 echo "Thank you for using the milestone planning script!"
+EOF
+
+chmod +x scripts/plan_v1.2.0_milestone.sh
+
+echo "Created plan_v1.2.0_milestone.sh script successfully!" 
