@@ -138,3 +138,9 @@ Based on current progress and priorities, the adjusted timeline is:
 - Enhanced build scripts to handle split firmware files
 - Updated README with better setup and troubleshooting information
 - Added better error handling and debugging output
+
+## Milestone Summaries
+
+For detailed summaries of each milestone, please refer to the following documents:
+
+- [v1.1.0 Milestone Summary](docs/milestone_v1.1.0_summary.md) - Debugging and QEMU Integration
