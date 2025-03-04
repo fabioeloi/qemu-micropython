@@ -166,9 +166,10 @@ The following documents and scripts are available for release preparation:
 
 - [v1.1.0 Final Checklist](docs/v1.1.0_final_checklist.md) - Checklist for v1.1.0 final release
 - [v1.1.0 Release Notes Template](docs/release_notes/v1.1.0_template.md) - Template for v1.1.0 final release notes
-- [prepare_final_release.sh](scripts/prepare_final_release.sh) - Script for preparing the final v1.1.0 release
+- [prepare_final_release.sh](scripts/prepare_final_release.sh) - Comprehensive script for preparing the final v1.1.0 release, including version updates, release notes creation, test execution, and tagging preparation
 - [plan_v1.2.0_milestone.sh](scripts/plan_v1.2.0_milestone.sh) - Script for planning the v1.2.0 milestone
 - [create_v1.2.0_issues.sh](scripts/create_v1.2.0_issues.sh) - Script for creating GitHub issues for the v1.2.0 milestone
+
 ## Project Status Summary
 
 For a comprehensive overview of the project's current status, accomplishments, and future plans, please refer to the following documents:
