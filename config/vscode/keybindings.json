@@ -1,0 +1,26 @@
+[
+    {
+        "key": "ctrl+shift+e",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": "vscode-except-visualize\n" },
+        "when": "debugSessionActive"
+    },
+    {
+        "key": "ctrl+shift+i",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": "vscode-except-info\n" },
+        "when": "debugSessionActive"
+    },
+    {
+        "key": "ctrl+shift+h",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": "mpy-except-history\n" },
+        "when": "debugSessionActive"
+    },
+    {
+        "key": "ctrl+shift+n",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": "mpy-except-navigate\n" },
+        "when": "debugSessionActive"
+    }
+] 
