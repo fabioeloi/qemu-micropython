@@ -43,10 +43,18 @@ Based on current progress and priorities, the adjusted timeline is:
 2. Enhance exception handling in GDB integration (v1.1.0)
 3. Extend network simulation capabilities (v1.2.0)
 4. Improve unit testing capabilities (v1.1.0)
+5. Begin planning for v1.2.0 milestone (IoT and Simulation Capabilities)
+6. Create detailed implementation plans for network simulation and virtual sensors
 
 ## Recent Progress Updates
 
 ### March 2025 Update
+- **v1.2.0 Milestone Planning**: Preparation for IoT and Simulation Capabilities
+  - Created comprehensive milestone plan for v1.2.0
+  - Defined key features and implementation phases
+  - Created issue templates for major components
+  - Established timeline and success criteria
+  - Set up project tracking for v1.2.0
 - **v2025.03.04.17 Release**: Enhanced Exception Handling Documentation and Testing
   - Created comprehensive exception handling command reference
   - Documented exception visualization workflow and best practices
