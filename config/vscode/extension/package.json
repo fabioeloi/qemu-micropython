@@ -1,0 +1,141 @@
+{
+  "name": "micropython-debugger",
+  "displayName": "MicroPython Debugger",
+  "description": "Enhanced debugging for MicroPython with exception visualization",
+  "version": "0.1.0",
+  "publisher": "qemu-micropython",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Visualization"
+  ],
+  "activationEvents": [
+    "onDebug",
+    "onCommand:micropython-debugger.visualizeException",
+    "onCommand:micropython-debugger.showExceptionHistory",
+    "onCommand:micropython-debugger.navigateException",
+    "onView:micropythonExceptions"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "micropython-debugger.visualizeException",
+        "title": "MicroPython: Visualize Current Exception"
+      },
+      {
+        "command": "micropython-debugger.showExceptionHistory",
+        "title": "MicroPython: Show Exception History"
+      },
+      {
+        "command": "micropython-debugger.navigateException",
+        "title": "MicroPython: Navigate Exception Frames"
+      },
+      {
+        "command": "micropython-debugger.refreshExceptionView",
+        "title": "MicroPython: Refresh Exception View",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "micropython-debugger",
+          "title": "MicroPython Debugger",
+          "icon": "$(bug)"
+        }
+      ]
+    },
+    "views": {
+      "micropython-debugger": [
+        {
+          "id": "micropythonExceptions",
+          "name": "Exceptions",
+          "when": "debugSessionActive"
+        },
+        {
+          "id": "micropythonVariables",
+          "name": "Exception Variables",
+          "when": "debugSessionActive"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "micropython-debugger.refreshExceptionView",
+          "when": "view == micropythonExceptions",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "micropython-debugger.visualizeException",
+          "when": "debugSessionActive"
+        },
+        {
+          "command": "micropython-debugger.showExceptionHistory",
+          "when": "debugSessionActive"
+        },
+        {
+          "command": "micropython-debugger.navigateException",
+          "when": "debugSessionActive"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "micropython-debugger.visualizeException",
+        "key": "ctrl+shift+e",
+        "when": "debugSessionActive"
+      },
+      {
+        "command": "micropython-debugger.showExceptionHistory",
+        "key": "ctrl+shift+h",
+        "when": "debugSessionActive"
+      },
+      {
+        "command": "micropython-debugger.navigateException",
+        "key": "ctrl+shift+n",
+        "when": "debugSessionActive"
+      }
+    ],
+    "configuration": {
+      "title": "MicroPython Debugger",
+      "properties": {
+        "micropythonDebugger.exceptionHistorySize": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum number of exceptions to keep in history"
+        },
+        "micropythonDebugger.autoVisualizeExceptions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically visualize exceptions when they occur"
+        },
+        "micropythonDebugger.colorOutput": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use colors in exception visualization"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.0",
+    "@types/vscode": "^1.60.0",
+    "@typescript-eslint/eslint-plugin": "^4.16.0",
+    "@typescript-eslint/parser": "^4.16.0",
+    "eslint": "^7.21.0",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {}
+} 
