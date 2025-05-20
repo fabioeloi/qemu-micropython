@@ -52,12 +52,13 @@ class IoTClient:
 class MQTTIoTClient(IoTClient):
     """MQTT-based IoT client"""
     def __init__(self, device_id=None, mqtt_host=DEFAULT_MQTT_HOST, 
-                 mqtt_port=DEFAULT_MQTT_PORT, mqtt_client_id=None):
+                 mqtt_port=DEFAULT_MQTT_PORT, mqtt_client_id=None, stream=None):
         super().__init__(device_id)
         self.mqtt_host = mqtt_host
         self.mqtt_port = mqtt_port
         self.mqtt_client_id = mqtt_client_id or self.device_id
         self.mqtt_client = None
+        self.stream = stream # Store the custom stream
         self.telemetry_topic = f"{DEFAULT_MQTT_TOPIC}/{self.device_id}"
         self.command_topic = f"devices/{self.device_id}/commands"
     
@@ -69,7 +70,23 @@ class MQTTIoTClient(IoTClient):
             return True
         
         try:
-            self.mqtt_client = MQTTClient(self.mqtt_client_id, self.mqtt_host, self.mqtt_port)
+            if self.stream:
+                # When using a custom stream, host and port for MQTTClient might be None or placeholders,
+                # as the stream itself handles the actual connection endpoint.
+                # umqtt.simple.MQTTClient expects server, port, user, password, client_id, ssl, ssl_params, sock
+                # We pass our stream as `sock`.
+                # The `server` and `port` parameters are not strictly used by umqtt.simple if `sock` is provided,
+                # but they are positional, so we provide them.
+                # Let's use placeholder or the configured values if they make sense.
+                # For a UART stream, host/port don't map directly.
+                self.mqtt_client = MQTTClient(client_id=self.mqtt_client_id, 
+                                              server=self.mqtt_host if self.mqtt_host else "uart.stream", 
+                                              port=self.mqtt_port if self.mqtt_port else 0, 
+                                              sock=self.stream,
+                                              ssl=False) # Assuming no SSL over UART stream
+            else:
+                self.mqtt_client = MQTTClient(self.mqtt_client_id, self.mqtt_host, self.mqtt_port)
+            
             self.mqtt_client.connect()
             self.mqtt_client.set_callback(self._on_message)
             self.mqtt_client.subscribe(self.command_topic)
