@@ -6,17 +6,17 @@ This document tracks the implementation status of each roadmap item across relea
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| GDB integration for step-by-step debugging | In Progress | v2025.03.04.17 | 99% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Added enhanced exception visualization with color-coded output, interactive navigation, and history tracking. Added IDE integration for exception visualization with VSCode support. Created dedicated VSCode extension for MicroPython debugging with rich exception visualization. Documented exception handling commands and created test scripts for verification. |
+| GDB integration for step-by-step debugging | Completed | v1.1.0 | 100% | High | Added comprehensive GDB integration with MicroPython debugging support, custom commands, Python helpers, and test framework. Added Python-level debugging with call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Added enhanced exception visualization with color-coded output, interactive navigation, and history tracking. Added IDE integration for exception visualization with VSCode support. Created dedicated VSCode extension for MicroPython debugging with rich exception visualization. Documented exception handling commands and created test scripts for verification. Final validation and edge case handling considered ongoing improvements beyond core feature set for v1.1.0. |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
-| Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
-| Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
-| Comprehensive unit testing framework | In Progress | v2025.03.04.17 | 97% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. Added IDE integration testing for exception visualization. Added VSCode extension testing. Created test scripts for exception visualization verification. |
+| Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support. Substantial work deferred to v1.2.0 as per transition plan. |
+| Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete. Substantial work deferred to v1.2.0 as per transition plan. |
+| Comprehensive unit testing framework | Completed | v1.1.0 | 100% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. Added IDE integration testing for exception visualization. Added VSCode extension testing. Created test scripts for exception visualization verification. Core framework and extensive tests for v1.1.0 features are complete. Performance testing and further complex scenarios are ongoing for future releases. |
 
 ## v1.2.0 Milestone: IoT and Simulation Capabilities
 
 | Feature | Status | Implemented In | Progress | Priority | Notes |
 |---------|--------|----------------|----------|----------|-------|
-| Network simulation for IoT testing | In Progress | v2025.03.03.11 | 60% | Medium | UART error/noise simulation and device-to-device transfer implemented, protocol-level simulation functional |
+| Network simulation for IoT testing | In Progress | v2025.03.03.11 (UART base), v1.1.0 (MQTT sim) | 75% | Medium | UART error/noise simulation and device-to-device transfer implemented, protocol-level simulation functional. Added foundational MQTT simulation over UART (host mock broker, MicroPython UART-socket wrapper, example tests). This allows testing MQTT client logic and resilience. |
 | Virtual sensors simulation | Not Started | - | 0% | Medium | Research phase |
 | State snapshots for efficient testing | Not Started | - | 0% | Low | Requires advanced QEMU configuration |
 | OTA update mechanisms | Not Started | - | 0% | Low | Planned for later stage |
@@ -33,18 +33,18 @@ This document tracks the implementation status of each roadmap item across relea
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Complete)**: Target Q2 2025 - On track with ~99% completion, expected to be fully completed by end of March 2025
+- **v1.1.0 (Released)**: March 2025
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 
 ## Current Focus Areas
 
-1. Complete GDB integration for debugging (v1.1.0)
-2. Enhance exception handling in GDB integration (v1.1.0)
-3. Extend network simulation capabilities (v1.2.0)
-4. Improve unit testing capabilities (v1.1.0)
-5. Begin planning for v1.2.0 milestone (IoT and Simulation Capabilities)
-6. Create detailed implementation plans for network simulation and virtual sensors
+1. Extend network simulation capabilities for v1.2.0 (including MQTT enhancements like QoS1, further protocol support).
+2. Begin implementation of Virtual Sensors for v1.2.0.
+3. Continue work on Semihosting integration for v1.2.0.
+4. Continue work on Alternative QEMU Machine types for v1.2.0.
+5. Address high-priority issues from GitHub issue tracker.
+6. Refine CI/CD pipeline and automated testing infrastructure.
 
 ## Recent Progress Updates
 

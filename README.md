@@ -12,11 +12,11 @@ This project provides a virtual development environment for STM32 microcontrolle
 
 ## Current Status
 
-**Current Release:** v2025.03.04.17 (v1.1.0-beta.5)  
-**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (In Progress, ~99% complete)  
+**Current Release:** v1.1.0 (Final)
+**Current Milestone:** v1.1.0 - Debugging and QEMU Integration (Completed)
 **Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
 
-We are currently focusing on improving debugging capabilities and QEMU integration. Recent progress includes:
+The v1.1.0 milestone, focusing on Debugging and QEMU Integration, is now complete. Key achievements in this milestone include:
 - Added comprehensive GDB integration with MicroPython debugging support
 - Implemented Python-level debugging with stack trace, variable inspection, and exception handling
 - Enhanced breakpoint support with Python function name resolution and memory inspection
@@ -187,15 +187,15 @@ See our [GDB Debugging Guide](docs/GDB_DEBUGGING_GUIDE.md) for detailed instruct
 
 The project is organized into several milestone releases:
 
-### v1.1.0 - Debugging and QEMU Integration (In Progress)
+### v1.1.0 - Debugging and QEMU Integration (Completed)
 
-- GDB integration for step-by-step debugging (99% complete)
-- Custom UART driver optimized for QEMU (100% complete)
-- Better semihosting integration for reliable output (50% complete)
-- Exploration of alternative QEMU machine types for STM32F4 (40% complete)
-- Comprehensive unit testing framework (97% complete)
+- GDB integration for step-by-step debugging
+- Custom UART driver optimized for QEMU
+- Better semihosting integration (basic support, further work deferred to v1.2.0)
+- Exploration of alternative QEMU machine types for STM32F4 (initial configuration, further work deferred to v1.2.0)
+- Comprehensive unit testing framework
 
-**Target completion:** Q2 2025
+**Released:** March 2025
 
 ### v1.2.0 - IoT and Simulation Capabilities (Planned)
 
@@ -232,6 +232,7 @@ For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPI
 - **v1.1.0-beta.2** (March 3, 2025): Completed implementation of custom UART driver for QEMU with simulation features
 - **v1.1.0-beta.4** (March 4, 2025): Comprehensive GDB integration with MicroPython debugging support
 - **v1.1.0-beta.5** (March 5, 2025): Enhanced exception visualization with color-coded output and interactive navigation
+- **v1.1.0 (Final)** (March 2025): Final release for the Debugging and QEMU Integration milestone. See [v1.1.0 Release Notes](docs/release_notes/v1.1.0_final.md).
 
 For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
 

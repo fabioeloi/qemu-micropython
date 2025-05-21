@@ -36,9 +36,9 @@ We have successfully completed the v1.1.0 milestone, which focused on Debugging 
 
 ## Current Project Status
 
-**Current Release:** v2025.03.04.17 (v1.1.0-beta.5)  
-**Final v1.1.0 Release:** Scheduled for end of March 2025  
-**Overall Project Completion:** ~40% (v1.1.0 milestone complete, v1.2.0 and v1.3.0 pending)
+**Current Release:** v1.1.0 (Final)
+**v1.1.0 Release:** March 2025 (Completed)
+**Overall Project Completion:** ~40% (v1.1.0 milestone completed, v1.2.0 and v1.3.0 in progress/pending)
 
 ### Project Structure
 - **27 Shell Scripts**: For building, testing, and managing the environment
@@ -49,9 +49,9 @@ We have successfully completed the v1.1.0 milestone, which focused on Debugging 
 
 ## Planning for v1.2.0
 
-The v1.2.0 milestone will focus on IoT and Simulation Capabilities, building on the strong foundation established in v1.1.0.
+The v1.2.0 milestone is now in progress and focuses on IoT and Simulation Capabilities, building on the strong foundation established in v1.1.0.
 
-### Key Features Planned
+### Key Features Planned for v1.2.0
 
 #### 1. Network Simulation (Priority: High)
 - Protocol-level simulation (MQTT, CoAP, HTTP)
@@ -99,6 +99,6 @@ By completing the v1.1.0 milestone, we have established a solid foundation for t
 
 The successful completion of the v1.1.0 milestone represents a significant achievement in creating a virtual development environment for STM32 microcontrollers. With comprehensive debugging capabilities, QEMU integration, and a robust testing framework, the project provides a solid foundation for IoT application development.
 
-As we move forward to the v1.2.0 milestone, we will continue to enhance the environment with more advanced IoT and simulation capabilities, further reducing the need for physical hardware during development and testing.
+As we move forward with the v1.2.0 milestone, we will continue to enhance the environment with more advanced IoT and simulation capabilities, further reducing the need for physical hardware during development and testing.
 
-The STM32 IoT Virtual Development Environment project is well-positioned to become an essential tool for IoT developers, enabling faster development cycles, more comprehensive testing, and ultimately more reliable IoT applications. 
+The STM32 IoT Virtual Development Environment project is well-positioned to become an essential tool for IoT developers, enabling faster development cycles, more comprehensive testing, and ultimately more reliable IoT applications.
