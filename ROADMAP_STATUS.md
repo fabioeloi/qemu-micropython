@@ -33,7 +33,7 @@ This document tracks the implementation status of each roadmap item across relea
 
 Based on current progress and priorities, the adjusted timeline is:
 
-- **v1.1.0 (Released)**: March 2025
+- **v1.1.0 (Released)**: v2025.03.05.1 (March 2025)
 - **v1.2.0 (Complete)**: Target Q4 2025
 - **v1.3.0 (Complete)**: Target Q1 2026
 

@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Current Release:** v1.1.0 (Final)
+**Current Release:** v2025.03.05.1 (v1.1.0 Final)
 **Current Milestone:** v1.1.0 - Debugging and QEMU Integration (Completed)
 **Next Milestone:** v1.2.0 - IoT and Simulation Capabilities (In Progress)
 
@@ -109,7 +109,7 @@ The project documentation is organized into several key documents:
    - [v1.2.0 Milestone Plan](milestone_v1.2.0_plan.md)
    - [v1.1.0 to v1.2.0 Transition](v1.1.0_to_v1.2.0_transition.md)
 6. **Release Notes**: Detailed notes for each release
-   - [v1.1.0 (Final) Release Notes](release_notes/v1.1.0_final.md)
+   - [v1.1.0 (Final) Release Notes](release_notes/v2025.03.05.1.md)
    - [v2025.03.04.17 Release Notes](release_notes/v2025.03.04.17.md)
    - [v1.1.0 Release Notes Template](release_notes/v1.1.0_template.md)
 7. **Feature Documentation**: Detailed documentation for specific features
