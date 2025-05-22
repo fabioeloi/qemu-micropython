@@ -77,39 +77,114 @@ jobs:
 
         # Map of feature keywords to issue numbers
         feature_mapping = {
-            'UART driver': 2,
-            'GDB integration': 1,
-            'semihosting': 3,
-            'QEMU machine': 4,
-            'testing framework': 8,
-            'network simulation': 5,
-            'virtual sensors': 7,
-            'state snapshots': 9,
-            'OTA update': 10,
-            'CI/CD': 6,
-            'automated testing': 11,
-            'documentation': 12,
-            'project tracking': 13
+            # v1.1.0
+            'GDB integration for step-by-step debugging': 14,
+            'Custom UART driver optimized for QEMU': 2,
+            'Better semihosting integration': 3,
+            'Alternative QEMU machine types for STM32F4': 4,
+            'Comprehensive unit testing framework': 8,
+            # v1.2.0
+            'Network simulation for IoT testing': 5,
+            'Virtual sensors simulation': 7,
+            'State snapshots for efficient testing': 9,
+            'OTA update mechanisms': 10,
+            # v1.3.0
+            'CI/CD pipeline for automated testing': 6,
+            'Automated testing in virtual environments': 11,
+            'Documentation improvements': 12,
+            # General
+            'Project Tracking Synchronization Process': 13
         }
 
         # Extract changed files from commit
         changed_files = [item.a_path for item in latest_commit.diff('HEAD~1')]
+        print(f"Script triggered by commit: {latest_commit.hexsha}")
+        print(f"Changed files in this commit: {changed_files}")
 
         # Analyze changes and update relevant issues
-        for file in changed_files:
-            # Extract relevant section from ROADMAP_STATUS.md based on changed files
-            if file.startswith('src/custom_uart'):
-                progress = extract_progress(roadmap_content, 'Custom UART driver')
-                if progress:
-                    update_issue_progress(2, progress)
-            elif file.startswith('src/network'):
-                progress = extract_progress(roadmap_content, 'Network simulation')
-                if progress:
-                    update_issue_progress(5, progress)
-            # Add more file patterns and their corresponding issues
+        if 'ROADMAP_STATUS.md' in changed_files:
+            print("ROADMAP_STATUS.md changed, attempting to update all mapped issues.")
+            for feature_key, issue_num in feature_mapping.items():
+                progress = extract_progress(roadmap_content, feature_key)
+                if progress is not None:
+                    print(f"Updating issue {issue_num} for feature '{feature_key}' with progress {progress}% (due to ROADMAP_STATUS.md change)")
+                    update_issue_progress(issue_num, progress)
+                else:
+                    print(f"Could not extract progress for feature '{feature_key}' from ROADMAP_STATUS.md")
+        else:
+            print(f"Analyzing specific file changes (ROADMAP_STATUS.md not in changed files): {changed_files}")
+            for file in changed_files:
+                print(f"Processing changed file: {file}")
+                if file.startswith('src/custom_uart_driver'): # Assuming this is the correct path prefix
+                    feature_key = 'Custom UART driver optimized for QEMU'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif 'gdb' in file.lower() or 'debug' in file.lower() or 'exception' in file.lower() and not file.startswith('tests/'): # Avoid double counting from general test folder
+                    feature_key = 'GDB integration for step-by-step debugging'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif file.startswith('src/lib/iot_client.py') or file.startswith('tools/mqtt_mock_broker.py') or 'network_sim' in file:
+                    feature_key = 'Network simulation for IoT testing'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif file.startswith('src/lib/sensors.py') or 'sensor' in file.lower() and not file.startswith('tests/'):
+                    feature_key = 'Virtual sensors simulation'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif 'semihosting' in file.lower():
+                    feature_key = 'Better semihosting integration'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif 'qemu_machine' in file.lower() or file.startswith('config/qemu'): # Example path
+                    feature_key = 'Alternative QEMU machine types for STM32F4'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif file.startswith('tests/'): # General test changes
+                    print(f"File {file} is a test file. Checking related testing frameworks.")
+                    # Could update 'Comprehensive unit testing framework' or 'Automated testing in virtual environments'
+                    # For simplicity, let's update the primary unit testing framework for now.
+                    feature_key_utf = 'Comprehensive unit testing framework'
+                    progress_utf = extract_progress(roadmap_content, feature_key_utf)
+                    if progress_utf is not None:
+                        print(f"Updating '{feature_key_utf}' (Issue {feature_mapping[feature_key_utf]}) with progress {progress_utf}%")
+                        update_issue_progress(feature_mapping[feature_key_utf], progress_utf)
+                    
+                    feature_key_ate = 'Automated testing in virtual environments'
+                    progress_ate = extract_progress(roadmap_content, feature_key_ate)
+                    if progress_ate is not None:
+                        print(f"Updating '{feature_key_ate}' (Issue {feature_mapping[feature_key_ate]}) with progress {progress_ate}%")
+                        update_issue_progress(feature_mapping[feature_key_ate], progress_ate)
+                elif file.startswith('docs/'):
+                    feature_key = 'Documentation improvements'
+                    progress = extract_progress(roadmap_content, feature_key)
+                    if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                elif file.startswith('.github/workflows/ci.yml'): # Example for CI/CD
+                     feature_key = 'CI/CD pipeline for automated testing'
+                     progress = extract_progress(roadmap_content, feature_key)
+                     if progress is not None:
+                        print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping[feature_key]} with progress {progress}%")
+                        update_issue_progress(feature_mapping[feature_key], progress)
+                else:
+                    print(f"File {file} did not match specific feature heuristics.")
+
 
         # Create a tracking update comment on the sync process issue
-        sync_issue = repo.get_issue(13)
+        sync_issue_number = feature_mapping.get('Project Tracking Synchronization Process', 13) # Default to 13 if not in map
+        sync_issue = repo.get_issue(sync_issue_number)
         sync_issue.create_comment(f"""
         Automatic Tracking Sync Report
         
