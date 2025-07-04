@@ -46,12 +46,12 @@ class MQTTMockBroker:
     def _parse_mqtt_packet(self, data):
         if not data:
             return None, None, None
-        
+
         packet_type = data[0] & 0xF0
         # Remaining length decoding (simplified for now, assumes length < 128)
         remaining_length = data[1]
         payload = data[2:2+remaining_length]
-        
+
         return packet_type, remaining_length, payload
 
     def _create_connack_packet(self, session_present=0, reason_code=0):
@@ -76,12 +76,12 @@ class MQTTMockBroker:
 
         # Remaining length
         remaining_length = len(variable_header) + len(payload_bytes)
-        
+
         # Remaining length encoding (simplified)
         if remaining_length > 127:
             # This simplified version doesn't handle multi-byte remaining lengths
             raise ValueError("Message too long for simplified remaining length encoding")
-        
+
         return bytes([header_byte1, remaining_length]) + variable_header + payload_bytes
 
     def _create_suback_packet(self, packet_id, reason_codes):
@@ -90,7 +90,7 @@ class MQTTMockBroker:
         payload = bytes(reason_codes)
         remaining_length = len(variable_header) + len(payload)
         return fixed_header + bytes([remaining_length]) + variable_header + payload
-        
+
     def _create_unsuback_packet(self, packet_id):
         fixed_header = struct.pack('!B', UNSUBACK) # Type
         variable_header = struct.pack('!H', packet_id)
@@ -105,18 +105,18 @@ class MQTTMockBroker:
         proto_name_len = struct.unpack('!H', payload[:2])[0]
         proto_name = payload[2:2+proto_name_len].decode('utf-8')
         offset = 2 + proto_name_len
-        
+
         # Protocol Level, Connect Flags, Keep Alive
         protocol_level, connect_flags, keep_alive = struct.unpack('!BBH', payload[offset:offset+4])
         offset += 4
-        
+
         # Client ID
         client_id_len = struct.unpack('!H', payload[offset:offset+2])[0]
         offset += 2
         self.client_id = payload[offset:offset+client_id_len].decode('utf-8')
-        
+
         logging.info(f"BROKER: CONNECT received from ClientID='{self.client_id}', Protocol='{proto_name}', ProtocolLevel={protocol_level}, ConnectFlags={hex(connect_flags)}, KeepAlive={keep_alive}")
-        
+
         connack_packet = self._create_connack_packet(reason_code=CONNECTION_ACCEPTED)
         self.client_socket.sendall(connack_packet)
         logging.info(f"BROKER: CONNACK sent to ClientID='{self.client_id}' with ReasonCode={CONNECTION_ACCEPTED}")
@@ -125,10 +125,10 @@ class MQTTMockBroker:
         topic_len = struct.unpack('!H', payload[:2])[0]
         topic = payload[2:2+topic_len].decode('utf-8')
         offset = 2 + topic_len
-        
+
         # Assuming QoS 0, no packet ID in variable header for incoming message
         message_payload = payload[offset:] # Keep as bytes for now
-        
+
         try:
             message_str = message_payload.decode('utf-8')
             log_message = message_str
@@ -136,7 +136,7 @@ class MQTTMockBroker:
             log_message = message_payload.hex() # Log hex if not valid UTF-8
 
         logging.info(f"BROKER: PUBLISH received from ClientID='{self.client_id}': Topic='{topic}', Message='{log_message}' (PayloadHex: {message_payload.hex()})")
-        
+
         # Echo to subscribed clients (in this case, only self if subscribed)
         # This mock broker only handles one client at a time, so it echoes to the sender if subscribed.
         if topic in self.subscriptions:
@@ -151,10 +151,10 @@ class MQTTMockBroker:
     def handle_subscribe(self, payload):
         packet_id = struct.unpack('!H', payload[:2])[0]
         offset = 2
-        
+
         topics_requested = []
         reason_codes = []
-        
+
         while offset < len(payload):
             topic_filter_len = struct.unpack('!H', payload[offset:offset+2])[0]
             offset += 2
@@ -162,14 +162,14 @@ class MQTTMockBroker:
             offset += topic_filter_len
             requested_qos = payload[offset] # QoS for this topic
             offset += 1
-            
+
             self.subscriptions[topic_filter] = requested_qos # Store with requested QoS
             topics_requested.append(topic_filter)
             # For this mock, we always grant QoS 0, regardless of requested_qos
-            granted_qos = 0x00 
-            reason_codes.append(granted_qos) 
+            granted_qos = 0x00
+            reason_codes.append(granted_qos)
             logging.info(f"BROKER: SUBSCRIBE received from ClientID='{self.client_id}': TopicFilter='{topic_filter}', RequestedQoS={requested_qos}, PacketID={packet_id}")
-            
+
         suback_packet = self._create_suback_packet(packet_id, reason_codes)
         self.client_socket.sendall(suback_packet)
         logging.info(f"BROKER: SUBACK sent to ClientID='{self.client_id}': PacketID={packet_id}, GrantedQoS/ReasonCodes={reason_codes}")
@@ -177,14 +177,14 @@ class MQTTMockBroker:
     def handle_unsubscribe(self, payload):
         packet_id = struct.unpack('!H', payload[:2])[0]
         offset = 2
-        
+
         unsubscribed_topics = []
         while offset < len(payload):
             topic_filter_len = struct.unpack('!H', payload[offset:offset+2])[0]
             offset += 2
             topic_filter = payload[offset:offset+topic_filter_len].decode('utf-8')
             offset += topic_filter_len
-            
+
             logging.info(f"BROKER: UNSUBSCRIBE received from ClientID='{self.client_id}': TopicFilter='{topic_filter}', PacketID={packet_id}")
             if topic_filter in self.subscriptions:
                 del self.subscriptions[topic_filter]
@@ -195,7 +195,7 @@ class MQTTMockBroker:
 
         # MQTT v3.1.1 UNSUBACK does not have a payload with reason codes.
         # MQTT v5.0 UNSUBACK can have reason codes. This broker is more v3.1.1 like.
-        unsuback_packet = self._create_unsuback_packet(packet_id) 
+        unsuback_packet = self._create_unsuback_packet(packet_id)
         self.client_socket.sendall(unsuback_packet)
         logging.info(f"BROKER: UNSUBACK sent to ClientID='{self.client_id}': PacketID={packet_id} (for topics: {unsubscribed_topics})")
 
@@ -241,7 +241,7 @@ class MQTTMockBroker:
                 logging.info(f"BROKER: Accepted connection from {self.client_address}")
                 self.client_id = None # Reset for new connection
                 self.subscriptions = {} # Reset for new connection
-                
+
                 try:
                     keep_conn_open = True
                     while keep_conn_open:
@@ -253,9 +253,9 @@ class MQTTMockBroker:
                         if not first_byte:
                             logging.info(f"BROKER: Client {self.client_address} (ClientID: {self.client_id or 'N/A'}) closed connection (no data for first byte).")
                             break
-                        
+
                         packet_type = first_byte[0] & 0xF0
-                        
+
                         # Decode remaining length (simplified for single byte)
                         # A full implementation needs to handle multi-byte remaining length.
                         length_byte = self.client_socket.recv(1)
@@ -263,21 +263,21 @@ class MQTTMockBroker:
                             logging.warning(f"BROKER: Client {self.client_address} (ClientID: {self.client_id or 'N/A'}) closed connection abruptly after first byte.")
                             break
                         remaining_length = length_byte[0] # Assumes length < 128
-                        
+
                         payload = b''
                         if remaining_length > 0:
                             payload = self.client_socket.recv(remaining_length)
                             if len(payload) < remaining_length:
                                 logging.warning(f"BROKER: Did not receive full payload from {self.client_address} (ClientID: {self.client_id or 'N/A'}). Expected {remaining_length}, got {len(payload)}. Closing connection.")
-                                break 
-                        
+                                break
+
                         logging.debug(f"BROKER: Received Raw from ClientID='{self.client_id or 'Unknown'}': TypeByte={hex(first_byte[0])}, RemLenByte={hex(length_byte[0])}, Payload={payload.hex()}")
-                        
+
                         keep_conn_open = self.process_packet(packet_type, payload)
                         if not keep_conn_open: # DISCONNECT received or critical error
                             logging.info(f"BROKER: Closing connection with {self.client_address} (ClientID: {self.client_id}) as requested by client or due to error.")
                             break
-                
+
                 except socket.timeout:
                     logging.warning(f"BROKER: Socket timeout with {self.client_address} (ClientID: {self.client_id or 'N/A'})")
                 except ConnectionResetError:

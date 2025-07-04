@@ -45,7 +45,7 @@ def run_test(test_func):
 def test_basic_file_operations_text():
     _cleanup_files(TEST_FILE_TXT)
     content_to_write = "Hello Semihosting!\nLine 2\n"
-    
+
     # Write
     print(f"Opening '{TEST_FILE_TXT}' in 'w' mode...")
     f = usemihosting.open(TEST_FILE_TXT, "w")
@@ -68,7 +68,7 @@ def test_basic_file_operations_text():
 def test_basic_file_operations_binary():
     _cleanup_files(TEST_FILE_BIN)
     content_to_write = b"\x01\x02\x03\x04\x05Hello Binary\x00\xFE\xFD"
-    
+
     # Write binary
     print(f"Opening '{TEST_FILE_BIN}' in 'wb' mode...")
     f = usemihosting.open(TEST_FILE_BIN, "wb")
@@ -122,7 +122,7 @@ def test_read_operations():
                                  # No, read(10) will read the next 10 chars: "1\nLine 22\n" (10 chars)
         assert data_partial == "1\nLine 22\n", f"read(10) after partial read failed. Got: '{data_partial}'"
         print(f"read(10) successful: '{data_partial}'")
-        
+
         # Read until EOF
         data_eof = f.read() # Reads remaining "Line 333"
         assert data_eof == "Line 333", f"read() until EOF failed. Got: '{data_eof}'"
@@ -172,7 +172,7 @@ def test_readline_operations():
     _cleanup_files(TEST_FILE_TXT)
     lines = ["First line.\n", "Second line with text.\n", "\n", "Last line, no newline"]
     full_content = "".join(lines)
-    
+
     with usemihosting.open(TEST_FILE_TXT, "w") as f:
         f.write(full_content)
 
@@ -183,7 +183,7 @@ def test_readline_operations():
         l1 = f.readline()
         assert l1 == lines[0], f"readline 1 mismatch. Got: '{l1}' Expected: '{lines[0]}'"
         print(f"Read line 1: '{l1.strip()}'")
-        
+
         l2 = f.readline()
         assert l2 == lines[1], f"readline 2 mismatch. Got: '{l2}' Expected: '{lines[1]}'"
         print(f"Read line 2: '{l2.strip()}'")
@@ -191,7 +191,7 @@ def test_readline_operations():
         l3 = f.readline() # The line that is just "\n"
         assert l3 == lines[2], f"readline 3 (empty line) mismatch. Got: '{l3}' Expected: '{lines[2]}'"
         print(f"Read line 3: '{l3.strip()}' (should be empty after strip)")
-        
+
         l4 = f.readline()
         assert l4 == lines[3], f"readline 4 (no newline) mismatch. Got: '{l4}' Expected: '{lines[3]}'"
         print(f"Read line 4: '{l4.strip()}'")
@@ -236,7 +236,7 @@ def test_seek_and_tell_operations():
         assert data_from_end == b"QRSTUVWXYZ", f"Read after seek from end failed. Got: {data_from_end}"
         assert f.tell() == 36, f"tell() at EOF should be 36, got {f.tell()}"
         print(f"SEEK_END to -10, read 'QRSTUVWXYZ', new position {f.tell()}")
-        
+
         # SEEK_CUR (Note: C implementation reported EOPNOTSUPP for SEEK_CUR in ioctl)
         # If Python's stream wrapper caches position, it might simulate SEEK_CUR.
         # Let's test if the VFS layer or stream wrapper handles it.
@@ -266,14 +266,14 @@ def test_remove_operation():
     print(f"Creating file '{TEST_FILE_TXT}' for remove test.")
     with usemihosting.open(TEST_FILE_TXT, "w") as f:
         f.write("delete me")
-    
+
     usemihosting.remove(TEST_FILE_TXT)
     print(f"Removed '{TEST_FILE_TXT}'. Verifying...")
-    
+
     try:
         with usemihosting.open(TEST_FILE_TXT, "r") as f:
             # Should not reach here
-            assert False, "File still exists after remove()" 
+            assert False, "File still exists after remove()"
     except OSError as e:
         assert e.args[0] == uerrno.ENOENT, f"Expected ENOENT after remove, got {e.args[0]}"
         print("File correctly not found after remove().")
@@ -320,13 +320,13 @@ def test_rename_operation():
         # Host OS might return ENOENT for old or new path. ENOENT is common.
         assert e.args[0] == uerrno.ENOENT, f"Expected ENOENT for rename on non-existent, got {e.args[0]}."
         print("Correctly got ENOENT for rename() on non-existent file.")
-    
+
     # Test renaming to an existing file (host behavior can vary: overwrite or error)
     # For semihosting, SYS_RENAME often overwrites.
     print(f"Creating '{TEST_FILE_TXT}' again.")
     with usemihosting.open(TEST_FILE_TXT, "w") as f:
         f.write("new original")
-    
+
     print(f"Attempting to rename '{TEST_FILE_RENAMED}' (exists) to '{TEST_FILE_TXT}' (exists)...")
     try:
         usemihosting.rename(TEST_FILE_RENAMED, TEST_FILE_TXT) # TEST_FILE_RENAMED has "original content"
@@ -369,7 +369,7 @@ def test_utility_functions():
     # Note: time.sleep might not be available or precise in all MicroPython ports/QEMU.
     # If available, it would be:
     # import time
-    # time.sleep_ms(150) 
+    # time.sleep_ms(150)
     # current_clock_after_delay = usemihosting.clock()
     # assert current_clock_after_delay > current_clock, "Clock did not advance."
     # print(f"usemihosting.clock() after delay: {current_clock_after_delay}")
@@ -377,7 +377,7 @@ def test_utility_functions():
 
 def test_error_handling():
     _cleanup_files(TEST_FILE_TXT)
-    
+
     # Open non-existent file for reading
     print("Testing open() non-existent file for reading...")
     try:
@@ -419,7 +419,7 @@ def test_error_handling():
         print(f"tell() on closed file returned (might be cached): {f.tell()}")
     except Exception as e:
         print(f"Got error on tell() on closed file (expected if it hits C layer): {e} (type: {type(e)})")
-    
+
     # Reading from write-only, writing to read-only (if modes are strictly enforced by host)
     # Semihosting open modes are sometimes loose.
     _cleanup_files(TEST_FILE_TXT)
@@ -457,13 +457,13 @@ def main():
     print("=============================================")
     print("=== Running usemihosting File I/O Tests ===")
     print("=============================================")
-    
+
     # Ensure initial cleanup
     _cleanup_files(TEST_FILE_TXT, TEST_FILE_BIN, TEST_FILE_RENAMED)
 
     tests_passed = 0
     tests_failed = 0
-    
+
     test_suite = [
         test_basic_file_operations_text,
         test_basic_file_operations_binary,
@@ -483,7 +483,7 @@ def main():
             tests_passed += 1
         else:
             tests_failed += 1
-            
+
     print("\n--- Test Suite Summary ---")
     print(f"Total tests run: {len(test_suite)}")
     print(f"Passed: {tests_passed}")
@@ -497,7 +497,7 @@ def main():
         print("\nSOME TESTS FAILED.")
         # In a CI environment, this might translate to an exit code.
         # For manual runs, the printout is the main indicator.
-        # Example: raise Exception(f"{tests_failed} tests failed") 
+        # Example: raise Exception(f"{tests_failed} tests failed")
         # However, that would stop the script here. Let it finish.
 
 if __name__ == "__main__":

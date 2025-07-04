@@ -27,7 +27,7 @@ def handle_client_connection(client_socket, client_address):
             if not len_bytes:
                 logging.info(f"Client {client_address} disconnected (no length bytes).")
                 break
-            
+
             # 2. Unpack length (big-endian)
             payload_len = struct.unpack('>H', len_bytes)[0]
             logging.debug(f"Received length header: {len_bytes.hex()} -> {payload_len} bytes")
@@ -56,7 +56,7 @@ def handle_client_connection(client_socket, client_address):
             if payload_len > 0:
                 logging.debug(f"Host echoing payload ({payload.hex() if len(payload) < 50 else str(len(payload)) + ' bytes'}) to {client_address}")
                 client_socket.sendall(payload)
-            
+
             logging.info(f"Host successfully echoed {payload_len} byte payload to {client_address}.")
 
     except EOFError as e:
@@ -72,15 +72,15 @@ def handle_client_connection(client_socket, client_address):
 def main():
     parser = argparse.ArgumentParser(description="Host-side pipe for QEMU semihosting console (TCP client mode).")
     parser.add_argument(
-        '--qemu-host', 
-        type=str, 
-        default='127.0.0.1', 
+        '--qemu-host',
+        type=str,
+        default='127.0.0.1',
         help="Host where QEMU's TCP server for serial is running (default: 127.0.0.1)."
     )
     parser.add_argument(
-        '--qemu-port', 
-        type=int, 
-        required=True, 
+        '--qemu-port',
+        type=int,
+        required=True,
         help="Port where QEMU's TCP server for serial is listening (e.g., if QEMU is run with -serial tcp::PORT,server,nowait)."
     )
     parser.add_argument(
@@ -100,12 +100,12 @@ def main():
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((args.qemu_host, args.qemu_port))
             logging.info(f"Successfully connected to QEMU at {args.qemu_host}:{args.qemu_port}")
-            
+
             # The client_socket here is the connection *to* QEMU.
             # QEMU's -serial tcp::PORT,server,nowait makes QEMU the server. This script is a client to QEMU.
             # The "client_address" for handle_client_connection is effectively QEMU's server address.
             handle_client_connection(client_socket, (args.qemu_host, args.qemu_port))
-            
+
             # If handle_client_connection returns, it means QEMU (or the pipe to it) disconnected.
             logging.info("QEMU side disconnected or connection handler exited.")
 
@@ -122,7 +122,7 @@ def main():
             logging.error(f"An unexpected error occurred in the main loop: {e}", exc_info=True)
             if client_socket:
                 client_socket.close()
-        
+
         logging.info(f"Attempting to reconnect to QEMU in {args.retry_interval} seconds...")
         time.sleep(args.retry_interval)
 

@@ -79,14 +79,14 @@ class MQTTIoTClient(IoTClient):
                 # but they are positional, so we provide them.
                 # Let's use placeholder or the configured values if they make sense.
                 # For a UART stream, host/port don't map directly.
-                self.mqtt_client = MQTTClient(client_id=self.mqtt_client_id, 
-                                              server=self.mqtt_host if self.mqtt_host else "uart.stream", 
-                                              port=self.mqtt_port if self.mqtt_port else 0, 
+                self.mqtt_client = MQTTClient(client_id=self.mqtt_client_id,
+                                              server=self.mqtt_host if self.mqtt_host else "uart.stream",
+                                              port=self.mqtt_port if self.mqtt_port else 0,
                                               sock=self.stream,
                                               ssl=False) # Assuming no SSL over UART stream
             else:
                 self.mqtt_client = MQTTClient(self.mqtt_client_id, self.mqtt_host, self.mqtt_port)
-            
+
             self.mqtt_client.connect()
             self.mqtt_client.set_callback(self._on_message)
             self.mqtt_client.subscribe(self.command_topic)

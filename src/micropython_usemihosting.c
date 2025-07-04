@@ -119,8 +119,8 @@ STATIC mp_uint_t semihosting_file_read(mp_obj_t self_in, void *buf, mp_uint_t si
     }
     mp_int_t params[3] = {self->host_fd, (mp_int_t)buf, size};
     mp_int_t bytes_not_read = do_semihosting_call(SYS_READ, params);
-    
-    if (bytes_not_read < 0 || bytes_not_read > (mp_int_t)size) { 
+
+    if (bytes_not_read < 0 || bytes_not_read > (mp_int_t)size) {
         *errcode = mp_get_errno_from_host(get_host_errno());
         return MP_STREAM_ERROR;
     }
@@ -163,7 +163,7 @@ STATIC mp_uint_t semihosting_file_ioctl(mp_obj_t self_in, mp_uint_t request, uin
 
     if (request == MP_STREAM_SEEK) {
         struct mp_stream_seek_t *s = (struct mp_stream_seek_t *)(uintptr_t)arg;
-        mp_int_t seek_params[2] = {self->host_fd, 0}; 
+        mp_int_t seek_params[2] = {self->host_fd, 0};
         mp_int_t flen_params[1] = {self->host_fd};
         mp_int_t res;
         mp_int_t new_pos = 0;
@@ -181,7 +181,7 @@ STATIC mp_uint_t semihosting_file_ioctl(mp_obj_t self_in, mp_uint_t request, uin
             // SYS_SEEK only sets absolute position. No direct SYS_TELL.
             // This makes SEEK_CUR non-trivial. We'd need to cache position.
             // For now, not supporting SEEK_CUR to avoid complexity of position caching.
-            *errcode = MP_EOPNOTSUPP; 
+            *errcode = MP_EOPNOTSUPP;
             return MP_STREAM_ERROR;
         } else {
             *errcode = MP_EINVAL;
@@ -190,13 +190,13 @@ STATIC mp_uint_t semihosting_file_ioctl(mp_obj_t self_in, mp_uint_t request, uin
 
         seek_params[1] = new_pos;
         res = do_semihosting_call(SYS_SEEK, seek_params); // SYS_SEEK returns 0 on success, -1 on error
-        if (res != 0) { 
+        if (res != 0) {
             *errcode = mp_get_errno_from_host(get_host_errno());
             return MP_STREAM_ERROR;
         }
         s->offset = new_pos; // Report back the absolute position set
         return 0; // Success
-        
+
     } else if (request == MP_STREAM_FLUSH) {
         // SYS_FLUSH (0x16 in some older ARM docs, but not universally standard)
         // Typically, host files are flushed on close. Explicit flush might not be needed/supported.
@@ -208,14 +208,14 @@ STATIC mp_uint_t semihosting_file_ioctl(mp_obj_t self_in, mp_uint_t request, uin
         if (self->host_fd == -1) return 0; // Already closed
         mp_int_t params[1] = {self->host_fd};
         mp_int_t res = do_semihosting_call(SYS_CLOSE, params); // SYS_CLOSE returns 0 on success
-        if (res != 0) { 
+        if (res != 0) {
             *errcode = mp_get_errno_from_host(get_host_errno());
             return MP_STREAM_ERROR;
         }
         self->host_fd = -1; // Mark as closed
         return 0; // Success
     }
-    
+
     *errcode = MP_EINVAL; // Unknown request
     return MP_STREAM_ERROR;
 }
@@ -248,7 +248,7 @@ STATIC mp_obj_t usemihosting_open(mp_obj_t path_obj, mp_obj_t mode_obj) {
     mp_int_t params[3] = {(mp_int_t)path, host_mode, strlen(path)};
     mp_int_t host_fd = do_semihosting_call(SYS_OPEN, params);
 
-    if (host_fd == -1) { 
+    if (host_fd == -1) {
         mp_raise_OSError_with_filename(mp_get_errno_from_host(get_host_errno()), path);
     }
 
@@ -263,7 +263,7 @@ STATIC mp_obj_t usemihosting_remove(mp_obj_t path_obj) {
     const char *path = mp_obj_str_get_str(path_obj);
     mp_int_t params[2] = {(mp_int_t)path, strlen(path)};
     mp_int_t res = do_semihosting_call(SYS_REMOVE, params); // Returns 0 on success, non-zero on error
-    if (res != 0) { 
+    if (res != 0) {
         mp_raise_OSError_with_filename(mp_get_errno_from_host(get_host_errno()), path);
     }
     return mp_const_none;
@@ -275,8 +275,8 @@ STATIC mp_obj_t usemihosting_rename(mp_obj_t old_path_obj, mp_obj_t new_path_obj
     const char *new_path = mp_obj_str_get_str(new_path_obj);
     mp_int_t params[4] = {(mp_int_t)old_path, strlen(old_path), (mp_int_t)new_path, strlen(new_path)};
     mp_int_t res = do_semihosting_call(SYS_RENAME, params); // Returns 0 on success, non-zero on error
-    if (res != 0) { 
-        mp_raise_OSError_with_filename(mp_get_errno_from_host(get_host_errno()), old_path); 
+    if (res != 0) {
+        mp_raise_OSError_with_filename(mp_get_errno_from_host(get_host_errno()), old_path);
     }
     return mp_const_none;
 }
@@ -309,13 +309,13 @@ STATIC mp_obj_t usemihosting_exit(size_t n_args, const mp_obj_t *args) {
         // but a debugger could inspect it if it breaks on the semihosting op.
         // Or a more complex exit sequence could be used if the target supports SYS_EXIT_EXTENDED (0x20).
     }
-    
-    mp_int_t params[1] = {reason_code}; 
+
+    mp_int_t params[1] = {reason_code};
     do_semihosting_call(SYS_REPORTEXCEPTION, (void*)params);
     // This call should not return.
     // If it does, the debugger didn't halt, which is unexpected for ApplicationExit.
     mp_raise_OSError(MP_EIO); // Should not be reached
-    return mp_const_none; 
+    return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(usemihosting_exit_obj, 0, 1, usemihosting_exit);
 
@@ -329,14 +329,14 @@ STATIC mp_obj_t usemihosting_is_semihosting_available(void) {
     // However, a dedicated check like trying to get command line is more robust.
     char buf[1]; // Dummy buffer
     mp_int_t params[2] = {(mp_int_t)buf, 1}; // Buffer pointer, buffer length (for CMDLINE)
-    
+
     // We're not actually calling SYS_GET_CMDLINE here, but rather checking if a debugger is present
     // by a common technique: if semihosting is *not* active, the BKPT/SVC might hardfault or behave differently.
     // A truly reliable check is difficult without knowing the exact behavior of the non-semihosting case.
     // For now, let's assume if SYS_TIME returns a non -1 like value (common error return), it's available.
     // This is not foolproof.
     mp_int_t time_val = do_semihosting_call(SYS_TIME, NULL);
-    if (time_val == (mp_int_t)-1 && get_host_errno() != 0) { 
+    if (time_val == (mp_int_t)-1 && get_host_errno() != 0) {
         // If time is -1 AND errno is set, it might indicate semihosting is there but call failed.
         // If time is -1 and errno is 0, it could be a valid time or an indication of no semihosting.
         // This is tricky. A more robust check would be using a specific "are you there?" semihosting call if one existed.
@@ -363,7 +363,7 @@ STATIC const mp_stream_p_t semihosting_file_stream_p = {
 MP_DEFINE_CONST_OBJ_TYPE(
     mp_type_semihosting_file,
     MP_QSTR_SemihostingFile,
-    MP_TYPE_FLAG_ITER_IS_STREAM, 
+    MP_TYPE_FLAG_ITER_IS_STREAM,
     protocol, &semihosting_file_stream_p
 );
 
@@ -491,7 +491,7 @@ STATIC mp_obj_t usemihosting_framed_console_recv(void) {
             // Premature end of stream or error
             // Free partially filled vstr buffer? Or let GC handle it.
             // For simplicity, raise error. A more robust impl might return partial data or None.
-            mp_raise_OSError(MP_EIO); 
+            mp_raise_OSError(MP_EIO);
         }
         buf[i] = (byte)byte_read;
     }

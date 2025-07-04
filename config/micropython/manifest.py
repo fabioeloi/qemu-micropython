@@ -4,6 +4,9 @@
 # Include our custom libraries from src/lib
 freeze_namespace(ns=None, path="src/lib", prefix="")
 
+# Include the microCoAPy library (as a package)
+freeze("src/lib/microcoapy/")
+
 # Include the standard STM32 port modules
 include("$(MPY_DIR)/ports/stm32/manifest.py")
 

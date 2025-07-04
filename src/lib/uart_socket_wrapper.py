@@ -52,11 +52,11 @@ class UARTSocket:
                 data_chunk = self.uart.read(read_now)
                 if data_chunk:
                     buf.extend(data_chunk)
-                else: 
+                else:
                     # Should not happen if any() > 0, but as a safeguard
                     # This could indicate peer closed if it returns None consistently
-                    pass 
-            
+                    pass
+
             if self._timeout is not None: # Non-blocking mode with timeout
                 if time.ticks_diff(time.ticks_ms(), start_time) > self._timeout * 1000:
                     if not buf: # No data read within timeout
@@ -69,7 +69,7 @@ class UARTSocket:
                 # settimeout() should be used.
                 if self.uart.any() == 0: # No data, pause briefly
                     time.sleep_ms(self._internal_read_timeout_ms)
-            
+
             # Check for overall timeout if one was set via settimeout()
             # This check is mostly for when _timeout is 0 (non-blocking) or very small.
             # For longer timeouts, the main blocking logic is above.
@@ -84,7 +84,7 @@ class UARTSocket:
             # For now, we return b'' which is standard for socket closed.
             self.peer_closed = True # Assume closed if read returns nothing when expecting data
             return b''
-            
+
         return bytes(buf)
 
     def readinto(self, buf, nbytes=0):
@@ -95,11 +95,11 @@ class UARTSocket:
         """
         if self.peer_closed:
             return 0 # No bytes read if connection is already considered closed
-            
+
         read_len = len(buf) if nbytes == 0 else min(nbytes, len(buf))
-        
+
         data_read = self.read(read_len)
-        
+
         if data_read:
             for i in range(len(data_read)):
                 buf[i] = data_read[i]
@@ -127,7 +127,7 @@ class UARTSocket:
         """
         if self.peer_closed:
             return b''
-        
+
         line = bytearray()
         start_time = time.ticks_ms()
         while True:
@@ -139,8 +139,8 @@ class UARTSocket:
                         break
                 else: # read returned None, could mean peer closed
                     self.peer_closed = True
-                    break 
-            
+                    break
+
             if self._timeout is not None:
                 if time.ticks_diff(time.ticks_ms(), start_time) > self._timeout * 1000:
                     # Timeout occurred
@@ -149,7 +149,7 @@ class UARTSocket:
                     break # Return what we have
             else: # Blocking
                 time.sleep_ms(self._internal_read_timeout_ms) # Pause briefly
-        
+
         if not line and self.peer_closed: # No data and determined peer closed
             return b''
         return bytes(line)
@@ -229,7 +229,7 @@ class UARTSocket:
         # Generally no-op for UART, unless specific UART features map to socket options
         # print(f"UARTSocket: setsockopt({level}, {optname}, {value}) called, no-op.")
         pass
-        
+
     # Required by some libraries that check for fileno
     def fileno(self):
         # UARTs don't have file descriptors in the same way.
@@ -273,7 +273,7 @@ if __name__ == '__main__':
                 print("Read timed out (EWOULDBLOCK) as expected if no data.")
             else:
                 print(f"Read error: {e}")
-        
+
         # Test non-blocking read
         print("\nTesting non-blocking read (settimeout(0))...")
         socket_uart.settimeout(0)
@@ -303,14 +303,14 @@ if __name__ == '__main__':
                 print("Readline timed out (EWOULDBLOCK).")
             else:
                 print(f"Readline error: {e}")
-        
+
         # Test makefile
         print("\nTesting makefile...")
         file_obj = socket_uart.makefile('rb')
         if file_obj is socket_uart:
             print("makefile() returned self, as expected for basic MicroPython sockets.")
             # You could try file_obj.read() here too
-        
+
         socket_uart.close()
         print("\nUARTSocket closed.")
 

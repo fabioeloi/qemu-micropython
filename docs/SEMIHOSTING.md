@@ -157,7 +157,7 @@ try:
     with usemihosting.open(filename, "r") as f:
         content_read = f.read()
         print(f"Read from '{filename}':\n{content_read}")
-    
+
     assert content_read == content_written
 
     # Clean up
@@ -179,23 +179,23 @@ import usemihosting
 
 if usemihosting.is_semihosting_available():
     print("Semihosting detected. Testing console pipe...")
-    
+
     message_to_send = b"Ping from MicroPython!"
-    
+
     try:
         print(f"Sending to host: {message_to_send!r}")
         usemihosting.framed_console_send(message_to_send)
-        
+
         print("Waiting for echo from host...")
         received_message = usemihosting.framed_console_recv()
-        
+
         print(f"Received from host: {received_message!r}")
-        
+
         if received_message == message_to_send:
             print("Console pipe echo successful!")
         else:
             print("Console pipe echo mismatch.")
-            
+
     except OSError as e:
         print(f"Console pipe OSError: {e}")
     except Exception as e:

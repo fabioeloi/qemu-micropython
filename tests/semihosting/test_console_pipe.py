@@ -50,28 +50,28 @@ def run_test(test_func):
 def test_basic_echo():
     print("Testing basic echo with a simple string...")
     test_string = b"Hello via Semihosting Console"
-    
+
     print(f"Sending: {test_string!r}")
     usemihosting.framed_console_send(test_string)
-    
+
     print("Receiving...")
     received_data = usemihosting.framed_console_recv()
     print(f"Received: {received_data!r}")
-    
+
     assert received_data == test_string, f"Basic echo failed. Expected {test_string!r}, got {received_data!r}"
     print("Basic echo data matches.")
 
 def test_empty_payload():
     print("Testing echo with an empty payload...")
     test_payload = b""
-    
+
     print(f"Sending empty payload: {test_payload!r}")
     usemihosting.framed_console_send(test_payload)
-    
+
     print("Receiving...")
     received_data = usemihosting.framed_console_recv()
     print(f"Received: {received_data!r}")
-    
+
     assert received_data == test_payload, f"Empty payload echo failed. Expected {test_payload!r}, got {received_data!r}"
     print("Empty payload echo data matches.")
 
@@ -80,15 +80,15 @@ def test_larger_payload():
     # Create a patterned payload
     pattern = b"FrameTest1234567890!@#$%^&*()" # 28 bytes
     test_payload = pattern * 10 # 280 bytes
-    
+
     print(f"Sending {len(test_payload)} bytes...")
     # print(f"Payload preview (first 30 bytes): {test_payload[:30]!r}")
     usemihosting.framed_console_send(test_payload)
-    
+
     print("Receiving...")
     received_data = usemihosting.framed_console_recv()
     # print(f"Received {len(received_data)} bytes. Preview (first 30 bytes): {received_data[:30]!r}")
-    
+
     assert len(received_data) == len(test_payload), \
         f"Larger payload length mismatch. Expected {len(test_payload)}, got {len(received_data)}"
     assert received_data == test_payload, \
@@ -104,24 +104,24 @@ def test_multiple_consecutive_sends():
         b"", # Empty message in sequence
         b"Last Message in Sequence"
     ]
-    
+
     received_messages = []
-    
+
     for i, msg_to_send in enumerate(messages):
         print(f"Sending message {i+1}/{len(messages)}: {msg_to_send!r}")
         usemihosting.framed_console_send(msg_to_send)
-        
+
         # Optional: small delay if timing issues are suspected, though pipe should handle it.
-        # time.sleep_ms(50) 
-        
+        # time.sleep_ms(50)
+
         print(f"Receiving message {i+1}/{len(messages)}...")
         received_msg = usemihosting.framed_console_recv()
         print(f"Received: {received_msg!r}")
-        
+
         assert received_msg == msg_to_send, \
             f"Consecutive send/recv mismatch for message {i+1}. Expected {msg_to_send!r}, got {received_msg!r}"
         received_messages.append(received_msg)
-        
+
     assert len(received_messages) == len(messages), "Not all messages were received in sequence."
     print("All consecutive messages sent and received successfully and match.")
 
@@ -143,7 +143,7 @@ def run_all_console_pipe_tests():
 
     tests_passed = 0
     tests_failed = 0
-    
+
     test_suite = [
         test_basic_echo,
         test_empty_payload,
@@ -156,7 +156,7 @@ def run_all_console_pipe_tests():
             tests_passed += 1
         else:
             tests_failed += 1
-            
+
     print("\n--- Console Pipe Test Suite Summary ---")
     print(f"Total tests run: {len(test_suite)}")
     print(f"Passed: {tests_passed}")

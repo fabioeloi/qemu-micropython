@@ -27,7 +27,7 @@ def mqtt_message_callback(topic, msg):
 def setup_mqtt_client(uart_id, baudrate, client_id_suffix="", use_uart_stream=True, custom_stream=None):
     """Helper to initialize UART, UARTSocket (if applicable), and MQTTIoTClient."""
     print(f"\n--- Setting up MQTT Client (UART_ID={uart_id}, Baud={baudrate}, ClientIDSuffix='{client_id_suffix}') ---")
-    
+
     if not MQTT_AVAILABLE:
         print("TEST_SETUP: umqtt.simple library is not available. Cannot proceed.")
         return None, None
@@ -43,7 +43,7 @@ def setup_mqtt_client(uart_id, baudrate, client_id_suffix="", use_uart_stream=Tr
         except Exception as e:
             print(f"TEST_SETUP: Error initializing UART({uart_id}): {e}")
             return None, None
-        
+
         uart_sock = UARTSocket(uart, host=DEFAULT_MOCK_BROKER_HOST_CONCEPTUAL, port=DEFAULT_MOCK_BROKER_PORT_CONCEPTUAL)
         print("TEST_SETUP: UARTSocket wrapper created for UART.")
         stream_to_use = uart_sock
@@ -86,7 +86,7 @@ def test_connect_ping_disconnect(uart_id, baudrate):
     print("\n===== Test: Connect, Ping (Implicit), Disconnect =====")
     test_passed = False
     mqtt_client, uart_obj_for_stream = setup_mqtt_client(uart_id, baudrate, client_id_suffix="-conn-ping-disc")
-    
+
     if not mqtt_client:
         print("TEST_CONN_PING_DISC: FAIL - MQTT client setup failed.")
         return False
@@ -97,7 +97,7 @@ def test_connect_ping_disconnect(uart_id, baudrate):
         print("TEST_CONN_PING_DISC: Attempting to connect...")
         if mqtt_client.connect():
             print("TEST_CONN_PING_DISC: Connection successful.")
-            
+
             # PING Test: umqtt.simple handles PINGREQ automatically based on keepalive.
             # For a short test, a PINGREQ might not be sent.
             # If keepalive is set in MQTTClient (default is 0, meaning disabled),
@@ -129,7 +129,7 @@ def test_connect_ping_disconnect(uart_id, baudrate):
                 print("TEST_CONN_PING_DISC: FAIL - Disconnection failed.")
         else:
             print("TEST_CONN_PING_DISC: FAIL - Connection failed.")
-            
+
     except Exception as e:
         print(f"TEST_CONN_PING_DISC: FAIL - Exception during test: {e}")
     finally:
@@ -144,9 +144,9 @@ def test_publish_subscribe_echo(uart_id, baudrate):
     test_passed = False
     client_id_suffix = "-pub-sub-echo"
     client_id = f"{DEFAULT_CLIENT_ID_BASE}{client_id_suffix}"
-    
+
     # Topics for this test
-    echo_topic_template = f"devices/{client_id}/test_echo" 
+    echo_topic_template = f"devices/{client_id}/test_echo"
     # The mock broker is set to subscribe the client to its own telemetry topic for echo
     # and the command topic. We will use the command topic for a clear echo test.
     # Let's define a specific topic pattern the client will subscribe to for echo.
@@ -167,7 +167,7 @@ def test_publish_subscribe_echo(uart_id, baudrate):
     try:
         if mqtt_client.connect():
             print("TEST_PUB_SUB_ECHO: Connection successful.")
-            
+
             # Subscribe to the reply topic (where broker will echo)
             print(f"TEST_PUB_SUB_ECHO: Subscribing to '{subscribe_topic}'...")
             mqtt_client.mqtt_client.subscribe(subscribe_topic.encode('utf-8'))
@@ -179,12 +179,12 @@ def test_publish_subscribe_echo(uart_id, baudrate):
             payload_echo_json = json.dumps(payload_echo)
             print(f"TEST_PUB_SUB_ECHO: Publishing to '{publish_to_trigger_echo_topic}': {payload_echo_json}")
             mqtt_client.mqtt_client.publish(publish_to_trigger_echo_topic.encode('utf-8'), payload_echo_json.encode('utf-8'))
-            
+
             print("TEST_PUB_SUB_ECHO: Waiting for echoed message...")
             time.sleep(1) # Initial wait
             mqtt_client.mqtt_client.check_msg() # Process incoming
             time.sleep(1) # Allow callback to process
-            
+
             echo_received = False
             if publish_to_trigger_echo_topic in received_messages: # Broker echoes on the same topic it received
                 if received_messages[publish_to_trigger_echo_topic] == payload_echo_json:
@@ -203,18 +203,18 @@ def test_publish_subscribe_echo(uart_id, baudrate):
             # Note: The MQTTIoTClient.send_telemetry uses a pre-defined topic.
             # We use the raw mqtt_client.publish here for specific topic control.
             mqtt_client.mqtt_client.publish(no_echo_topic.encode('utf-8'), payload_no_echo_json.encode('utf-8'))
-            
+
             print("TEST_PUB_SUB_ECHO: Waiting briefly to ensure no message on unsubscribed topic...")
             time.sleep(2)
             mqtt_client.mqtt_client.check_msg()
-            
+
             no_echo_correct = True
             if no_echo_topic in received_messages:
                 print(f"TEST_PUB_SUB_ECHO: FAIL - Message received on '{no_echo_topic}' when none expected.")
                 no_echo_correct = False
             else:
                 print(f"TEST_PUB_SUB_ECHO: PASS - No message received on '{no_echo_topic}', as expected.")
-            
+
             if echo_received and no_echo_correct:
                 test_passed = True
         else:
@@ -259,7 +259,7 @@ def test_publish_with_uart_errors(uart_id, baudrate):
             uart_for_stream.set_error_simulation(0.1) # Example: 10% error rate
         else:
             print("TEST_UART_ERRORS: uart.set_error_simulation method not found. Skipping.")
-        
+
         if hasattr(uart_for_stream, "set_noise_simulation"):
             print("TEST_UART_ERRORS: Enabling UART noise simulation (level=0.05).")
             uart_for_stream.set_noise_simulation(0.05) # Example: 5% noise level
@@ -273,11 +273,11 @@ def test_publish_with_uart_errors(uart_id, baudrate):
         print("TEST_UART_ERRORS: Attempting to connect...")
         if mqtt_client.connect():
             print("TEST_UART_ERRORS: Connection successful (or seemed to be).")
-            
+
             payload = {"data_quality": "potentially_corrupt", "value": 123}
             json_payload = json.dumps(payload)
             print(f"TEST_UART_ERRORS: Attempting to publish: {json_payload}")
-            
+
             # Using the client's send_telemetry method
             if mqtt_client.send_telemetry(payload):
                 print("TEST_UART_ERRORS: send_telemetry reported success.")
@@ -293,10 +293,10 @@ def test_publish_with_uart_errors(uart_id, baudrate):
             print("TEST_UART_ERRORS: Attempting to disconnect...")
             mqtt_client.disconnect()
             print("TEST_UART_ERRORS: Disconnect attempt finished.")
-            
+
         else:
             print("TEST_UART_ERRORS: Connection failed. This might be expected with high error rates.")
-            
+
     except Exception as e:
         print(f"TEST_UART_ERRORS: Exception during MQTT operations with (simulated) UART errors: {e}")
         # This is an expected outcome in some error simulation scenarios.
@@ -308,7 +308,7 @@ def test_publish_with_uart_errors(uart_id, baudrate):
             if hasattr(uart_for_stream, "set_noise_simulation"):
                 print("TEST_UART_ERRORS: Disabling UART noise simulation.")
                 uart_for_stream.set_noise_simulation(0)
-        
+
         cleanup_client(mqtt_client, uart_stream)
 
     print("===== Test Publish with UART Errors: COMPLETED (Observational) =====")
@@ -317,24 +317,24 @@ def test_publish_with_uart_errors(uart_id, baudrate):
 def run_all_tests(uart_id, baudrate):
     """Runs all defined MQTT test cases sequentially."""
     print(f"\n===== Starting MQTT UART Test Suite (UART_ID={uart_id}, Baudrate={baudrate}) =====")
-    
+
     results = {}
-    
+
     results["connect_ping_disconnect"] = test_connect_ping_disconnect(uart_id, baudrate)
     time.sleep(2) # Pause between tests
-    
+
     results["publish_subscribe_echo"] = test_publish_subscribe_echo(uart_id, baudrate)
     time.sleep(2) # Pause between tests
-    
+
     results["publish_with_uart_errors"] = test_publish_with_uart_errors(uart_id, baudrate)
-    
+
     print("\n===== MQTT UART Test Suite Summary =====")
     all_passed = True
     for test_name, status in results.items():
         print(f"Test '{test_name}': {'PASS' if status else 'FAIL'}")
         if not status:
             all_passed = False
-            
+
     print(f"Overall Test Suite Result: {'PASS' if all_passed else 'FAIL'}")
     print("========================================")
     return all_passed

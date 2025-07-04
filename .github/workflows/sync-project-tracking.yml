@@ -124,7 +124,7 @@ jobs:
                         print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping.get(feature_key)} with progress {progress}%")
                         if feature_mapping.get(feature_key): update_issue_progress(feature_mapping[feature_key], progress)
                         updated_via_heuristic = True
-                
+
                 # GDB integration
                 if not updated_via_heuristic and (file.startswith('config/gdb/') or \
                      file.startswith('scripts/debug_micropython.sh') or \
@@ -176,7 +176,7 @@ jobs:
                         print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping.get(feature_key)} with progress {progress}%")
                         if feature_mapping.get(feature_key): update_issue_progress(feature_mapping[feature_key], progress)
                         updated_via_heuristic = True
-                
+
                 # State Snapshots
                 if not updated_via_heuristic and ('snapshot' in file.lower() and (file.startswith('src/') or file.startswith('tools/'))):
                     feature_key = 'State snapshots for efficient testing'
@@ -203,7 +203,7 @@ jobs:
                         print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping.get(feature_key)} with progress {progress}%")
                         if feature_mapping.get(feature_key): update_issue_progress(feature_mapping[feature_key], progress)
                         updated_via_heuristic = True
-                
+
                 # Test-related changes (handles both test framework issues)
                 if not updated_via_heuristic and file.startswith('tests/'):
                     print(f"File {file} is a test file. Checking related testing frameworks.")
@@ -212,14 +212,14 @@ jobs:
                     if progress_utf is not None:
                         print(f"Updating '{feature_key_utf}' (Issue {feature_mapping.get(feature_key_utf)}) with progress {progress_utf}%")
                         if feature_mapping.get(feature_key_utf): update_issue_progress(feature_mapping[feature_key_utf], progress_utf)
-                    
+
                     feature_key_ate = 'Automated testing in virtual environments'
                     progress_ate = extract_progress(roadmap_content, feature_key_ate)
                     if progress_ate is not None:
                         print(f"Updating '{feature_key_ate}' (Issue {feature_mapping.get(feature_key_ate)}) with progress {progress_ate}%")
                         if feature_mapping.get(feature_key_ate): update_issue_progress(feature_mapping[feature_key_ate], progress_ate)
                     updated_via_heuristic = True
-                
+
                 # Documentation
                 if not updated_via_heuristic and file.startswith('docs/'):
                     feature_key = 'Documentation improvements'
@@ -228,7 +228,7 @@ jobs:
                         print(f"File {file} relates to '{feature_key}'. Updating issue {feature_mapping.get(feature_key)} with progress {progress}%")
                         if feature_mapping.get(feature_key): update_issue_progress(feature_mapping[feature_key], progress)
                         updated_via_heuristic = True
-                
+
                 if not updated_via_heuristic:
                     print(f"File {file} did not match specific feature heuristics.")
 
