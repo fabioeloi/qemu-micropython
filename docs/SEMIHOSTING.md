@@ -70,10 +70,10 @@ These functions allow interaction with the host system's filesystem. Paths are t
         *   Changes the current file position.
         *   `offset`: The offset in bytes.
         *   `whence`: Defines the reference point: `0` for start of file (SEEK_SET), `1` for current position (SEEK_CUR), `2` for end of file (SEEK_END).
-        *   **Limitation for `SEEK_CUR`**: The underlying C implementation of `usemihosting` may not support `SEEK_CUR` directly due to the lack of a standard `SYS_TELL` semihosting operation. If so, attempts to use `whence=1` might raise an `OSError(EOPNOTSUPP)`. The Python stream layer might attempt to emulate it if it caches the position.
+        *   `SEEK_CUR` is supported by caching the current position within the MicroPython module.
         *   Returns the new absolute file position.
     *   `tell()` -> `int`
-        *   Returns the current file position in bytes. This relies on the Python stream layer's position caching if `SEEK_CUR` is not directly supported at the C level for semihosting.
+        *   Returns the current file position in bytes. This relies on the module's internal position caching.
     *   `flush()`
         *   This is currently a no-op in the C implementation, as semihosting `SYS_FLUSH` is not universally standard or typically required (files are often flushed on close by the host).
     *   **Context Manager Support:**

@@ -237,27 +237,60 @@ def test_seek_and_tell_operations():
         assert f.tell() == 36, f"tell() at EOF should be 36, got {f.tell()}"
         print(f"SEEK_END to -10, read 'QRSTUVWXYZ', new position {f.tell()}")
 
-        # SEEK_CUR (Note: C implementation reported EOPNOTSUPP for SEEK_CUR in ioctl)
-        # If Python's stream wrapper caches position, it might simulate SEEK_CUR.
-        # Let's test if the VFS layer or stream wrapper handles it.
-        # First, seek to a known position.
-        f.seek(5, 0) # Back to '5' (index 5)
-        assert f.tell() == 5
+        # SEEK_CUR
+        print("Testing SEEK_CUR...")
+        f.seek(5, 0) # Go to position 5 ("56789...")
+        assert f.tell() == 5, f"tell() after seek(5,0) should be 5, got {f.tell()}"
+        print(f"  Seeked to 5. Current tell(): {f.tell()}")
+
+        # Seek forward with SEEK_CUR
+        res_seek_cur_fwd = f.seek(10, 1) # From pos 5, seek 10 forward to pos 15 ("FGHIJ...")
+        assert res_seek_cur_fwd == 15, f"seek(10, SEEK_CUR) from pos 5 should return 15, got {res_seek_cur_fwd}"
+        assert f.tell() == 15, f"tell() after seek(10, SEEK_CUR) from pos 5 should be 15, got {f.tell()}"
+        data_after_fwd_seek = f.read(5)
+        assert data_after_fwd_seek == b"FGHIJ", f"Read after SEEK_CUR forward failed. Got: {data_after_fwd_seek}"
+        assert f.tell() == 20, f"tell() after read should be 20, got {f.tell()}"
+        print(f"  SEEK_CUR forward by 10 from pos 5 to {res_seek_cur_fwd}. Read: {data_after_fwd_seek}. New tell(): {f.tell()}")
+
+        # Seek backward with SEEK_CUR
+        # Current pos is 20 ("KLMNO...")
+        res_seek_cur_bwd = f.seek(-15, 1) # From pos 20, seek 15 backward to pos 5 ("56789...")
+        assert res_seek_cur_bwd == 5, f"seek(-15, SEEK_CUR) from pos 20 should return 5, got {res_seek_cur_bwd}"
+        assert f.tell() == 5, f"tell() after seek(-15, SEEK_CUR) from pos 20 should be 5, got {f.tell()}"
+        data_after_bwd_seek = f.read(5)
+        assert data_after_bwd_seek == b"56789", f"Read after SEEK_CUR backward failed. Got: {data_after_bwd_seek}"
+        assert f.tell() == 10, f"tell() after read should be 10, got {f.tell()}"
+        print(f"  SEEK_CUR backward by -15 from pos 20 to {res_seek_cur_bwd}. Read: {data_after_bwd_seek}. New tell(): {f.tell()}")
+
+        # Seek with 0 offset using SEEK_CUR (should not change position)
+        current_pos_before_zero_seek = f.tell() # Should be 10
+        res_seek_zero = f.seek(0, 1)
+        assert res_seek_zero == current_pos_before_zero_seek, f"seek(0, SEEK_CUR) should return current pos {current_pos_before_zero_seek}, got {res_seek_zero}"
+        assert f.tell() == current_pos_before_zero_seek, f"tell() after seek(0, SEEK_CUR) should remain {current_pos_before_zero_seek}, got {f.tell()}"
+        print(f"  SEEK_CUR by 0 from pos {current_pos_before_zero_seek} successful. New tell(): {f.tell()}")
+
+        # Test seeking beyond EOF with SEEK_CUR (actual seek should succeed, read should be empty)
+        f.seek(0, 2) # Go to EOF (pos 36)
+        assert f.tell() == 36, f"tell() at EOF should be 36, got {f.tell()}"
+        res_seek_past_eof = f.seek(100, 1) # Seek 100 past current EOF
+        assert res_seek_past_eof == 136, f"seek(100, SEEK_CUR) from EOF should return 136, got {res_seek_past_eof}"
+        assert f.tell() == 136, f"tell() after seeking past EOF should be 136, got {f.tell()}"
+        data_past_eof = f.read(5)
+        assert data_past_eof == b"", f"Read after seeking past EOF should be empty. Got: {data_past_eof}"
+        print(f"  SEEK_CUR past EOF successful. New tell(): {f.tell()}. Read was empty.")
+
+        # Test seeking before start of file with SEEK_CUR (should raise OSError or similar)
+        f.seek(10, 0) # Go to pos 10
+        assert f.tell() == 10
         try:
-            # If SEEK_CUR is not supported at C level, this might fail or behave unexpectedly
-            # depending on how MicroPython's stream layer handles EOPNOTSUPP from ioctl.
-            # Often, if ioctl returns MP_EOPNOTSUPP for SEEK_CUR, the Python layer might try
-            # to emulate it using its cached position, or it might propagate the error.
-            # If it emulates, f.seek(5, 1) from pos 5 should go to pos 10.
-            res_seek_cur = f.seek(5, 1) # SEEK_CUR = 1. Seek 5 bytes forward from current pos 5.
-            assert res_seek_cur == 10, f"seek(5, SEEK_CUR) from pos 5 should return 10, got {res_seek_cur}"
-            assert f.tell() == 10, f"tell() after seek(5, SEEK_CUR) should be 10, got {f.tell()}"
-            print(f"SEEK_CUR by 5 from pos 5 successful, new position {f.tell()}.")
+            f.seek(-20, 1) # Attempt to seek to pos -10
+            assert False, "seek(-20, SEEK_CUR) from pos 10 should have failed (seeking before start)"
         except OSError as e:
-            if e.args[0] == uerrno.EOPNOTSUPP:
-                print("SEEK_CUR test: Caught EOPNOTSUPP as expected from C layer. Python stream layer did not emulate.")
-            else:
-                raise # Re-raise unexpected OSError
+            assert e.args[0] == uerrno.EINVAL, f"Expected EINVAL for seek before start, got {e.args[0]}"
+            print(f"  Correctly got EINVAL when seeking before start of file with SEEK_CUR. Current tell(): {f.tell()}")
+        # Position should remain unchanged after a failed seek
+        assert f.tell() == 10, f"tell() after failed seek should remain 10, got {f.tell()}"
+
 
     _cleanup_files(TEST_FILE_BIN)
 

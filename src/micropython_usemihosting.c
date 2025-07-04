@@ -106,8 +106,7 @@ static int mp_get_errno_from_host(int host_errno) {
 typedef struct _mp_obj_semihosting_file_t {
     mp_obj_base_t base;
     mp_int_t host_fd; // Host file descriptor
-    // We could cache current file position here if SYS_TELL is unavailable
-    // mp_uint_t current_pos;
+    mp_uint_t current_pos; // Cached current file position
 } mp_obj_semihosting_file_t;
 
 // Stream protocol functions
@@ -125,7 +124,9 @@ STATIC mp_uint_t semihosting_file_read(mp_obj_t self_in, void *buf, mp_uint_t si
         return MP_STREAM_ERROR;
     }
     // SYS_READ returns number of bytes *not* read. 0 means all 'size' bytes were read.
-    return size - bytes_not_read;
+    mp_uint_t bytes_read = size - bytes_not_read;
+    self->current_pos += bytes_read; // Update cached position
+    return bytes_read;
 }
 
 STATIC mp_uint_t semihosting_file_write(mp_obj_t self_in, const void *buf, mp_uint_t size, int *errcode) {
@@ -139,14 +140,16 @@ STATIC mp_uint_t semihosting_file_write(mp_obj_t self_in, const void *buf, mp_ui
 
     // SYS_WRITE returns 0 on success (all bytes written).
     // Some docs say it returns number of bytes *not* written if non-zero (error or partial).
-    // Others say any non-zero is an error code or handle.
     // Let's assume 0 = success, anything else means error or partial write.
     if (write_result == 0) {
+        self->current_pos += size; // Update cached position
         return size; // All bytes written
     } else {
         // If write_result is positive and <= size, it's bytes_not_written
         if (write_result > 0 && write_result <= (mp_int_t)size) {
-            return size - write_result; // Partial write
+            mp_uint_t bytes_written = size - write_result;
+            self->current_pos += bytes_written; // Update for partial write
+            return bytes_written; // Partial write
         }
         // Otherwise, it's an error. Get errno.
         *errcode = mp_get_errno_from_host(get_host_errno());
@@ -166,35 +169,37 @@ STATIC mp_uint_t semihosting_file_ioctl(mp_obj_t self_in, mp_uint_t request, uin
         mp_int_t seek_params[2] = {self->host_fd, 0};
         mp_int_t flen_params[1] = {self->host_fd};
         mp_int_t res;
-        mp_int_t new_pos = 0;
+        mp_int_t new_pos_abs = 0;
 
         if (s->whence == SEEK_SET) {
-            new_pos = s->offset;
+            new_pos_abs = s->offset;
         } else if (s->whence == SEEK_END) {
             res = do_semihosting_call(SYS_FLEN, flen_params);
             if (res < 0) { // SYS_FLEN returns length or -1 on error
                 *errcode = mp_get_errno_from_host(get_host_errno());
                 return MP_STREAM_ERROR;
             }
-            new_pos = res + s->offset;
+            new_pos_abs = res + s->offset;
         } else if (s->whence == SEEK_CUR) {
-            // SYS_SEEK only sets absolute position. No direct SYS_TELL.
-            // This makes SEEK_CUR non-trivial. We'd need to cache position.
-            // For now, not supporting SEEK_CUR to avoid complexity of position caching.
-            *errcode = MP_EOPNOTSUPP;
-            return MP_STREAM_ERROR;
+            new_pos_abs = self->current_pos + s->offset;
         } else {
             *errcode = MP_EINVAL;
             return MP_STREAM_ERROR;
         }
 
-        seek_params[1] = new_pos;
+        if (new_pos_abs < 0) { // Seeking before start of file
+            *errcode = MP_EINVAL;
+            return MP_STREAM_ERROR;
+        }
+
+        seek_params[1] = new_pos_abs;
         res = do_semihosting_call(SYS_SEEK, seek_params); // SYS_SEEK returns 0 on success, -1 on error
         if (res != 0) {
             *errcode = mp_get_errno_from_host(get_host_errno());
             return MP_STREAM_ERROR;
         }
-        s->offset = new_pos; // Report back the absolute position set
+        self->current_pos = new_pos_abs; // Update cached position
+        s->offset = self->current_pos; // Report back the absolute position set
         return 0; // Success
 
     } else if (request == MP_STREAM_FLUSH) {
@@ -254,6 +259,7 @@ STATIC mp_obj_t usemihosting_open(mp_obj_t path_obj, mp_obj_t mode_obj) {
 
     mp_obj_semihosting_file_t *o = mp_obj_malloc(mp_obj_semihosting_file_t, &mp_type_semihosting_file);
     o->host_fd = host_fd;
+    o->current_pos = 0; // Initialize cached position
     return MP_OBJ_FROM_PTR(o);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(usemihosting_open_obj, usemihosting_open);
@@ -334,19 +340,36 @@ STATIC mp_obj_t usemihosting_is_semihosting_available(void) {
     // by a common technique: if semihosting is *not* active, the BKPT/SVC might hardfault or behave differently.
     // A truly reliable check is difficult without knowing the exact behavior of the non-semihosting case.
     // For now, let's assume if SYS_TIME returns a non -1 like value (common error return), it's available.
-    // This is not foolproof.
-    mp_int_t time_val = do_semihosting_call(SYS_TIME, NULL);
-    if (time_val == (mp_int_t)-1 && get_host_errno() != 0) {
-        // If time is -1 AND errno is set, it might indicate semihosting is there but call failed.
-        // If time is -1 and errno is 0, it could be a valid time or an indication of no semihosting.
-        // This is tricky. A more robust check would be using a specific "are you there?" semihosting call if one existed.
-        // For now, assume if it doesn't hardfault and returns *something* that isn't a clear error, it's there.
-        // A common test is to perform an operation that only a debugger would respond to.
-        // Let's simplify: if SYS_CLOCK returns >= 0, assume available.
-        mp_int_t clock_val = do_semihosting_call(SYS_CLOCK, NULL);
-        return mp_obj_new_bool(clock_val != (mp_int_t)-1); // If clock returns -1, assume not available or error.
+    // A more robust way to check for semihosting is to try to open the
+    // special file ":semihosting-features" and check its magic number.
+    // Ref: ARM Semihosting Specification
+    const char *features_path = ":semihosting-features";
+    mp_int_t open_params[3] = {(mp_int_t)features_path, SEMIHOSTING_OPEN_R, strlen(features_path)};
+    mp_int_t host_fd = do_semihosting_call(SYS_OPEN, open_params);
+
+    if (host_fd == -1) {
+        return mp_obj_new_bool(false); // Failed to open, semihosting likely not available or features not supported
     }
-    return mp_obj_new_bool(true); // If SYS_TIME didn't return -1 or did with no error, assume present.
+
+    // Try to read the magic bytes
+    char magic_buf[4];
+    mp_int_t read_params[3] = {host_fd, (mp_int_t)magic_buf, sizeof(magic_buf)};
+    mp_int_t bytes_not_read = do_semihosting_call(SYS_READ, read_params);
+
+    mp_int_t close_params[1] = {host_fd};
+    do_semihosting_call(SYS_CLOSE, close_params); // Attempt to close regardless of read outcome
+
+    if (bytes_not_read != 0) { // Should be 0 if 4 bytes were read
+        return mp_obj_new_bool(false); // Failed to read enough bytes
+    }
+
+    // Check magic bytes: SHFB (0x53, 0x48, 0x46, 0x42)
+    if (magic_buf[0] == 0x53 && magic_buf[1] == 0x48 &&
+        magic_buf[2] == 0x46 && magic_buf[3] == 0x42) {
+        return mp_obj_new_bool(true);
+    }
+
+    return mp_obj_new_bool(false); // Magic bytes didn't match
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(usemihosting_is_semihosting_available_obj, usemihosting_is_semihosting_available);
 
