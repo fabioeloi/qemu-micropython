@@ -315,35 +315,101 @@ class MicroPythonHelper:
             # This primarily handles dict-based locals (modules, classes, etc.)
             # Stack-based locals for functions are not fully handled here yet.
             locals_map_ptr = target_frame_ptr['locals_dict'] # Common member name for such dicts
-            if locals_map_ptr and locals_map_ptr.address != 0:
-                locals_map = locals_map_ptr.dereference()
-                map_table = locals_map['table']
-                map_alloc = int(locals_map['alloc'])
+            is_function_frame = False
+            if hasattr(target_frame_ptr, 'locals_dict'):
+                locals_map_ptr = target_frame_ptr['locals_dict']
+                if locals_map_ptr and locals_map_ptr.address != 0:
+                    locals_map = locals_map_ptr.dereference()
+                    map_table = locals_map['table']
+                    map_alloc = int(locals_map['alloc'])
+                    sentinel_addr = 0
+                    try:
+                        sentinel_val = gdb.lookup_global_symbol('mp_const_map_elem_is_value_sentinel')
+                        if sentinel_val: sentinel_addr = sentinel_val.value().address
+                    except gdb.error: pass
 
-                # Attempt to get sentinel value, otherwise fallback to just checking for NULL key
-                sentinel_addr = 0
-                try:
-                    sentinel_val = gdb.lookup_global_symbol('mp_const_map_elem_is_value_sentinel')
-                    if sentinel_val:
-                        sentinel_addr = sentinel_val.value().address
-                except gdb.error: # Symbol not found
-                    pass
+                    for i in range(map_alloc):
+                        entry = map_table[i]
+                        key_obj = entry['key']
+                        if key_obj != 0 and (sentinel_addr == 0 or key_obj.address != sentinel_addr):
+                            name = self.get_qstr(key_obj)
+                            value_obj = entry['value']
+                            value_str = self.format_mp_obj(value_obj)
+                            locals_dict[name] = value_str
+                    if locals_dict: # Successfully got locals from a dict
+                        return locals_dict
+                is_function_frame = True # No locals_dict or it was empty, try stack
+            else:
+                is_function_frame = True # No 'locals_dict' field, assume stack locals
 
-                for i in range(map_alloc):
-                    entry = map_table[i]
-                    key_obj = entry['key']
-                    if key_obj != 0 and (sentinel_addr == 0 or key_obj.address != sentinel_addr):
-                        name = self.get_qstr(key_obj)
-                        value_obj = entry['value']
-                        value_str = self.format_mp_obj(value_obj)
-                        locals_dict[name] = value_str
-            # else:
-                # print(Colors.colorize("  <Frame may use stack-based locals, not yet fully supported by mpy-locals for selected frames>", Colors.YELLOW))
+            if is_function_frame:
+                fun_bc_ptr = target_frame_ptr['fun_bc']
+                if fun_bc_ptr and fun_bc_ptr.address != 0:
+                    fun_bc_obj = fun_bc_ptr.dereference()
+                    num_pos_args = int(fun_bc_obj['n_pos_args'])
+                    num_kwonly_args = int(fun_bc_obj['n_kwonly_args'])
+                    num_total_args = num_pos_args + num_kwonly_args
 
-        except gdb.error:
-            pass
-        except Exception:
-            pass
+                    # Attempt to get a pointer to the base of the stack area for this frame's locals
+                    stack_locals_base_ptr = None
+                    try:
+                        if 'code_state' in target_frame_ptr.type.fields():
+                            code_state_val = target_frame_ptr['code_state']
+                            code_state_obj = None
+                            if code_state_val.type.code == gdb.TYPE_CODE_PTR and code_state_val.address != 0:
+                                code_state_obj = code_state_val.dereference()
+                            elif code_state_val.type.code != gdb.TYPE_CODE_PTR: # Is a struct
+                                code_state_obj = code_state_val
+
+                            if code_state_obj:
+                                if 'state' in code_state_obj.type.fields():
+                                    stack_locals_base_ptr = code_state_obj['state']
+                                elif 'state_v' in code_state_obj.type.fields(): # Another common name
+                                    stack_locals_base_ptr = code_state_obj['state_v']
+                                # TODO: Could also check target_frame_ptr['sp'] and work backwards if n_state is known
+                    except gdb.error: pass # Silently ignore if fields are not there
+
+                    if stack_locals_base_ptr and stack_locals_base_ptr.address != 0:
+                        # Try to determine number of locals on stack from n_state if possible
+                        # This is highly dependent on n_state encoding (see py/bc.h)
+                        # For now, we will just display up to num_total_args
+                        # A more complete solution would parse n_state for total locals.
+                        # unsigned int n_state_val = fun_bc_obj['n_state'];
+                        # unsigned int n_locals_from_state = (n_state_val >> MP_BC_NUM_STATE_LOCAL_SHIFT) & MP_BC_NUM_STATE_LOCAL_MASK;
+                        # The above shifts/masks are from C, need to be known for GDB.
+                        # Let's assume num_locals_to_display = num_total_args for now.
+                        # If a field like fun_bc_obj['n_locals_on_stack'] existed, it would be used.
+
+                        for i in range(num_total_args): # Only show arguments for now
+                            try:
+                                local_obj = stack_locals_base_ptr[i] # mp_obj_t
+                                # Argument names are still hard. Using generic names.
+                                locals_dict[f"<arg{i}>"] = self.format_mp_obj(local_obj)
+                            except Exception as e_val:
+                                locals_dict[f"<arg{i}>"] = f"<error: {e_val}>"
+
+                        # If we wanted to show other stack slots (non-arg locals) without names:
+                        # num_all_stack_slots = ... (from n_state)
+                        # for i in range(num_total_args, num_all_stack_slots):
+                        #    try:
+                        #        local_obj = stack_locals_base_ptr[i]
+                        #        locals_dict[f"<stack_var{i-num_total_args}>"] = self.format_mp_obj(local_obj)
+                        #    except Exception as e_val:
+                        #        locals_dict[f"<stack_var{i-num_total_args}>"] = f"<error: {e_val}>"
+
+                    else: # Could not determine stack_locals_base_ptr
+                        if not locals_dict and num_total_args > 0:
+                            for i in range(num_total_args):
+                                locals_dict[f"<arg{i}>"] = "<stack base unknown>"
+
+                    if not locals_dict: # If still empty after trying stack
+                         locals_dict["<info>"] = "<function frame: no dict locals, stack locals not fully resolved>"
+
+        except gdb.error: # Catches GDB errors from field access etc.
+            # locals_dict might be partially filled or empty
+            if not locals_dict: locals_dict["<error>"] = "<GDB error accessing frame details>"
+        except Exception as e_py: # Catches Python errors in this script
+            if not locals_dict: locals_dict["<error>"] = f"<Python error: {type(e_py).__name__}>"
         
         return locals_dict
 
@@ -823,14 +889,28 @@ class MPLocalsCommand(gdb.Command):
                  header_printed = True
 
         if locals_dict:
-            if not header_printed: # If header wasn't printed (e.g. no selection, but current VM frame had locals)
+            if not header_printed:
                  print(Colors.colorize("Locals for current MicroPython VM frame:", Colors.CYAN))
-            for name, value in sorted(locals_dict.items()): # Sort for consistent output
+            for name, value in sorted(locals_dict.items()):
                 print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
-        elif header_printed: # Header was printed, but no locals found for that frame
-            print(Colors.colorize("  <No locals available or applicable for this frame type/selection>", Colors.YELLOW))
-            print(Colors.colorize("  (Note: `mpy-locals` primarily shows dict-based locals e.g. modules, not stack variables for functions yet)", Colors.YELLOW))
-        else: # No header printed and no locals, means no frame context at all or empty
+
+            has_generic_names = any(k.startswith("<arg") or k.startswith("<local") or k.startswith("<stack_var") for k in locals_dict.keys())
+            is_info_only = all(k.startswith(("<info", "<error")) for k in locals_dict.keys())
+
+            if has_generic_names:
+                print(Colors.colorize("  (Note: Some argument/local names are generic placeholders. Full name resolution for stack variables is complex.)", Colors.YELLOW))
+            elif not locals_dict or (len(locals_dict) == 1 and is_info_only and not has_generic_names): # Empty or only contains info/error
+                 # This condition needs to be careful not to suppress valid info/error messages if locals_dict only contains them
+                 if not is_info_only : # if it's truly empty of vars, not just an info message
+                    print(Colors.colorize("  <No specific local variables found for this frame>", Colors.YELLOW))
+
+        elif header_printed:
+            print(Colors.colorize("  <No locals available for this frame type/selection>", Colors.YELLOW))
+            # Check if the only content is an info/error message from get_locals
+            is_info_only_for_empty = all(k.startswith(("<info", "<error")) for k in locals_dict.keys()) if locals_dict else True
+            if not (locals_dict and is_info_only_for_empty): # if not just an error/info message explaining why it's empty
+                print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
+        else:
             print(Colors.colorize("No valid MicroPython frame context or no locals found.", Colors.YELLOW))
 
 
@@ -949,8 +1029,18 @@ Shows frame details and its local variables."""
             if locals_dict:
                 for name, value in sorted(locals_dict.items()):
                     print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
-            else:
+
+                has_generic_names = any(k.startswith("<arg") or k.startswith("<local") or k.startswith("<stack_var") for k in locals_dict.keys())
+                is_info_only = all(k.startswith(("<info", "<error")) for k in locals_dict.keys())
+
+                if has_generic_names:
+                    print(Colors.colorize("  (Note: Some argument/local names are generic placeholders. Full name resolution for stack variables is complex.)", Colors.YELLOW))
+                elif not any(locals_dict) or (len(locals_dict) == 1 and is_info_only and not has_generic_names) :
+                     if not is_info_only :
+                        print(Colors.colorize("  <No specific local variables found for this frame>", Colors.YELLOW))
+            else: # locals_dict is empty from the start
                 print(Colors.colorize("  <No locals available or applicable for this frame type>", Colors.YELLOW))
+                print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
 
         except ValueError:
             print(Colors.colorize(f"Error: Invalid frame index '{arg}'. Must be an integer.", Colors.RED))
