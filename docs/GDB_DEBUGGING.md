@@ -52,6 +52,18 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 - `mpy-except-navigate <frame_number>` - (If implemented and useful) Navigate within the exception's traceback frames.
 - `mpy-except-visualize` - Show a visual box representation of the current exception.
 
+### Configuring Source Code Display
+For tracebacks to display source code context, GDB needs to know where to find your MicroPython project's source files. You can configure this using:
+
+- **GDB parameter `mpy-source-path`**: Set this to a colon-separated (Linux/macOS) or semicolon-separated (Windows) list of directories.
+  ```gdb
+  set mpy-source-path /path/to/my_project/src:/another/path:.
+  ```
+  (Using `.` includes GDB's current working directory).
+- **Environment Variable `MPY_SOURCE_PATH`**: Alternatively, set this environment variable before starting GDB.
+
+The script will search these paths, plus GDB's current working directory and absolute paths.
+
 ## Debugging Workflow
 
 1. **Starting a Debug Session**
@@ -81,7 +93,7 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 
 3. **Examining State**
    ```gdb
-   # Show Python backtrace
+   # Show Python backtrace (live, with source context if available)
    mpy-bt
    
    # Show local variables
@@ -221,9 +233,10 @@ When an exception breakpoint is hit, you can use these commands to examine the e
 mpy-except-info
 
 # Show detailed exception information (including parsed attributes like errno for OSError)
+# The traceback part will include source code context if files are found.
 mpy-except-info -d
 
-# Show Python-level traceback of the exception
+# Show Python-level traceback of the exception (includes source context)
 mpy-except-bt
 
 # Show local variables at the point where the exception occurred

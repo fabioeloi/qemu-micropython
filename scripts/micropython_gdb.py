@@ -49,6 +49,130 @@ class Colors:
 # Check if color output is enabled
 def is_color_enabled():
     """Check if color output is enabled in GDB"""
+
+# --- Source Code Lookup Helpers ---
+# Configuration for source lookup
+# Order of search:
+# 1. Absolute paths.
+# 2. Relative to GDB's current working directory.
+# 3. Relative to paths in GDB parameter `mpy-source-path`.
+# 4. Relative to paths in environment variable `MPY_SOURCE_PATH`.
+
+class MpySourcePathParameter(gdb.Parameter):
+    """Set the source path for MicroPython projects.
+    A list of directories separated by os.pathsep (e.g., /path/to/src1:/path/to/src2)."""
+    set_doc = "Set MicroPython source lookup paths."
+    show_doc = "Show MicroPython source lookup paths."
+
+    def __init__(self):
+        super().__init__("mpy-source-path", gdb.COMMAND_SUPPORT, gdb.PARAM_STRING)
+        self.value = "" # Default value
+
+# Instantiate the parameter to register it with GDB (if not already defined)
+if 'MpySourcePathParameter_registered' not in globals():
+    MpySourcePathParameter()
+    MpySourcePathParameter_registered = True
+
+
+def _gdb_resolve_source_path(filename_str):
+    """Tries to find the absolute path for a source file."""
+    if not filename_str or filename_str.startswith("<"): # Don't try to resolve special names
+        return None
+
+    if os.path.isabs(filename_str):
+        if os.path.exists(filename_str):
+            return filename_str
+        return None
+
+    # Try relative to GDB's CWD
+    try:
+        gdb_cwd_output = gdb.execute("pwd", to_string=True)
+        if gdb_cwd_output:
+             gdb_cwd = gdb_cwd_output.strip().splitlines()[0]
+             path_in_gdb_cwd = os.path.join(gdb_cwd, filename_str)
+             if os.path.exists(path_in_gdb_cwd):
+                 return path_in_gdb_cwd
+    except Exception:
+        pass
+
+    # Try paths from GDB parameter 'mpy-source-path'
+    try:
+        mpy_source_paths_param_val = gdb.parameter("mpy-source-path")
+        if mpy_source_paths_param_val: # Check if it's not None or empty string
+            # GDB parameters are strings. If it's meant to be a list, it's a pathsep-separated string.
+            paths_to_check = str(mpy_source_paths_param_val).split(os.pathsep)
+            for p_path in paths_to_check:
+                if not p_path: continue # Skip empty paths from splitting "::"
+                abs_path = os.path.join(p_path.strip(), filename_str)
+                if os.path.exists(abs_path):
+                    return abs_path
+    except gdb.error:
+        pass
+    except Exception:
+        pass
+
+    # Try paths from environment variable MPY_SOURCE_PATH
+    env_path_str = os.environ.get("MPY_SOURCE_PATH")
+    if env_path_str:
+        for p_path in env_path_str.split(os.pathsep):
+            if not p_path: continue
+            abs_path = os.path.join(p_path.strip(), filename_str)
+            if os.path.exists(abs_path):
+                return abs_path
+
+    # Fallback: try filename as is (might be relative and work if GDB started in right dir)
+    if os.path.exists(filename_str):
+        return filename_str
+
+    return None
+
+
+def _gdb_helper_get_source_lines(filename_str, lineno_int, context_window_size=0):
+    """
+    Attempts to read a source line and optional context from a file.
+    Returns a list of strings (source lines) or an empty list if not found/error.
+    Prepends "    " (4 spaces) to each source line for formatting.
+    """
+    if not filename_str or filename_str.startswith("<") or lineno_int <= 0:
+        return []
+
+    full_path = _gdb_resolve_source_path(filename_str)
+    if not full_path:
+        # Be less verbose if file not found, as it's common for core/ROM modules
+        # return [f"    <Source file '{filename_str}' not found in search paths>"]
+        return []
+
+
+    lines_to_return = []
+    try:
+        with open(full_path, 'r', encoding='utf-8', errors='replace') as f:
+            all_lines = f.readlines()
+
+        # Adjust lineno_int to be 0-indexed for list access
+        target_line_idx = lineno_int - 1
+
+        start_idx = max(0, target_line_idx - context_window_size)
+        end_idx = min(len(all_lines), target_line_idx + 1 + context_window_size) # +1 because target_line_idx is 0-based
+
+        if target_line_idx < 0 or target_line_idx >= len(all_lines):
+             return [f"    <Line {lineno_int} out of range for '{os.path.basename(filename_str)}'>"]
+
+        for i in range(start_idx, end_idx):
+            line_prefix = "  -> " if i == target_line_idx else "     "
+            # Indent source lines with 4 spaces to align nicely under the "File..." line
+            lines_to_return.append(f"    {line_prefix}{all_lines[i].rstrip()}")
+
+    except Exception: # Catch file read errors, etc.
+        return [f"    <Error reading source '{os.path.basename(filename_str)}'>"]
+
+    if not lines_to_return and lineno_int > 0:
+        return [f"    <Line {lineno_int} not found in '{os.path.basename(filename_str)}' (but file was read)>"]
+
+    return lines_to_return
+
+# --- End Source Code Lookup Helpers ---
+
+class MicroPythonHelper:
     try:
         return gdb.parameter("color") != "off"
     except:
@@ -284,16 +408,120 @@ class MicroPythonHelper:
 
     def get_exception_traceback(self, exc_obj: gdb.Value) -> List[str]:
         """Get the traceback for an exception"""
+        # It starts from MP_STATE_VM(thread)['frame']
+        frame_ptr = self.get_current_frame() # This gets self.mp_state_vm['frame']
+        if not frame_ptr:
+            return ["<No live Python stack frames>"]
+
+        formatted_backtrace = []
+        try:
+            frame_idx = 0
+            while frame_ptr and frame_ptr.address != 0:
+                fun_name = "<module>" # Default if no function context (e.g., top level module code)
+                source_file_str = "<unknown_file>"
+                line_num_str = "<unknown_line>"
+
+                # mp_frame_t has 'fun_bc' which is mp_obj_fun_bc_t*
+                fun_bc_ptr = frame_ptr['fun_bc']
+                if fun_bc_ptr and fun_bc_ptr.address != 0:
+                    try:
+                        fun_bc_obj = fun_bc_ptr.dereference()
+
+                        # Get function name
+                        qstr_name = fun_bc_obj['name']
+                        if qstr_name != 0: # qstr 0 can mean anonymous/lambda etc.
+                            fun_name = self.get_qstr(qstr_name)
+
+                        # Get source file
+                        qstr_file = fun_bc_obj['source_file']
+                        if qstr_file != 0:
+                            source_file_str = self.get_qstr(qstr_file)
+
+                        # Get start line of the function.
+                        # Getting precise current IP's line number is complex from GDB python.
+                        # mp_bytecode_get_source_line_from_ip would be needed.
+                        # Using function's start_line as an approximation.
+                        start_line = int(fun_bc_obj['start_line'])
+                        line_num_str = str(start_line)
+                        if source_file_str == "?" and fun_name == "<module>": # often means REPL
+                             source_file_str = "<stdin>" # Or <REPL>
+
+                    except gdb.error as e:
+                        # Handle cases where fun_bc_ptr might be invalid or fields missing
+                        fun_name = f"<error reading fun_bc: {e}>"
+
+                frame_line_str = f"  File \"{source_file_str}\", line {line_num_str}, in {fun_name}"
+                formatted_backtrace.append(frame_line_str)
+
+                current_line_int = 0
+                if line_num_str.isdigit():
+                    current_line_int = int(line_num_str)
+
+                if current_line_int > 0:
+                    source_context_lines = _gdb_helper_get_source_lines(source_file_str, current_line_int, 0)
+                    formatted_backtrace.extend(source_context_lines)
+
+                if frame_ptr['prev_frame'] == frame_ptr: # Avoid infinite loop on bad frame linkage
+                     formatted_backtrace.append("  <Error: Frame points to itself>")
+                     break
+                frame_ptr = frame_ptr['prev_frame'] # mp_frame_t has 'prev_frame'
+                frame_idx += 1
+                if frame_idx > 50: # Safety break for very deep or corrupt stacks
+                    formatted_backtrace.append("  <Backtrace truncated due to depth limit>")
+                    break
+
+        except Exception as e:
+            formatted_backtrace.append(f"<Error during live backtrace generation: {e}>")
+
+        if not formatted_backtrace:
+            return ["<No live Python stack frames processed>"]
+        return formatted_backtrace
+
+    def get_exception_traceback(self, exc_obj: gdb.Value) -> List[str]:
+        """Get the stored traceback from an exception object."""
+        # exc_obj is mp_obj_exception_t*
         frames = []
         try:
-            frame = exc_obj["traceback"]
-            while frame:
-                file_name = self.get_qstr(frame["file"])
-                line_num = int(frame["line"])
-                frames.append(f"  File \"{file_name}\", line {line_num}")
-                frame = frame["next"]
-        except:
-            frames.append("<error getting traceback>")
+            # mp_obj_exception_t has 'traceback' member, which is mp_exc_stack_t*
+            tb_data_ptr = exc_obj["traceback"]
+
+            if not tb_data_ptr or tb_data_ptr.address == 0:
+                # Some exceptions might not have a traceback (e.g. raised from C, or very early)
+                return ["  <No stored traceback available for this exception>"]
+
+            frame_idx = 0
+            while tb_data_ptr and tb_data_ptr.address != 0:
+                # mp_exc_stack_t has 'file' (qstr), 'line' (mp_uint_t), 'next' (mp_exc_stack_t*)
+                file_name_qstr = tb_data_ptr["file"]
+                line_num = int(tb_data_ptr["line"])
+
+                file_name_str = self.get_qstr(file_name_qstr)
+                if file_name_str == "?":
+                    file_name_str = "<unknown_file_in_traceback>"
+
+                # Function name is not available in mp_exc_stack_t
+                # So, we use the simpler format here.
+                frame_line_str = f"  File \"{file_name_str}\", line {line_num}"
+                frames.append(frame_line_str)
+
+                if line_num > 0:
+                    source_context_lines = _gdb_helper_get_source_lines(file_name_str, line_num, 0)
+                    frames.extend(source_context_lines)
+
+                if tb_data_ptr['next'] == tb_data_ptr: # Avoid infinite loop
+                    frames.append("  <Error: Traceback frame points to itself>")
+                    break
+                tb_data_ptr = tb_data_ptr["next"]
+                frame_idx +=1
+                if frame_idx > 50:
+                    frames.append("  <Stored traceback truncated due to depth limit>")
+                    break
+
+        except Exception as e:
+            frames.append(f"<Error getting stored traceback: {e}>")
+
+        if not frames:
+             return ["  <No valid frames in stored traceback>"]
         return frames
 
     def get_exception_attributes(self, exc_obj: gdb.Value) -> Dict[str, str]:
@@ -389,17 +617,23 @@ class MicroPythonHelper:
         
         # Format the traceback
         traceback_header = Colors.colorize("Traceback (most recent call last):", Colors.CYAN, bold=True)
-        traceback_lines = []
-        for frame in exc_info['traceback']:
-            # Extract file and line information
-            match = re.match(r'  File "(.*)", line (\d+)', frame)
-            if match:
-                file_name, line_num = match.groups()
-                # Highlight the file and line number
-                formatted_frame = f"  File \"{Colors.colorize(file_name, Colors.GREEN)}\", line {Colors.colorize(line_num, Colors.MAGENTA)}"
-                traceback_lines.append(formatted_frame)
+        processed_traceback_lines = []
+        for frame_line_or_source in exc_info['traceback']:
+            # Check if it's a main frame descriptor line
+            if frame_line_or_source.strip().startswith("File \""):
+                # Try to match format with optional 'in function_name' part
+                match = re.match(r'  File "(.*)", line ([^,]+)(?:, in (.*))?', frame_line_or_source.strip())
+                if match:
+                    file_name, line_num, func_name = match.groups() # func_name can be None
+                    func_name_part = f", in {Colors.colorize(func_name, Colors.YELLOW)}" if func_name else ""
+                    formatted_frame = f"  File \"{Colors.colorize(file_name, Colors.GREEN)}\", line {Colors.colorize(line_num, Colors.MAGENTA)}{func_name_part}"
+                    processed_traceback_lines.append(formatted_frame)
+                else:
+                    # Fallback if regex doesn't match complex frame string (should not happen ideally)
+                    processed_traceback_lines.append(frame_line_or_source)
             else:
-                traceback_lines.append(frame)
+                # This is a source code line or an error/info message from traceback generation
+                processed_traceback_lines.append(frame_line_or_source)
         
         # Format attributes if available and detailed mode is on
         attributes_section = ""
@@ -474,13 +708,26 @@ class MPBacktraceCommand(gdb.Command):
         self.mpy = mpy
 
     def invoke(self, arg, from_tty):
-        backtrace = self.mpy.get_backtrace()
-        if backtrace:
-            print("Python backtrace:")
-            for i, frame in enumerate(backtrace):
-                print(f"#{i}: {frame}")
+        backtrace_lines = self.mpy.get_backtrace() # This now includes source lines
+        if backtrace_lines:
+            print(Colors.colorize("Python backtrace (live):", Colors.CYAN, bold=True))
+            frame_num = 0
+            for line_content in backtrace_lines:
+                if line_content.strip().startswith("File \""):
+                    # This is a main frame descriptor line
+                    print(f"#{frame_num}: {line_content}")
+                    frame_num += 1
+                elif line_content.strip().startswith("<Error:") or \
+                     line_content.strip().startswith("<Backtrace truncated") or \
+                     line_content.strip().startswith("<No live Python stack frames"):
+                    # Print error messages from traceback generation distinctly
+                    print(f" {line_content}")
+                else:
+                    # This is a source code line (already has padding) or other info
+                    print(line_content)
         else:
-            print("No Python backtrace available")
+            # This case should ideally be handled by get_backtrace returning a list with an info string
+            print(Colors.colorize("No Python backtrace available", Colors.YELLOW))
 
 class MPCatchCommand(gdb.Command):
     """Configure exception catching and breakpoints"""
@@ -508,7 +755,7 @@ class MPCatchCommand(gdb.Command):
             final_condition = base_condition
             if custom_cond_str: # custom_cond_str is built by the new parsing logic
                 final_condition += f" && {custom_cond_str}"
-            
+
             bp.condition = final_condition
             self.mpy.exception_breakpoints[exc_type] = bp # Assuming self.mpy exists
             print(Colors.colorize(f"Will break on {catch_type} {exc_type} if: {final_condition}", Colors.GREEN))
