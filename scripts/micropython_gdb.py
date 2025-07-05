@@ -380,30 +380,47 @@ class MicroPythonHelper:
                         # Let's assume num_locals_to_display = num_total_args for now.
                         # If a field like fun_bc_obj['n_locals_on_stack'] existed, it would be used.
 
-                        for i in range(num_total_args): # Only show arguments for now
+                    n_locals_total_on_stack = 0
+                    if 'n_state' in fun_bc_obj.type.fields():
+                        n_state_val = int(fun_bc_obj['n_state'])
+                        # Typical shifts/masks - THESE ARE ASSUMPTIONS AND BUILD-DEPENDENT
+                        N_STATE_EXC_STACK_SHIFT = 0 # Placeholder, actual value from py/bc.h
+                        N_STATE_EXC_STACK_MASK = 0x3F # Placeholder, e.g. 6 bits
+                        N_STATE_LOCAL_SHIFT = 6 # Placeholder, e.g. after exc_stack bits
+                        N_STATE_LOCAL_MASK = 0xFF # Placeholder, e.g. 8 bits for locals count
+
+                        # This is a simplified interpretation. Real decoding is more complex.
+                        # n_exc_stack = (n_state_val >> N_STATE_EXC_STACK_SHIFT) & N_STATE_EXC_STACK_MASK;
+                        n_locals_total_on_stack = (n_state_val >> N_STATE_LOCAL_SHIFT) & N_STATE_LOCAL_MASK
+                        if n_locals_total_on_stack == 0 and num_total_args > 0 : # If decoding failed or gave 0, but we know there are args
+                            n_locals_total_on_stack = num_total_args # At least try to show args
+                    else:
+                        n_locals_total_on_stack = num_total_args # Fallback if no n_state
+
+                    if stack_locals_base_ptr and stack_locals_base_ptr.address != 0:
+                        for i in range(n_locals_total_on_stack):
+                            local_name = ""
+                            if i < num_total_args:
+                                local_name = f"<arg{i}>"
+                                # TODO: Attempt real argument name retrieval here in future
+                            else:
+                                local_name = f"<local_{i - num_total_args}>"
+                                # TODO: Attempt real local name retrieval here (from line_info)
+
                             try:
-                                local_obj = stack_locals_base_ptr[i] # mp_obj_t
-                                # Argument names are still hard. Using generic names.
-                                locals_dict[f"<arg{i}>"] = self.format_mp_obj(local_obj)
+                                local_obj = stack_locals_base_ptr[i]
+                                locals_dict[local_name] = self.format_mp_obj(local_obj)
                             except Exception as e_val:
-                                locals_dict[f"<arg{i}>"] = f"<error: {e_val}>"
+                                locals_dict[local_name] = f"<error: {e_val}>"
+                    else:
+                        if not locals_dict:
+                            if n_locals_total_on_stack > 0:
+                                locals_dict["<info>"] = f"<Stack base unknown; {n_locals_total_on_stack} stack var(s) not displayed>"
+                            else:
+                                locals_dict["<info>"] = "<Stack base unknown or no stack variables>"
 
-                        # If we wanted to show other stack slots (non-arg locals) without names:
-                        # num_all_stack_slots = ... (from n_state)
-                        # for i in range(num_total_args, num_all_stack_slots):
-                        #    try:
-                        #        local_obj = stack_locals_base_ptr[i]
-                        #        locals_dict[f"<stack_var{i-num_total_args}>"] = self.format_mp_obj(local_obj)
-                        #    except Exception as e_val:
-                        #        locals_dict[f"<stack_var{i-num_total_args}>"] = f"<error: {e_val}>"
-
-                    else: # Could not determine stack_locals_base_ptr
-                        if not locals_dict and num_total_args > 0:
-                            for i in range(num_total_args):
-                                locals_dict[f"<arg{i}>"] = "<stack base unknown>"
-
-                    if not locals_dict: # If still empty after trying stack
-                         locals_dict["<info>"] = "<function frame: no dict locals, stack locals not fully resolved>"
+                    if not locals_dict :
+                         locals_dict["<info>"] = "<Function frame: No dict locals, stack locals unresolved or empty>"
 
         except gdb.error: # Catches GDB errors from field access etc.
             # locals_dict might be partially filled or empty
@@ -894,23 +911,22 @@ class MPLocalsCommand(gdb.Command):
             for name, value in sorted(locals_dict.items()):
                 print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
 
-            has_generic_names = any(k.startswith("<arg") or k.startswith("<local") or k.startswith("<stack_var") for k in locals_dict.keys())
-            is_info_only = all(k.startswith(("<info", "<error")) for k in locals_dict.keys())
+            has_generic_names = any(k.startswith(("<arg", "<local_", "<stack_var")) for k in locals_dict.keys())
+            # Check if dict contains only info/error keys, or is genuinely empty of vars
+            actual_var_keys = [k for k in locals_dict.keys() if not k.startswith(("<info", "<error"))]
 
             if has_generic_names:
-                print(Colors.colorize("  (Note: Some argument/local names are generic placeholders. Full name resolution for stack variables is complex.)", Colors.YELLOW))
-            elif not locals_dict or (len(locals_dict) == 1 and is_info_only and not has_generic_names): # Empty or only contains info/error
-                 # This condition needs to be careful not to suppress valid info/error messages if locals_dict only contains them
-                 if not is_info_only : # if it's truly empty of vars, not just an info message
-                    print(Colors.colorize("  <No specific local variables found for this frame>", Colors.YELLOW))
+                print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Full name resolution is complex and pending.)", Colors.YELLOW))
+            elif not actual_var_keys and locals_dict: # Not empty, but only info/error messages
+                pass # The info/error messages from get_locals() are already printed as key-value
+            elif not locals_dict: # Completely empty dict returned by get_locals
+                 print(Colors.colorize("  <No specific local variables found or resolved for this frame>", Colors.YELLOW))
 
-        elif header_printed:
-            print(Colors.colorize("  <No locals available for this frame type/selection>", Colors.YELLOW))
-            # Check if the only content is an info/error message from get_locals
-            is_info_only_for_empty = all(k.startswith(("<info", "<error")) for k in locals_dict.keys()) if locals_dict else True
-            if not (locals_dict and is_info_only_for_empty): # if not just an error/info message explaining why it's empty
-                print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
-        else:
+
+        elif header_printed: # Header was printed (so a frame was targeted), but locals_dict was empty
+            print(Colors.colorize("  <No local variables available for this frame type/selection>", Colors.YELLOW))
+            print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
+        else: # No header_printed and locals_dict is empty: means no valid frame context at all.
             print(Colors.colorize("No valid MicroPython frame context or no locals found.", Colors.YELLOW))
 
 
@@ -1030,17 +1046,22 @@ Shows frame details and its local variables."""
                 for name, value in sorted(locals_dict.items()):
                     print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
 
-                has_generic_names = any(k.startswith("<arg") or k.startswith("<local") or k.startswith("<stack_var") for k in locals_dict.keys())
-                is_info_only = all(k.startswith(("<info", "<error")) for k in locals_dict.keys())
+                has_generic_names = any(k.startswith(("<arg", "<local_", "<stack_var")) for k in locals_dict.keys())
+                actual_var_keys = [k for k in locals_dict.keys() if not k.startswith(("<info", "<error"))]
 
                 if has_generic_names:
-                    print(Colors.colorize("  (Note: Some argument/local names are generic placeholders. Full name resolution for stack variables is complex.)", Colors.YELLOW))
-                elif not any(locals_dict) or (len(locals_dict) == 1 and is_info_only and not has_generic_names) :
-                     if not is_info_only :
-                        print(Colors.colorize("  <No specific local variables found for this frame>", Colors.YELLOW))
-            else: # locals_dict is empty from the start
+                    print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Full name resolution is complex and pending.)", Colors.YELLOW))
+                elif not actual_var_keys and locals_dict:
+                    pass # Only info/error messages were in locals_dict, already printed.
+                elif not locals_dict: # Genuinely empty dictionary from get_locals
+                    print(Colors.colorize("  <No specific local variables found or resolved for this frame>", Colors.YELLOW))
+
+            else: # locals_dict was empty from get_locals() initially
                 print(Colors.colorize("  <No locals available or applicable for this frame type>", Colors.YELLOW))
-                print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
+                # The (Attempted stack variable...) note might be too noisy if get_locals itself returned an <info> message.
+                # However, if get_locals returned truly empty for a function frame, it's useful.
+                # Let's assume get_locals returning empty for a function frame means it couldn't process it.
+                print(Colors.colorize("  (Full name/value support for all stack variables is work-in-progress.)", Colors.YELLOW))
 
         except ValueError:
             print(Colors.colorize(f"Error: Invalid frame index '{arg}'. Must be an integer.", Colors.RED))

@@ -53,8 +53,8 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 
 ### Frame Navigation and Inspection (Live Call Stack)
 - `mpy-bt` - Show MicroPython live call stack (Python-level). Refreshes the frame list for `mpy-frame` and indicates the currently selected frame with `=>`.
-- `mpy-frame [index]` - Selects and displays details (file, line, function, source, locals) for the live stack frame at `index`. For function frames, 'locals' will include argument values (e.g., `<arg0>: value`). If `index` is omitted, shows the currently selected frame. Use `mpy-bt` to see available frames and indices.
-- `mpy-locals` - Shows local variables. If a frame is selected via `mpy-frame`, shows locals for that frame (including argument values like `<arg0>: value` for functions). Otherwise, shows locals for the current top VM frame. (Note: Shows named locals for dict-based scopes like modules/classes. For functions, currently shows argument values with generic names; other local variables defined within functions are not yet displayed with names/values).
+- `mpy-frame [index]` - Selects and displays details (file, line, function, source, locals) for the live stack frame at `index`. For function frames, 'locals' will include values for arguments (e.g., `<arg0>: value`) and other function-scoped local variables (e.g., `<local_0>: value`), using generic names. If `index` is omitted, shows the currently selected frame. Use `mpy-bt` to see available frames and indices.
+- `mpy-locals` - Shows local variables. If a frame is selected via `mpy-frame`, shows locals for that frame. For function frames, this includes values for arguments (e.g., `<arg0>: value`) and other function-scoped local variables (e.g., `<local_0>: value`), using generic names. Otherwise, shows locals for the current top VM frame. (Note: Shows named locals for dict-based scopes like modules/classes. For function frames, stack variable *values* are shown with *generic names*; full name resolution from debug info is a complex pending enhancement).
 - `mpy-globals` - Show global variables (typically for the current module context).
 
 
