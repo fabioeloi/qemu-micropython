@@ -39,10 +39,13 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 - `mpy-stack` - Show Python stack contents
 
 ### Exception Handling Commands
-- `mpy-catch` - Configure exception catching and breakpoints
-- `mpy-except-info` - Show exception details
-- `mpy-except-bt` - Show exception backtrace
-- `mpy-except-vars` - Show variables at exception point
+- `mpy-catch <type> [all|uncaught]` - Configure exception catching. Default is `uncaught`.
+- `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError).
+- `mpy-except-bt` - Show Python-level traceback of the current exception.
+- `mpy-except-vars` - Show local variables at the point of the current exception.
+- `mpy-except-history` - Show a list of recent exceptions.
+- `mpy-except-navigate <frame_number>` - (If implemented and useful) Navigate within the exception's traceback frames.
+- `mpy-except-visualize` - Show a visual box representation of the current exception.
 
 ## Debugging Workflow
 
@@ -90,6 +93,13 @@ This guide provides detailed instructions for debugging MicroPython firmware run
    
    # Show exception information
    mpy-except-info
+   mpy-except-info -d # For more details including parsed attributes
+
+   # Show exception history
+   mpy-except-history
+
+   # Visualize exception (if preferred over text)
+   mpy-except-visualize
    ```
 
 4. **Stepping Through Code**
@@ -165,8 +175,9 @@ The `mpy-catch` command allows you to set breakpoints that trigger when specific
 
 ```gdb
 # Syntax: mpy-catch <exception_type> [all|uncaught]
-mpy-catch ValueError           # Break on uncaught ValueError (default)
-mpy-catch ZeroDivisionError all  # Break on all ZeroDivisionError exceptions
+mpy-catch ValueError           # Break on uncaught ValueError (default behavior)
+mpy-catch ZeroDivisionError all  # Break on all ZeroDivisionError instances
+mpy-catch NameError uncaught     # Explicitly break on uncaught NameError
 ```
 
 ### Examining Exceptions
@@ -174,14 +185,23 @@ mpy-catch ZeroDivisionError all  # Break on all ZeroDivisionError exceptions
 When an exception breakpoint is hit, you can use these commands to examine the exception:
 
 ```gdb
-# Show exception type and value
+# Show basic exception type and value
 mpy-except-info
 
-# Show exception traceback
+# Show detailed exception information (including parsed attributes like errno for OSError)
+mpy-except-info -d
+
+# Show Python-level traceback of the exception
 mpy-except-bt
 
-# Show local variables at exception point
+# Show local variables at the point where the exception occurred
 mpy-except-vars
+
+# List recent exceptions
+mpy-except-history
+
+# View a specific historical exception (e.g., index 0 from mpy-except-history)
+mpy-except-info -i 0 -d
 ```
 
 ### Exception Debugging Workflow

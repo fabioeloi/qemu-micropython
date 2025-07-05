@@ -306,18 +306,61 @@ class MicroPythonHelper:
                 attributes["args"] = self.format_mp_obj(args_obj)
             
             # Try to get common exception attributes
-            common_attrs = ["message", "errno", "strerror", "filename", "lineno", "offset", "text"]
-            for attr in common_attrs:
-                try:
-                    # This is a simplification - in reality, we'd need to search the exception's
-                    # locals dictionary for these attributes
-                    attr_val = exc_obj[attr]
-                    if attr_val:
-                        attributes[attr] = self.format_mp_obj(attr_val)
-                except:
-                    pass
-        except:
-            pass
+            # Standard attributes are often part of the 'args' tuple.
+            # For specific exception types, we can parse 'args' more intelligently.
+            exc_type_str = self.get_obj_type(exc_obj["base"]["type"]) # Get type name as string
+
+            if args_obj and args_obj['len'] > 0: # If there are args
+                if exc_type_str == "OSError":
+                    if args_obj['len'] >= 1:
+                        try:
+                            errno_val = args_obj['items'][0]
+                            attributes["errno"] = self.format_mp_obj(errno_val)
+                        except:
+                            attributes["errno"] = "<error parsing>"
+                    if args_obj['len'] >= 2:
+                        try:
+                            # strerror is often not directly part of OSError args in MPy,
+                            # but os.strerror(errno) is used.
+                            # If it's present, it's usually the second arg for some custom OSErrors.
+                            # For now, we'll just show what's in args.
+                            # A more advanced version could call os.strerror if available.
+                            pass # Not adding strerror directly from args unless sure of format
+                        except:
+                            pass
+                    # filename could be args[2] for some OSErrors
+                elif exc_type_str == "SyntaxError":
+                    # args for SyntaxError: (msg, (filename, lineno, offset, text))
+                    if args_obj['len'] >= 1:
+                        attributes["msg"] = self.format_mp_obj(args_obj['items'][0])
+                    if args_obj['len'] >= 2:
+                        details_tuple = args_obj['items'][1]
+                        if self.get_obj_type(details_tuple) == "tuple" and details_tuple['len'] == 4:
+                            try:
+                                attributes["filename"] = self.format_mp_obj(details_tuple['items'][0])
+                                attributes["lineno"] = self.format_mp_obj(details_tuple['items'][1])
+                                attributes["offset"] = self.format_mp_obj(details_tuple['items'][2])
+                                attributes["text"] = self.format_mp_obj(details_tuple['items'][3])
+                            except:
+                                attributes["details_tuple"] = "<error parsing>"
+                # Add other specific exception types here if needed
+
+            # Fallback for other common attributes if not specifically parsed (less likely to work directly)
+            # common_attrs_fallback = ["message"] # "errno", "strerror", etc. are usually not direct members
+            # for attr_name in common_attrs_fallback:
+            #     try:
+            #         # This direct member access is unlikely to work for mp_obj_exception_t
+            #         # but kept for conceptual completeness if some exceptions have direct fields.
+            #         attr_gdb_val = exc_obj[attr_name]
+            #         if attr_gdb_val: # Check if the gdb.Value itself is non-null/valid
+            #             attributes[attr_name] = self.format_mp_obj(attr_gdb_val)
+            #     except gdb.error: # Catch GDB errors if member doesn't exist
+            #         pass
+            #     except Exception: # Catch other Python errors during formatting
+            #         pass
+
+        except Exception as e:
+            attributes["error_parsing_attributes"] = str(e)
         
         return attributes
 
@@ -458,10 +501,13 @@ class MPCatchCommand(gdb.Command):
         # Set breakpoint on exception handling
         try:
             bp = gdb.Breakpoint("mp_raise", internal=True)
-            bp.condition = f"mp_obj_get_type(exc) == mp_type_{exc_type}"
+            # Ensure exc is not NULL before trying to get its type.
+            condition = f"exc != 0 && mp_obj_get_type(exc) == mp_type_{exc_type}"
             if catch_type == "uncaught":
-                bp.condition += " && !mp_state_ctx.thread.state.exc_state.handler"
+                # Assuming mp_state_ctx.thread.state.exc_state.handler is non-zero if a Python handler exists.
+                condition += " && mp_state_ctx.thread.state.exc_state.handler == 0" # Or check for NULL if it's a pointer
             
+            bp.condition = condition
             self.mpy.exception_breakpoints[exc_type] = bp
             print(Colors.colorize(f"Will break on {catch_type} {exc_type} exceptions", Colors.GREEN))
         except Exception as e:
