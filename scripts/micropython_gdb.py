@@ -183,11 +183,14 @@ class MicroPythonHelper:
     def __init__(self):
         self.mp_state_ctx = None
         self.mp_state_vm = None
-        self.current_frame = None
+        # self.current_frame = None # Replaced by get_current_frame() logic
         self.exception_breakpoints = {}
-        self.last_exception = None
+        self.last_exception = None # For the most recent exception object
         self.exception_history = []  # Track exception history
         self.max_history = 10  # Maximum number of exceptions to track
+
+        self.live_call_stack_frames = [] # Stores context of live frames for 'mpy-frame'
+        self.selected_live_frame_index = -1 # Index for 'mpy-frame'
 
     def get_mp_state(self) -> None:
         """Get MicroPython state from GDB"""
@@ -292,25 +295,55 @@ class MicroPythonHelper:
         except:
             return "<error formatting exception>"
 
-    def get_locals(self) -> Dict[str, str]:
-        """Get local variables from current frame"""
-        frame = self.get_current_frame()
-        if not frame:
+    def get_locals(self, frame_ptr_val: Optional[gdb.Value] = None) -> Dict[str, str]:
+        """Get local variables from a given frame_ptr_val or the currently selected live frame."""
+        target_frame_ptr = None
+
+        if frame_ptr_val:
+            target_frame_ptr = frame_ptr_val
+        elif self.selected_live_frame_index != -1 and \
+             0 <= self.selected_live_frame_index < len(self.live_call_stack_frames):
+            target_frame_ptr = self.live_call_stack_frames[self.selected_live_frame_index]['frame_ptr_val']
+        else:
+            target_frame_ptr = self.get_current_frame()
+
+        if not target_frame_ptr or target_frame_ptr.address == 0:
             return {}
         
         locals_dict = {}
         try:
-            # Get locals dict
-            locals_ptr = frame['locals']
-            if locals_ptr:
-                for i in range(int(locals_ptr['map']['alloc'])):
-                    entry = locals_ptr['map']['table'][i]
-                    if entry['key'] != 0:
-                        name = self.get_qstr(entry['key'])
-                        value = self.format_mp_obj(entry['value'])
-                        locals_dict[name] = value
-        except Exception as e:
-            print(f"Error getting locals: {e}")
+            # This primarily handles dict-based locals (modules, classes, etc.)
+            # Stack-based locals for functions are not fully handled here yet.
+            locals_map_ptr = target_frame_ptr['locals_dict'] # Common member name for such dicts
+            if locals_map_ptr and locals_map_ptr.address != 0:
+                locals_map = locals_map_ptr.dereference()
+                map_table = locals_map['table']
+                map_alloc = int(locals_map['alloc'])
+
+                # Attempt to get sentinel value, otherwise fallback to just checking for NULL key
+                sentinel_addr = 0
+                try:
+                    sentinel_val = gdb.lookup_global_symbol('mp_const_map_elem_is_value_sentinel')
+                    if sentinel_val:
+                        sentinel_addr = sentinel_val.value().address
+                except gdb.error: # Symbol not found
+                    pass
+
+                for i in range(map_alloc):
+                    entry = map_table[i]
+                    key_obj = entry['key']
+                    if key_obj != 0 and (sentinel_addr == 0 or key_obj.address != sentinel_addr):
+                        name = self.get_qstr(key_obj)
+                        value_obj = entry['value']
+                        value_str = self.format_mp_obj(value_obj)
+                        locals_dict[name] = value_str
+            # else:
+                # print(Colors.colorize("  <Frame may use stack-based locals, not yet fully supported by mpy-locals for selected frames>", Colors.YELLOW))
+
+        except gdb.error:
+            pass
+        except Exception:
+            pass
         
         return locals_dict
 
@@ -410,13 +443,18 @@ class MicroPythonHelper:
         """Get the traceback for an exception"""
         # It starts from MP_STATE_VM(thread)['frame']
         frame_ptr = self.get_current_frame() # This gets self.mp_state_vm['frame']
-        if not frame_ptr:
+
+        # Clear previous stack info and reset selected frame
+        self.live_call_stack_frames = []
+        self.selected_live_frame_index = -1
+
+        if not frame_ptr or frame_ptr.address == 0: # Check address too for null pointers
             return ["<No live Python stack frames>"]
 
-        formatted_backtrace = []
+        formatted_backtrace_display_list = []
         try:
             frame_idx = 0
-            while frame_ptr and frame_ptr.address != 0:
+            while frame_ptr and frame_ptr.address != 0: # Ensure frame_ptr itself is not null
                 fun_name = "<module>" # Default if no function context (e.g., top level module code)
                 source_file_str = "<unknown_file>"
                 line_num_str = "<unknown_line>"
@@ -461,21 +499,40 @@ class MicroPythonHelper:
                     source_context_lines = _gdb_helper_get_source_lines(source_file_str, current_line_int, 0)
                     formatted_backtrace.extend(source_context_lines)
 
+                # Store context for mpy-frame command
+                line_num_int = 0
+                if line_num_str.isdigit():
+                    line_num_int = int(line_num_str)
+
+                frame_context = {
+                    'frame_ptr_val': frame_ptr,
+                    'source_file': source_file_str,
+                    'line_num': line_num_int, # Store as int
+                    'func_name': fun_name,
+                    'display_str': frame_line_str # The string already formatted for display
+                }
+                self.live_call_stack_frames.append(frame_context)
+
+                # Add source context lines to the display list
+                if current_line_int > 0: # current_line_int was from int(line_num_str)
+                    source_context_lines = _gdb_helper_get_source_lines(source_file_str, current_line_int, 0)
+                    formatted_backtrace_display_list.extend(source_context_lines)
+
                 if frame_ptr['prev_frame'] == frame_ptr: # Avoid infinite loop on bad frame linkage
-                     formatted_backtrace.append("  <Error: Frame points to itself>")
+                     formatted_backtrace_display_list.append("  <Error: Frame points to itself>")
                      break
                 frame_ptr = frame_ptr['prev_frame'] # mp_frame_t has 'prev_frame'
                 frame_idx += 1
                 if frame_idx > 50: # Safety break for very deep or corrupt stacks
-                    formatted_backtrace.append("  <Backtrace truncated due to depth limit>")
+                    formatted_backtrace_display_list.append("  <Backtrace truncated due to depth limit>")
                     break
 
         except Exception as e:
-            formatted_backtrace.append(f"<Error during live backtrace generation: {e}>")
+            formatted_backtrace_display_list.append(f"<Error during live backtrace generation: {e}>")
 
-        if not formatted_backtrace:
+        if not formatted_backtrace_display_list:
             return ["<No live Python stack frames processed>"]
-        return formatted_backtrace
+        return formatted_backtrace_display_list
 
     def get_exception_traceback(self, exc_obj: gdb.Value) -> List[str]:
         """Get the stored traceback from an exception object."""
@@ -744,13 +801,38 @@ class MPLocalsCommand(gdb.Command):
         self.mpy = mpy
 
     def invoke(self, arg, from_tty):
-        locals_dict = self.mpy.get_locals()
-        if locals_dict:
-            print("Local variables:")
-            for name, value in locals_dict.items():
-                print(f"  {name} = {value}")
+        # get_locals() will now use the selected frame if available,
+        # or fallback to current VM frame.
+        locals_dict = self.mpy.get_locals() # No args, uses selected_live_frame_index internally
+
+        header_printed = False
+        if self.mpy.selected_live_frame_index != -1 and \
+           0 <= self.mpy.selected_live_frame_index < len(self.mpy.live_call_stack_frames):
+            selected_frame_info = self.mpy.live_call_stack_frames[self.mpy.selected_live_frame_index]
+            print(Colors.colorize(f"Locals for selected MicroPython frame #{self.mpy.selected_live_frame_index}:", Colors.CYAN))
+            print(f"{selected_frame_info['display_str']}")
+            source_lines = _gdb_helper_get_source_lines(selected_frame_info['source_file'], selected_frame_info['line_num'], 0)
+            for line in source_lines:
+                print(line)
+            header_printed = True
         else:
-            print("No local variables found")
+            # Check if get_locals() fell back to current VM frame and got something
+            if locals_dict:
+                 print(Colors.colorize("Locals for current MicroPython VM frame:", Colors.CYAN))
+                 # Optionally display current VM frame info if easily accessible and not redundant
+                 header_printed = True
+
+        if locals_dict:
+            if not header_printed: # If header wasn't printed (e.g. no selection, but current VM frame had locals)
+                 print(Colors.colorize("Locals for current MicroPython VM frame:", Colors.CYAN))
+            for name, value in sorted(locals_dict.items()): # Sort for consistent output
+                print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
+        elif header_printed: # Header was printed, but no locals found for that frame
+            print(Colors.colorize("  <No locals available or applicable for this frame type/selection>", Colors.YELLOW))
+            print(Colors.colorize("  (Note: `mpy-locals` primarily shows dict-based locals e.g. modules, not stack variables for functions yet)", Colors.YELLOW))
+        else: # No header printed and no locals, means no frame context at all or empty
+            print(Colors.colorize("No valid MicroPython frame context or no locals found.", Colors.YELLOW))
+
 
 class MPGlobalsCommand(gdb.Command):
     """Print global variables in current Python frame"""
@@ -774,26 +856,107 @@ class MPBacktraceCommand(gdb.Command):
         self.mpy = mpy
 
     def invoke(self, arg, from_tty):
-        backtrace_lines = self.mpy.get_backtrace() # This now includes source lines
-        if backtrace_lines:
+        # get_backtrace populates self.mpy.live_call_stack_frames
+        # and returns a list of strings already formatted with source for direct display.
+        # For mpy-bt, we want to show the frame numbers and selection marker based on live_call_stack_frames.
+        self.mpy.get_backtrace() # This call refreshes self.mpy.live_call_stack_frames
+
+        if self.mpy.live_call_stack_frames:
             print(Colors.colorize("Python backtrace (live):", Colors.CYAN, bold=True))
-            frame_num = 0
-            for line_content in backtrace_lines:
-                if line_content.strip().startswith("File \""):
-                    # This is a main frame descriptor line
-                    print(f"#{frame_num}: {line_content}")
-                    frame_num += 1
-                elif line_content.strip().startswith("<Error:") or \
-                     line_content.strip().startswith("<Backtrace truncated") or \
-                     line_content.strip().startswith("<No live Python stack frames"):
-                    # Print error messages from traceback generation distinctly
-                    print(f" {line_content}")
-                else:
-                    # This is a source code line (already has padding) or other info
-                    print(line_content)
+            for idx, frame_ctx in enumerate(self.mpy.live_call_stack_frames):
+                # frame_ctx is like {'frame_ptr_val': ..., 'source_file': ..., 'line_num': ...,
+                #                    'func_name': ..., 'display_str': ...}
+                selector = Colors.colorize(" =>", Colors.YELLOW) if idx == self.mpy.selected_live_frame_index else f"#{idx}:"
+
+                # Print the main frame display string (already starts with "  File...")
+                print(f"{selector}{frame_ctx['display_str']}")
+
+                # Print associated source lines for this frame
+                # These are now fetched again here to ensure correct association if context_window changes
+                source_lines = _gdb_helper_get_source_lines(frame_ctx['source_file'], frame_ctx['line_num'], 0)
+                for srcline in source_lines:
+                    # _gdb_helper_get_source_lines already prepends "    " and "  -> " or "     "
+                    # We might want a bit more indentation under the frame selector line.
+                    # Let's assume _gdb_helper_get_source_lines provides sufficient leading spaces.
+                    print(srcline)
         else:
-            # This case should ideally be handled by get_backtrace returning a list with an info string
-            print(Colors.colorize("No Python backtrace available", Colors.YELLOW))
+            # Check if get_backtrace returned an info string like ["<No live Python stack frames>"]
+            # The list might be empty if get_current_frame() was None initially.
+            # live_call_stack_frames would be empty in that case.
+            print(Colors.colorize("No Python backtrace available (or an error occurred during generation).", Colors.YELLOW))
+
+
+class MPyFrameCommand(gdb.Command):
+    """Select and display a MicroPython live stack frame.
+Usage: mpy-frame [index]
+If no index, shows current selection. If index is provided, selects that frame.
+Shows frame details and its local variables."""
+
+    def __init__(self, mpy_helper: MicroPythonHelper):
+        super().__init__("mpy-frame", gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
+        self.mpy = mpy_helper
+
+    def invoke(self, arg: str, from_tty: bool) -> None:
+        if not self.mpy.live_call_stack_frames:
+            # Try to generate it if it's empty, in case mpy-bt wasn't run first
+            self.mpy.get_backtrace()
+            if not self.mpy.live_call_stack_frames:
+                print(Colors.colorize("No live call stack captured. Use 'mpy-bt' first if stack is empty.", Colors.YELLOW))
+                return
+
+        if not arg: # No argument, print current selection
+            if self.mpy.selected_live_frame_index == -1 or \
+               self.mpy.selected_live_frame_index >= len(self.mpy.live_call_stack_frames):
+                print(Colors.colorize("No frame currently selected.", Colors.YELLOW))
+                print(f"Use 'mpy-bt' to see frames, then 'mpy-frame <index>' to select one.")
+            else:
+                frame_context = self.mpy.live_call_stack_frames[self.mpy.selected_live_frame_index]
+                print(Colors.colorize(f"Currently selected MicroPython frame #{self.mpy.selected_live_frame_index}:", Colors.CYAN))
+                print(frame_context['display_str']) # Already starts with "  "
+                source_lines = _gdb_helper_get_source_lines(frame_context['source_file'], frame_context['line_num'], 0)
+                for line in source_lines:
+                    print(line) # Already formatted with leading spaces
+
+                print(Colors.colorize("\nLocals for this frame:", Colors.CYAN))
+                frame_ptr_val = frame_context['frame_ptr_val']
+                locals_dict = self.mpy.get_locals(frame_ptr_val=frame_ptr_val)
+                if locals_dict:
+                    for name, value in sorted(locals_dict.items()):
+                        print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
+                else:
+                    print(Colors.colorize("  <No locals available or applicable for this frame type>", Colors.YELLOW))
+            return
+
+        try:
+            index = int(arg)
+            if not (0 <= index < len(self.mpy.live_call_stack_frames)):
+                print(Colors.colorize(f"Error: Frame index {index} is out of bounds (0-{len(self.mpy.live_call_stack_frames)-1}).", Colors.RED))
+                return
+
+            self.mpy.selected_live_frame_index = index
+            selected_frame_context = self.mpy.live_call_stack_frames[index]
+
+            print(Colors.colorize(f"Selected MicroPython frame #{index}:", Colors.CYAN))
+            # display_str already starts with "  File..."
+            print(selected_frame_context['display_str'])
+            source_lines = _gdb_helper_get_source_lines(selected_frame_context['source_file'], selected_frame_context['line_num'], 0)
+            for line in source_lines:
+                print(line) # Already has leading spaces
+
+            print(Colors.colorize("\nLocals for this frame:", Colors.CYAN))
+            frame_ptr_val = selected_frame_context['frame_ptr_val']
+            locals_dict = self.mpy.get_locals(frame_ptr_val=frame_ptr_val)
+            if locals_dict:
+                for name, value in sorted(locals_dict.items()):
+                    print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
+            else:
+                print(Colors.colorize("  <No locals available or applicable for this frame type>", Colors.YELLOW))
+
+        except ValueError:
+            print(Colors.colorize(f"Error: Invalid frame index '{arg}'. Must be an integer.", Colors.RED))
+        except Exception as e:
+            print(Colors.colorize(f"Error selecting/displaying frame: {e}", Colors.RED))
+
 
 class MPCatchCommand(gdb.Command):
     """Configure exception catching and breakpoints"""
@@ -1123,6 +1286,7 @@ def register_micropython_commands():
         MPExceptNavigateCommand(mpy)
         MPExceptHistoryCommand(mpy)
         MPExceptVisualizeCommand(mpy)
+        MPyFrameCommand(mpy) # Register new command
         print("MicroPython GDB helpers loaded successfully")
         print(Colors.colorize("Enhanced exception handling commands available:", Colors.GREEN))
         print("  mpy-catch <type> [all|uncaught] - Configure exception catching")

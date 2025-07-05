@@ -49,8 +49,14 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 - `mpy-except-bt` - Show Python-level traceback of the current exception.
 - `mpy-except-vars` - Show local variables at the point of the current exception.
 - `mpy-except-history` - Show a list of recent exceptions.
-- `mpy-except-navigate <frame_number>` - (If implemented and useful) Navigate within the exception's traceback frames.
 - `mpy-except-visualize` - Show a visual box representation of the current exception.
+
+### Frame Navigation and Inspection (Live Call Stack)
+- `mpy-bt` - Show MicroPython live call stack (Python-level). Refreshes the frame list for `mpy-frame` and indicates the currently selected frame with `=>`.
+- `mpy-frame [index]` - Selects and displays details (file, line, function, source, locals) for the live stack frame at `index`. If `index` is omitted, shows the currently selected frame. Use `mpy-bt` to see available frames and indices.
+- `mpy-locals` - Shows local variables. If a frame is selected via `mpy-frame`, shows locals for that frame. Otherwise, shows locals for the current top VM frame. (Note: Primarily shows dict-based locals, e.g., for modules/classes; stack-based function locals are not fully displayed with names yet).
+- `mpy-globals` - Show global variables (typically for the current module context).
+
 
 ### Configuring Source Code Display
 For tracebacks to display source code context, GDB needs to know where to find your MicroPython project's source files. You can configure this using:
@@ -94,9 +100,15 @@ The script will search these paths, plus GDB's current working directory and abs
 3. **Examining State**
    ```gdb
    # Show Python backtrace (live, with source context if available)
+   # This also lists frames with indices for mpy-frame and marks selected one.
    mpy-bt
    
-   # Show local variables
+   # Select a frame from mpy-bt's output (e.g., frame 1)
+   mpy-frame 1
+   # This will display info for frame 1 and its locals.
+   # Subsequent mpy-locals will also target frame 1.
+
+   # Show local variables for the currently selected frame (or top frame if none selected)
    mpy-locals
    
    # Show global variables
