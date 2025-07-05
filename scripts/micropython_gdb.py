@@ -501,17 +501,123 @@ class MPCatchCommand(gdb.Command):
         # Set breakpoint on exception handling
         try:
             bp = gdb.Breakpoint("mp_raise", internal=True)
-            # Ensure exc is not NULL before trying to get its type.
-            condition = f"exc != 0 && mp_obj_get_type(exc) == mp_type_{exc_type}"
+            base_condition = f"exc != 0 && mp_obj_get_type(exc) == mp_type_{exc_type}"
             if catch_type == "uncaught":
-                # Assuming mp_state_ctx.thread.state.exc_state.handler is non-zero if a Python handler exists.
-                condition += " && mp_state_ctx.thread.state.exc_state.handler == 0" # Or check for NULL if it's a pointer
+                base_condition += " && mp_state_ctx.thread.state.exc_state.handler == 0"
+
+            final_condition = base_condition
+            if custom_cond_str: # custom_cond_str is built by the new parsing logic
+                final_condition += f" && {custom_cond_str}"
             
-            bp.condition = condition
-            self.mpy.exception_breakpoints[exc_type] = bp
-            print(Colors.colorize(f"Will break on {catch_type} {exc_type} exceptions", Colors.GREEN))
+            bp.condition = final_condition
+            self.mpy.exception_breakpoints[exc_type] = bp # Assuming self.mpy exists
+            print(Colors.colorize(f"Will break on {catch_type} {exc_type} if: {final_condition}", Colors.GREEN))
         except Exception as e:
             print(Colors.colorize(f"Error setting exception breakpoint: {e}", Colors.RED))
+            if 'final_condition' in locals():
+                 print(Colors.colorize(f"Generated condition was: {final_condition}", Colors.YELLOW))
+
+# Helper functions for GDB conditions (module level)
+# These are called by GDB's 'python' command in breakpoint conditions.
+# 'exc_addr' is expected to be the address of the mp_obj_exception_t * (i.e., the mp_obj_t value of the exception)
+
+def _gdb_helper_get_mp_obj_as_int(mp_obj_addr):
+    if mp_obj_addr == 0: return None
+    mp_obj = gdb.Value(mp_obj_addr)
+    if (int(mp_obj) & 1): # MP_OBJ_IS_SMALL_INT
+        return int(mp_obj) >> 1
+    # Add more for full int objects if necessary, for now only small int
+    return None
+
+def _gdb_helper_get_mp_obj_as_str(mp_obj_addr):
+    if mp_obj_addr == 0: return None
+    mp_obj = gdb.Value(mp_obj_addr)
+
+    # Simplified string fetching - this needs to be robust like in MicroPythonHelper.format_mp_obj
+    # This is a placeholder and likely needs the full qstr/str object handling
+    try:
+        # Assuming mp_obj is a pointer to mp_obj_base_t if it's not a small int
+        if not (int(mp_obj) & 1): # Not a small int
+            base = mp_obj.cast(gdb.lookup_type('mp_obj_base_t').pointer())
+            obj_type = base['type']
+            type_name_qstr = obj_type['name'] # This is a qstr value
+
+            # This is a very simplified way to compare type_name_qstr with mp_type_str's name qstr
+            # A proper way would be to get string from type_name_qstr and compare
+            # Or compare the type pointer directly: obj_type == gdb.lookup_type('mp_type_str').pointer()
+            # For now, let's assume if we need a string, we try to cast and access.
+            # This part is complex because we don't have the full mpy_helper context here.
+
+            # Attempt to cast to mp_obj_str_t and get data
+            # This check for type is crucial and hard to do generically here
+            # For demonstration, let's assume if it's not other known immediate types, it might be a str ptr.
+            # A real implementation would need to call something like mpy_helper.get_qstr or format_mp_obj.
+            # This is a significant simplification:
+            if obj_type.address == gdb.lookup_type("mp_type_str").pointer().address:
+                 str_obj = mp_obj.cast(gdb.lookup_type('mp_obj_str_t').pointer())
+                 str_len = int(str_obj['len'])
+                 str_data_ptr = str_obj['data'] # This is const byte*
+                 # GDB's string() method might not work directly on const byte* if it expects char*
+                 # Fetch byte by byte or use gdb.Value.string() if available and works
+                 # For now, returning raw pointer for GDB to handle or further process
+                 # This is insufficient for direct regex in python.
+                 # Let's assume we can fetch it as bytes.
+                 # py_bytes = str_data_ptr.lazy_string(length=str_len) # GDB 7.7+
+                 # return py_bytes.decode('utf-8', errors='replace')
+                 # The above is too modern. Let's try simpler read.
+                 return str_data_ptr.string(length=str_len) # Hope this works
+    except Exception:
+        return None
+    return None
+
+
+def _gdb_helper_get_exc_arg_obj_addr(exc_addr, arg_idx):
+    """Gets the mp_obj_t address of an argument from the exception object."""
+    if exc_addr == 0: return 0
+    try:
+        exc_val = gdb.Value(exc_addr).cast(gdb.lookup_type('mp_obj_exception_t').pointer())
+        args_tuple_ptr = exc_val['args']
+        if not args_tuple_ptr or args_tuple_ptr.address == 0: return 0
+
+        args_tuple_obj = args_tuple_ptr.dereference()
+        if arg_idx >= int(args_tuple_obj['len']): return 0
+
+        return int(args_tuple_obj['items'][arg_idx]) # Return the mp_obj_t value (address or tagged int)
+    except Exception:
+        return 0
+
+
+def gdb_helper_compare_exc_arg_int(exc_obj_addr, arg_idx_int, expected_val_int, op_str):
+    arg_obj_addr = _gdb_helper_get_exc_arg_obj_addr(exc_obj_addr, arg_idx_int)
+    if arg_obj_addr == 0: return False
+
+    actual_val = _gdb_helper_get_mp_obj_as_int(arg_obj_addr)
+    if actual_val is None: return False
+
+    if op_str == "==": return actual_val == expected_val_int
+    if op_str == "!=": return actual_val != expected_val_int
+    if op_str == ">": return actual_val > expected_val_int
+    if op_str == "<": return actual_val < expected_val_int
+    if op_str == ">=": return actual_val >= expected_val_int
+    if op_str == "<=": return actual_val <= expected_val_int
+    return False
+
+def gdb_helper_match_exc_arg_str(exc_obj_addr, arg_idx_int, pattern_str, match_type_str):
+    arg_obj_addr = _gdb_helper_get_exc_arg_obj_addr(exc_obj_addr, arg_idx_int)
+    if arg_obj_addr == 0: return False
+
+    actual_str = _gdb_helper_get_mp_obj_as_str(arg_obj_addr)
+    if actual_str is None: return False
+
+    try:
+        if match_type_str == "matches":
+            return bool(re.search(pattern_str, actual_str))
+        if match_type_str == "contains":
+            return pattern_str in actual_str
+    except Exception: # e.g. regex error
+        return False
+    return False
+
 
 class MPExceptInfoCommand(gdb.Command):
     """Show information about the current exception"""

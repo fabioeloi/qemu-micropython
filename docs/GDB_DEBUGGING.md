@@ -39,7 +39,12 @@ This guide provides detailed instructions for debugging MicroPython firmware run
 - `mpy-stack` - Show Python stack contents
 
 ### Exception Handling Commands
-- `mpy-catch <type> [all|uncaught]` - Configure exception catching. Default is `uncaught`.
+- `mpy-catch <type> [all|uncaught] [if <attr_path> <op> <value>]` - Configure exception catching.
+  - Default for `[all|uncaught]` is `uncaught`.
+  - The `if` clause allows conditional breakpoints based on exception attributes or message content.
+    - `<attr_path>`: `args[index]` (e.g., `args[0]`) or `message`.
+    - `<op>`: `==`, `!=`, `>`, `<`, `>=`, `<=` (for numbers); `matches`, `contains`, `==`, `!=` (for strings).
+    - `<value>`: Integer or a double-quoted string (regex for `matches`, literal for `contains`/`==`/`!=`).
 - `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError).
 - `mpy-except-bt` - Show Python-level traceback of the current exception.
 - `mpy-except-vars` - Show local variables at the point of the current exception.
@@ -171,14 +176,41 @@ continue
 
 ### Configuring Exception Breakpoints
 
-The `mpy-catch` command allows you to set breakpoints that trigger when specific exceptions occur:
+The `mpy-catch` command allows you to set breakpoints that trigger when specific exceptions occur. It supports advanced conditional breaking:
 
 ```gdb
-# Syntax: mpy-catch <exception_type> [all|uncaught]
+# Syntax: mpy-catch <exception_type> [all|uncaught] [if <attribute_path> <operator> <value>]
+
+# Basic usage:
 mpy-catch ValueError           # Break on uncaught ValueError (default behavior)
 mpy-catch ZeroDivisionError all  # Break on all ZeroDivisionError instances
 mpy-catch NameError uncaught     # Explicitly break on uncaught NameError
+
+# Conditional breaking examples:
+# Break on OSError if its first argument (errno) is 2
+mpy-catch OSError if args[0] == 2
+
+# Break on ValueError if its message (usually args[0]) contains "important"
+mpy-catch ValueError if message contains "important"
+
+# Break on CustomError if its second argument (args[1]) is greater than 100
+mpy-catch CustomError all if args[1] > 100
+
+# Break on NameError if its message (args[0]) matches a regex (e.g., starts with "global name")
+mpy-catch NameError if message matches "^global name"
 ```
+
+**Attribute Paths for `if` clause:**
+- `args[index]`: Accesses the argument at `index` from the exception's `args` tuple (e.g., `args[0]`, `args[1]`).
+- `message`: Typically refers to the primary string representation of the exception, often equivalent to `args[0]` for exceptions with a single string argument.
+
+**Operators for `if` clause:**
+- For numerical comparisons with `args[index]`: `==`, `!=`, `>`, `<`, `>=`, `<=`.
+- For string operations with `message` or string-type `args[index]`:
+    - `matches`: The `<value>` is treated as a regular expression (e.g., `"^my pattern"`).
+    - `contains`: The `<value>` is treated as a literal substring.
+    - `==`, `!=`: For exact string equality or inequality.
+- Remember to double-quote string values in the `if` clause.
 
 ### Examining Exceptions
 
