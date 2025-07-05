@@ -45,14 +45,14 @@ This guide provides detailed instructions for debugging MicroPython firmware run
     - `<attr_path>`: `args[index]` (e.g., `args[0]`) or `message`.
     - `<op>`: `==`, `!=`, `>`, `<`, `>=`, `<=` (for numbers); `matches`, `contains`, `==`, `!=` (for strings).
     - `<value>`: Integer or a double-quoted string (regex for `matches`, literal for `contains`/`==`/`!=`).
-- `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError, custom attributes for user-defined exceptions).
-- `mpy-except-bt` - Show Python-level traceback of the current exception.
-- `mpy-except-vars` - Show local variables at the point of the current exception.
+- `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError, custom attributes for user-defined exceptions). Traceback shown includes source context.
+- `mpy-except-bt` - Show Python-level traceback of the current exception (includes source code context if available).
+- `mpy-except-vars` - Show local variables at the point of the current exception. (Behavior is similar to `mpy-locals` for the top exception frame).
 - `mpy-except-history` - Show a list of recent exceptions.
 - `mpy-except-visualize` - Show a visual box representation of the current exception.
 
 ### Frame Navigation and Inspection (Live Call Stack)
-- `mpy-bt` - Show MicroPython live call stack (Python-level). Refreshes the frame list for `mpy-frame` and indicates the currently selected frame with `=>`.
+- `mpy-bt` - Show MicroPython live call stack (Python-level), including source code context if available. Refreshes the frame list for `mpy-frame` and indicates the currently selected frame with `=>`.
 - `mpy-frame [index]` - Selects and displays details (file, line, function, source, locals) for the live stack frame at `index`. For function frames, 'locals' will attempt to show actual names and values for arguments and other function-scoped local variables by parsing debug information. If names cannot be resolved, generic names (e.g., `<arg0>`, `<local_0>`) are used for the values. If `index` is omitted, shows the currently selected frame. Use `mpy-bt` to see available frames and indices.
 - `mpy-locals` - Shows local variables. If a frame is selected via `mpy-frame`, shows locals for that frame. For function frames, this attempts to show actual names and values for arguments and other function-scoped local variables. If names cannot be resolved, generic names (e.g., `<arg0>`, `<local_0>`) are used for the values. Otherwise, shows locals for the current top VM frame. (Note: Shows named locals for dict-based scopes (modules/classes). For function frames, stack variable values are displayed; name resolution is best-effort based on available debug info and parser capabilities).
 - `mpy-globals` - Show global variables (typically for the current module context).
