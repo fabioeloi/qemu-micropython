@@ -164,7 +164,47 @@ Our debugging environment provides:
 - Exception analysis
 - Custom MicroPython GDB commands
 
-See our [GDB Debugging Guide](docs/GDB_DEBUGGING_GUIDE.md) for detailed instructions.
+See our [GDB Debugging Guide](docs/GDB_DEBUGGING.md) for detailed instructions.
+
+## Testing
+
+This project includes several types of automated tests. Ensure you have completed the setup steps first. For detailed information on writing and adding tests, please refer to the guides in the "Documentation" section below.
+
+### Host C Unit Tests
+
+These tests compile C code with `gcc` and run directly on your host machine, suitable for testing logic independent of specific MCU hardware.
+```bash
+# From the project root directory
+make -C test/host run_tests
+```
+
+### Target C Unit Tests (Running in QEMU)
+
+These C unit tests are compiled for the ARM target and run inside the QEMU emulator, allowing tests closer to the hardware environment.
+
+1.  **Build Test Binaries:**
+    Each test suite (e.g., for `string_utils`) is compiled into a separate `.bin` file.
+    ```bash
+    # From the project root directory
+    make -C test/target all         # Build all target test suites
+    # OR, to build a specific suite:
+    # make -C test/target test_string_utils_qemu.bin
+    ```
+
+2.  **Run a Test Suite in QEMU:**
+    Use the `run_qemu_c_tests.py` script:
+    ```bash
+    # From the project root directory
+    python3 scripts/run_qemu_c_tests.py test/target/test_string_utils_qemu.bin
+    ```
+
+### Python Unit Tests
+
+These tests use Python's `unittest` module to test Python scripts and tools within the project.
+```bash
+# From the project root directory
+make test_python
+```
 
 ## Troubleshooting
 
@@ -235,6 +275,25 @@ For mapping between version types, see our [Version Mapping Guide](VERSION_MAPPI
 - **v1.1.0 (Final) - v2025.03.05.1** (March 2025): Final release for the Debugging and QEMU Integration milestone. See [v1.1.0 Release Notes](docs/release_notes/v2025.03.05.1.md).
 
 For full release details, visit our [Releases Page](https://github.com/fabioeloi/qemu-micropython/releases).
+
+## Documentation
+
+Key documentation for this project can be found in the `docs/` directory and root:
+
+*   **[Project Roadmap](ROADMAP_STATUS.md)**: Tracks overall project progress and milestones.
+*   **[GDB Debugging Guide](docs/GDB_DEBUGGING.md)**: Detailed instructions for debugging MicroPython in QEMU.
+*   **[Semihosting with `usemihosting`](docs/SEMIHOSTING.md)**: Guide to the `usemihosting` MicroPython module.
+*   **Unit Testing Guides:**
+    *   **[Host-Based C Unit Testing](docs/UNIT_TESTING_C_HOST.md)**
+    *   **[On-Target C Unit Testing in QEMU](docs/UNIT_TESTING_C_QEMU.md)**
+    *   **[Python Unit Testing](docs/UNIT_TESTING_PYTHON.md)**
+*   **[Continuous Integration (CI)](docs/CONTINUOUS_INTEGRATION.md)**: Overview of the GitHub Actions CI setup.
+*   **[QEMU STM32F4 Machine Exploration](docs/qemu_stm32f4_machine_exploration.md)**: Report on alternative QEMU machine types.
+*   **[QEMU STM32 General Notes](QEMU-STM32-NOTES.md)**: General findings on QEMU's STM32 emulation.
+*   **[UART Integration Guide](docs/UART_INTEGRATION_GUIDE.md)**
+*   **[IDE Integration](docs/IDE_INTEGRATION.md)**
+*   Release Notes are available in `docs/release_notes/`.
+*   The `LICENSE` file details the project's license.
 
 ## Contributing
 
