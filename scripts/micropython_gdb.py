@@ -588,7 +588,67 @@ class MicroPythonHelper:
             #         pass
 
         except Exception as e:
-            attributes["error_parsing_attributes"] = str(e)
+            # This catches errors from the specific type parsing (OSError, SyntaxError)
+            attributes["error_parsing_typed_attributes"] = str(e)
+
+        # Now, try to get instance members if it's an mp_obj_instance_t
+        # This applies to user-defined exceptions and potentially some built-ins if they use the instance layout.
+        try:
+            # The mp_obj_exception_t is the base for exception instances.
+            # If it's a user-defined class, it's an mp_obj_instance_t.
+            # We attempt to access its 'members' map.
+            # A gdb.error will be raised if 'members' is not a field of the concrete type of exc_obj.
+
+            # First, ensure exc_obj is not a NULL pointer before trying to cast and dereference.
+            if exc_obj.address == 0:
+                pass # Cannot get members from a NULL object
+            else:
+                # Attempt to cast to mp_obj_instance_t* and access members.
+                # This assumes the layout of mp_obj_exception_t for user classes
+                # is compatible with mp_obj_instance_t at least up to the 'members' field.
+                instance_obj_ptr = exc_obj.cast(gdb.lookup_type('mp_obj_instance_t').pointer())
+                instance_members_map_ptr = instance_obj_ptr['members']
+
+                if instance_members_map_ptr and instance_members_map_ptr.address != 0:
+                    members_map = instance_members_map_ptr.dereference() # mp_map_t
+                    map_table = members_map['table']
+                    map_alloc = int(members_map['alloc'])
+
+                    # Sentinel value for mp_map_elem_t.key when slot is deleted
+                    # mp_const_map_elem_is_value_sentinel is not directly accessible as a gdb symbol easily
+                    # but deleted keys are often specific non-NULL pointers.
+                    # However, active keys are just not MP_OBJ_NULL.
+
+                    for i in range(map_alloc):
+                        map_elem = map_table[i]
+                        key_obj = map_elem['key']
+
+                        # Valid keys are not MP_OBJ_NULL (0) and not MP_OBJ_SENTINEL (a specific marker)
+                        # For simplicity here, checking against 0 is a good first pass for active slots.
+                        # A more robust check would involve knowing MP_OBJ_SENTINEL's value.
+                        if key_obj != 0 : # If key is not MP_OBJ_NULL
+                            # Further check to ensure it's not MP_OBJ_SENTINEL if its value is known
+                            # if key_obj.address == address_of_mp_const_sentinel: continue
+
+                            try:
+                                attr_name_str = self.get_qstr(key_obj)
+                                value_obj = map_elem['value']
+                                attr_val_str = self.format_mp_obj(value_obj)
+
+                                # Prefix to distinguish from args-derived attributes, or handle potential overwrite.
+                                # For now, add directly. If key exists from args parsing, it might be overwritten.
+                                attributes[f"{attr_name_str}"] = attr_val_str
+                            except Exception:
+                                # Skip this member if there's an error formatting it
+                                pass
+        except gdb.error:
+            # This gdb.error can occur if 'members' field doesn't exist for exc_obj's actual type,
+            # or if the cast to mp_obj_instance_t* was inappropriate for this specific exception object.
+            # This is a silent fallback: means no instance members were found or accessible this way.
+            pass
+        except Exception as e_outer:
+            # Catch other Python errors during this process
+            attributes["error_parsing_instance_members"] = str(e_outer)
         
         return attributes
 
@@ -640,9 +700,15 @@ class MicroPythonHelper:
         if detailed and exc_info.get('attributes'):
             attributes_header = Colors.colorize("\nException Attributes:", Colors.CYAN, bold=True)
             attributes_lines = []
-            for key, value in exc_info['attributes'].items():
+            # Sort attributes by key for consistent display
+            for key, value in sorted(exc_info['attributes'].items()):
                 attributes_lines.append(f"  {Colors.colorize(key, Colors.GREEN)}: {value}")
-            attributes_section = f"{attributes_header}\n" + "\n".join(attributes_lines)
+
+            if attributes_lines:
+                attributes_section = f"{attributes_header}\n" + "\n".join(attributes_lines)
+            else:
+                # Only show header if detailed view was requested, even if no attributes found
+                attributes_section = f"{attributes_header}\n  {Colors.colorize('<No specific attributes found>', Colors.YELLOW)}"
         
         # Format locals if available and detailed mode is on
         locals_section = ""

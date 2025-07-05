@@ -45,7 +45,7 @@ This guide provides detailed instructions for debugging MicroPython firmware run
     - `<attr_path>`: `args[index]` (e.g., `args[0]`) or `message`.
     - `<op>`: `==`, `!=`, `>`, `<`, `>=`, `<=` (for numbers); `matches`, `contains`, `==`, `!=` (for strings).
     - `<value>`: Integer or a double-quoted string (regex for `matches`, literal for `contains`/`==`/`!=`).
-- `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError).
+- `mpy-except-info [-d|--detailed] [-i N|--index=N]` - Show current or historical exception details. `-d` for more detail (e.g., parsed attributes for OSError, custom attributes for user-defined exceptions).
 - `mpy-except-bt` - Show Python-level traceback of the current exception.
 - `mpy-except-vars` - Show local variables at the point of the current exception.
 - `mpy-except-history` - Show a list of recent exceptions.
@@ -232,7 +232,8 @@ When an exception breakpoint is hit, you can use these commands to examine the e
 # Show basic exception type and value
 mpy-except-info
 
-# Show detailed exception information (including parsed attributes like errno for OSError)
+# Show detailed exception information (including parsed attributes like errno for OSError,
+# and custom attributes for user-defined exceptions like self.my_attr).
 # The traceback part will include source code context if files are found.
 mpy-except-info -d
 
