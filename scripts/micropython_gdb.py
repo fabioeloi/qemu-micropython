@@ -50,6 +50,37 @@ class Colors:
 def is_color_enabled():
     """Check if color output is enabled in GDB"""
 
+# Helper class to read from a gdb.Value representing a byte array in memory
+class GdbByteArrayReader:
+    def __init__(self, gdb_value_byte_ptr, length_val=None):
+        self.ptr = gdb_value_byte_ptr
+        self.current_offset = 0
+        self.length = length_val
+
+    def read_byte(self) -> Optional[int]:
+        if self.length is not None and self.current_offset >= self.length:
+            return None
+        try:
+            byte_val = int((self.ptr + self.current_offset).dereference())
+            self.current_offset += 1
+            return byte_val
+        except gdb.error:
+            return None
+
+    def get_offset(self) -> int:
+        return self.current_offset
+
+    def set_offset(self, offset: int) -> None:
+        self.current_offset = offset
+
+    def peek_byte(self) -> Optional[int]:
+        if self.length is not None and self.current_offset >= self.length:
+            return None
+        try:
+            return int((self.ptr + self.current_offset).dereference())
+        except gdb.error:
+            return None
+
 # --- Source Code Lookup Helpers ---
 # Configuration for source lookup
 # Order of search:
@@ -392,26 +423,32 @@ class MicroPythonHelper:
                         # This is a simplified interpretation. Real decoding is more complex.
                         # n_exc_stack = (n_state_val >> N_STATE_EXC_STACK_SHIFT) & N_STATE_EXC_STACK_MASK;
                         n_locals_total_on_stack = (n_state_val >> N_STATE_LOCAL_SHIFT) & N_STATE_LOCAL_MASK
-                        if n_locals_total_on_stack == 0 and num_total_args > 0 : # If decoding failed or gave 0, but we know there are args
-                            n_locals_total_on_stack = num_total_args # At least try to show args
+                        if n_locals_total_on_stack == 0 and num_total_args > 0 :
+                            n_locals_total_on_stack = num_total_args
                     else:
-                        n_locals_total_on_stack = num_total_args # Fallback if no n_state
+                        n_locals_total_on_stack = num_total_args
 
                     if stack_locals_base_ptr and stack_locals_base_ptr.address != 0:
+                        # Attempt to get actual names from debug info
+                        slot_to_name_map = self._decode_local_var_names_from_line_info(
+                            fun_bc_obj, num_total_args, n_locals_total_on_stack
+                        )
+
                         for i in range(n_locals_total_on_stack):
-                            local_name = ""
-                            if i < num_total_args:
-                                local_name = f"<arg{i}>"
-                                # TODO: Attempt real argument name retrieval here in future
-                            else:
-                                local_name = f"<local_{i - num_total_args}>"
-                                # TODO: Attempt real local name retrieval here (from line_info)
+                            actual_name = slot_to_name_map.get(i)
+
+                            if not actual_name: # Fallback to generic names
+                                if i < num_total_args:
+                                    actual_name = f"<arg{i}>"
+                                else:
+                                    actual_name = f"<local_{i - num_total_args}>"
+                            # If actual_name from map was like "<qstr_err:val>", it will be used as is.
 
                             try:
                                 local_obj = stack_locals_base_ptr[i]
-                                locals_dict[local_name] = self.format_mp_obj(local_obj)
+                                locals_dict[actual_name] = self.format_mp_obj(local_obj)
                             except Exception as e_val:
-                                locals_dict[local_name] = f"<error: {e_val}>"
+                                locals_dict[actual_name] = f"<error: {e_val}>"
                     else:
                         if not locals_dict:
                             if n_locals_total_on_stack > 0:
@@ -792,6 +829,116 @@ class MicroPythonHelper:
         
         return attributes
 
+    def _decode_varintsq(self, reader: GdbByteArrayReader) -> Optional[int]:
+        """Decodes an unsigned varint (varintsq) from the byte stream."""
+        val = 0
+        shift = 0
+        try:
+            while True:
+                byte = reader.read_byte()
+                if byte is None:
+                    return None # End of stream or error
+                val |= (byte & 0x7f) << shift
+                if not (byte & 0x80): # Check MSB (continuation bit)
+                    return val
+                shift += 7
+                if shift >= 64: # Protect against malformed data / overflow
+                    return None # Or raise error
+        except Exception: # Catch any error during read_byte or bitwise ops
+            return None
+
+
+    def _decode_local_var_names_from_line_info(self, fun_bc_obj: gdb.Value,
+                                             num_total_args: int,
+                                             num_total_stack_locals: int) -> Dict[int, str]:
+        """
+        Attempts to decode local variable names (args then other locals)
+        from the fun_bc_obj's line_info stream.
+        Returns a dictionary mapping stack_slot_index to name_string.
+        This is a simplified parser and highly dependent on known opcodes and line_info structure.
+        """
+        names_map = {} # slot_index -> name_str
+
+        line_info_ptr = fun_bc_obj['line_info']
+        len_line_info_val = None
+        if 'len_line_info' in fun_bc_obj.type.fields(): # Check if MicroPython build includes this field
+            len_line_info_val = int(fun_bc_obj['len_line_info'])
+
+        if not line_info_ptr or line_info_ptr.address == 0:
+            return names_map
+
+        reader = GdbByteArrayReader(line_info_ptr, length_val=len_line_info_val)
+
+        # --- 1. Parse Preamble (source_file QSTR, start_line, code_size) ---
+        # These must be consumed to reach the main name/line mapping stream.
+        try:
+            qstr_src_file = self._decode_varintsq(reader)
+            if qstr_src_file is None: return names_map
+            start_line = self._decode_varintsq(reader)
+            if start_line is None: return names_map
+            code_size = self._decode_varintsq(reader) # For bytecode length
+            if code_size is None: return names_map
+        except Exception: # Error during preamble parsing
+            return names_map
+
+        # --- 2. Parse Main Debug Stream for Names ---
+        # These opcodes MUST match the target MicroPython's py/bc.h definitions
+        # Using common, but potentially incorrect, example values.
+        BC_DEBUG_INFO_OPCODE_MASK = 0x80
+        BC_DEBUG_INFO_OPCODE_ARG_NAME = 0x81 # Hypothetical
+        BC_DEBUG_INFO_OPCODE_LOCAL_NAME = 0x82 # Hypothetical
+        # Other opcodes that take varintsq operands (like line/offset changes) also need handling
+        # for robust stream advancement. This parser is simplified.
+
+        current_slot_index = 0
+        max_names_to_find = num_total_stack_locals
+
+        while current_slot_index < max_names_to_find:
+            opcode = reader.peek_byte()
+            if opcode is None: break
+
+            name_qstr = None
+            is_name_opcode_processed = False
+
+            if opcode == BC_DEBUG_INFO_OPCODE_ARG_NAME:
+                reader.read_byte() # Consume opcode
+                name_qstr = self._decode_varintsq(reader)
+                is_name_opcode_processed = True
+            elif opcode == BC_DEBUG_INFO_OPCODE_LOCAL_NAME:
+                reader.read_byte() # Consume opcode
+                name_qstr = self._decode_varintsq(reader)
+                is_name_opcode_processed = True
+
+            if is_name_opcode_processed:
+                if name_qstr is not None:
+                    try:
+                        # QSTR 0 is often "<unknown>" or similar, or sometimes used for '_'
+                        # self.get_qstr handles qstr 0 returning "?"
+                        name_str = self.get_qstr(gdb.Value(name_qstr))
+                        names_map[current_slot_index] = name_str
+                        current_slot_index += 1
+                    except Exception:
+                        names_map[current_slot_index] = f"<qstr_err:{name_qstr}>"
+                        current_slot_index += 1
+                else: # Failed to decode QSTR after a name opcode
+                    break
+            else: # Not a recognized name opcode
+                # This is the fragile part: correctly skipping other opcodes and their operands.
+                # If opcode < 0x80, it's a simple delta, consumes 1 byte.
+                # If opcode >= 0x80, it's a complex one. Many take a varintsq operand.
+                consumed_opcode = reader.read_byte() # Consume the opcode itself
+                if consumed_opcode is None: break
+
+                if (consumed_opcode & BC_DEBUG_INFO_OPCODE_MASK): # If it was a complex opcode (MSB set)
+                    # Most other complex debug opcodes (line/offset changes) take a varintsq.
+                    # Try to consume one varintsq operand.
+                    # This is a heuristic and might be wrong for some opcodes.
+                    if self._decode_varintsq(reader) is None and reader.peek_byte() is not None:
+                        # Failed to decode varintsq but not at EOF, stream might be misaligned
+                        break
+                # If it was a simple delta ( < 0x80 ), it's already consumed.
+        return names_map
+
     def add_to_exception_history(self, exception_info: Dict[str, Any]) -> None:
         """Add exception to history"""
         # Check if this exception is already in history (by address)
@@ -912,21 +1059,25 @@ class MPLocalsCommand(gdb.Command):
                 print(f"  {Colors.colorize(name, Colors.GREEN)} = {value}")
 
             has_generic_names = any(k.startswith(("<arg", "<local_", "<stack_var")) for k in locals_dict.keys())
-            # Check if dict contains only info/error keys, or is genuinely empty of vars
             actual_var_keys = [k for k in locals_dict.keys() if not k.startswith(("<info", "<error"))]
+            has_only_generic_or_no_actual_vars = all(k.startswith(("<arg", "<local_", "<stack_var", "<info", "<error")) for k in locals_dict.keys())
 
-            if has_generic_names:
-                print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Full name resolution is complex and pending.)", Colors.YELLOW))
-            elif not actual_var_keys and locals_dict: # Not empty, but only info/error messages
-                pass # The info/error messages from get_locals() are already printed as key-value
-            elif not locals_dict: # Completely empty dict returned by get_locals
+
+            if actual_var_keys: # If there are any actual variables displayed
+                if has_generic_names and not has_only_generic_or_no_actual_vars : # Mix of real and generic names
+                     print(Colors.colorize("  (Note: Displaying resolved names for some stack variables; others may be generic if full parsing was incomplete.)", Colors.YELLOW))
+                elif has_only_generic_or_no_actual_vars and has_generic_names: # All vars shown have generic names
+                    print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Name resolution from debug info was partial or unsuccessful.)", Colors.YELLOW))
+                # If all names are actual (has_actual_names is true, has_generic_names is false), no special note needed.
+            elif locals_dict: # No actual_var_keys, but locals_dict is not empty (so it has info/error messages)
+                pass # Messages already printed
+            else: # locals_dict is completely empty (get_locals returned empty)
                  print(Colors.colorize("  <No specific local variables found or resolved for this frame>", Colors.YELLOW))
 
-
-        elif header_printed: # Header was printed (so a frame was targeted), but locals_dict was empty
-            print(Colors.colorize("  <No local variables available for this frame type/selection>", Colors.YELLOW))
-            print(Colors.colorize("  (Attempted stack variable retrieval; full name/value support is work-in-progress.)", Colors.YELLOW))
-        else: # No header_printed and locals_dict is empty: means no valid frame context at all.
+        elif header_printed: # Header was printed, but get_locals() returned empty.
+            print(Colors.colorize("  <No local variables found or resolved for this frame type/selection>", Colors.YELLOW))
+            print(Colors.colorize("  (This may indicate an issue with stack base detection, n_state decoding, or an empty variable set.)", Colors.YELLOW))
+        else:
             print(Colors.colorize("No valid MicroPython frame context or no locals found.", Colors.YELLOW))
 
 
@@ -1048,20 +1199,25 @@ Shows frame details and its local variables."""
 
                 has_generic_names = any(k.startswith(("<arg", "<local_", "<stack_var")) for k in locals_dict.keys())
                 actual_var_keys = [k for k in locals_dict.keys() if not k.startswith(("<info", "<error"))]
+                # Check if all displayed variable keys are generic (ignoring info/error messages)
+                all_displayed_vars_are_generic = True
+                if actual_var_keys: # Only if there are actual vars to check
+                    all_displayed_vars_are_generic = all(k.startswith(("<arg", "<local_", "<stack_var")) for k in actual_var_keys)
 
-                if has_generic_names:
-                    print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Full name resolution is complex and pending.)", Colors.YELLOW))
-                elif not actual_var_keys and locals_dict:
-                    pass # Only info/error messages were in locals_dict, already printed.
-                elif not locals_dict: # Genuinely empty dictionary from get_locals
+                if actual_var_keys: # If there are any actual variables displayed
+                    if not all_displayed_vars_are_generic and has_generic_names: # Mix of real and generic names
+                        print(Colors.colorize("  (Note: Displaying resolved names for some stack variables; others may be generic if full parsing was incomplete.)", Colors.YELLOW))
+                    elif all_displayed_vars_are_generic: # All vars shown have generic names
+                        print(Colors.colorize("  (Note: Displaying stack variable values with generic names. Name resolution from debug info was partial or unsuccessful.)", Colors.YELLOW))
+                    # If all names are actual, no special note needed here for names.
+                elif locals_dict: # No actual_var_keys, but locals_dict is not empty (so it has info/error messages from get_locals)
+                    pass # Messages already printed by the loop
+                else: # locals_dict is completely empty (get_locals returned empty)
                     print(Colors.colorize("  <No specific local variables found or resolved for this frame>", Colors.YELLOW))
 
-            else: # locals_dict was empty from get_locals() initially
-                print(Colors.colorize("  <No locals available or applicable for this frame type>", Colors.YELLOW))
-                # The (Attempted stack variable...) note might be too noisy if get_locals itself returned an <info> message.
-                # However, if get_locals returned truly empty for a function frame, it's useful.
-                # Let's assume get_locals returning empty for a function frame means it couldn't process it.
-                print(Colors.colorize("  (Full name/value support for all stack variables is work-in-progress.)", Colors.YELLOW))
+            else: # locals_dict was empty from get_locals() initially by MPyFrameCommand
+                print(Colors.colorize("  <No local variables found or resolved for this frame>", Colors.YELLOW))
+                print(Colors.colorize("  (This may indicate an issue with stack base detection, n_state decoding, or an empty variable set.)", Colors.YELLOW))
 
         except ValueError:
             print(Colors.colorize(f"Error: Invalid frame index '{arg}'. Must be an integer.", Colors.RED))
