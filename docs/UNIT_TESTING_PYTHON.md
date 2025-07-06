@@ -179,3 +179,48 @@ Refer to the [official `unittest.mock` documentation](https://docs.python.org/3/
 Python unit tests are automatically executed as part of the GitHub Actions CI workflow (defined in `.github/workflows/ci.yml`). The CI uses the `make test_python` command. If any Python unit test fails, the CI run will be marked as failed.
 
 This setup provides a robust way to ensure the quality and correctness of Python code within the project.
+
+## 7. Special Considerations for Testing GDB Python Scripts
+
+Unit testing Python scripts that are designed to run within GDB (e.g., `scripts/micropython_gdb.py`) requires special handling due to their dependency on the `gdb` Python module, which is only available inside an active GDB session. To unit test the Python logic of such scripts externally (e.g., via `make test_python`), you must **mock the `gdb` module**.
+
+### Key Strategies for Mocking `gdb`
+
+1.  **Mocking the `gdb` Module Import:**
+    *   Use `unittest.mock.patch` to replace the `gdb` module that your script imports with a `MagicMock` object. The target for patching is where the `gdb` module is looked up by your script under test. For example, if your script `scripts/my_gdb_script.py` contains `import gdb`, you would typically patch it in your test as `@patch('scripts.my_gdb_script.gdb')`.
+
+    ```python
+    from unittest.mock import patch, MagicMock
+    # Assuming 'scripts.my_gdb_script' is the module under test (sut)
+    # import scripts.my_gdb_script as sut
+
+    # @patch('scripts.my_gdb_script.gdb') # Correct patching target
+    # def test_my_function_using_gdb_api(self, mock_gdb_module):
+    #     # Configure mock_gdb_module attributes and methods
+    #     mock_gdb_module.parameter.return_value = "on"
+    #     mock_gdb_module.error = type('MockGdbError', (Exception,), {}) # Mock gdb.error
+    #
+    #     # result = sut.my_function_that_uses_gdb_parameter()
+    #     # self.assertTrue(result)
+    #     mock_gdb_module.parameter.assert_called_once_with("some_param")
+    ```
+
+2.  **Mocking `gdb.Value` Objects:**
+    *   Functions processing `gdb.Value` objects require `MagicMock` instances that simulate `gdb.Value` behavior. This includes mocking:
+        *   Attribute access (e.g., `my_gdb_value.address`, `my_gdb_value.type.code`).
+        *   Method calls (e.g., `my_gdb_value.dereference()`, `my_gdb_value.cast()`, `my_gdb_value.string()`).
+        *   Special Python methods if used (e.g., `__add__` for pointer arithmetic, `__getitem__` for field access like `my_gdb_value['field']`, `__int__` for casting to integer).
+    *   This can be complex, requiring careful setup of the mock `gdb.Value` to match the expected structure and behavior for each test case.
+
+3.  **Focus on Python Logic:**
+    *   The primary aim is to test the Python logic within your GDB script (argument parsing, string manipulation, conditional flows, class behavior), not GDB's own functionality.
+    *   Mocking allows you to control the inputs/outputs of GDB API interactions, enabling isolated testing of your script's responses.
+
+4.  **Importing the Script Under Test:**
+    *   Ensure your GDB Python script is importable by your test file. This might involve `sys.path` adjustments in your test setup (as seen in `test/python/scripts/test_micropython_gdb.py`) or structuring your `scripts` directory as a Python package (e.g., by adding an `__init__.py`).
+
+### Example
+
+For detailed examples of mocking the `gdb` module and its objects, refer to the test file `test/python/scripts/test_micropython_gdb.py`. This file contains tests for utilities within `scripts/micropython_gdb.py`, such as `is_color_enabled()`, `Colors.colorize()`, the `GdbByteArrayReader` class, and the argument parsing logic of `MPCatchCommand`.
+
+By employing these mocking techniques, you can achieve effective unit test coverage for the Python logic within your GDB extension scripts, even when they are run outside the GDB environment.
