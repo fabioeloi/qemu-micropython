@@ -11,8 +11,7 @@ Below is a list of primary documentation pages to help you get started and under
 *   **[IDE Integration](IDE_INTEGRATION.md)**: Notes on integrating with IDEs like VSCode.
 
 **Core Functionality & Emulation:**
-*   **[QEMU STM32F4 Machine Exploration](qemu_stm32f4_machine_exploration.md)**: Analysis of QEMU machine types for STM32F4 emulation.
-*   **[QEMU Limitations and STM32 Emulation Notes](../QEMU-STM32-NOTES.md)**: Important considerations and known limitations when using QEMU for STM32. (Note: This file might be refactored or its content merged).
+*   **[QEMU for STM32F4 Development and Testing](QEMU_GUIDE_STM32F4.md)**: Comprehensive guide covering QEMU setup, machine choices, core features utilized (serial, semihosting, GDB stub), known limitations, and best practices. This consolidates information from previous QEMU notes and exploration reports.
 *   **[Semihosting with `usemihosting`](SEMIHOSTING.md)**: Guide to using the `usemihosting` MicroPython module for host interaction.
 
 **Development & Testing:**
@@ -38,5 +37,7 @@ Below is a list of primary documentation pages to help you get started and under
 
 **Historical / To Be Reviewed:**
 *   **[NEXT_STEPS.md](NEXT_STEPS.md)**: Historical planning document, largely superseded by GitHub Issues and current roadmap. Consider for archival.
+*   The content from `qemu_stm32f4_machine_exploration.md` and `QEMU-STM32-NOTES.md` has been integrated into the new `QEMU_GUIDE_STM32F4.md`. These older files can be archived or removed.
+
 
 Please refer to the main project [../README.md](../README.md) for the primary entry point and overall structure.

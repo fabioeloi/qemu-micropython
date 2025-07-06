@@ -288,8 +288,7 @@ Key documentation for this project can be found in the `docs/` directory and roo
     *   **[On-Target C Unit Testing in QEMU](docs/UNIT_TESTING_C_QEMU.md)**
     *   **[Python Unit Testing](docs/UNIT_TESTING_PYTHON.md)**
 *   **[Continuous Integration (CI)](docs/CONTINUOUS_INTEGRATION.md)**: Overview of the GitHub Actions CI setup.
-*   **[QEMU STM32F4 Machine Exploration](docs/qemu_stm32f4_machine_exploration.md)**: Report on alternative QEMU machine types.
-*   **[QEMU STM32 General Notes](QEMU-STM32-NOTES.md)**: General findings on QEMU's STM32 emulation.
+*   **[QEMU for STM32F4 Guide](docs/QEMU_GUIDE_STM32F4.md)**: Comprehensive guide on using QEMU for development and testing, including setup, machine choices, limitations, and best practices.
 *   **[UART Integration Guide](docs/UART_INTEGRATION_GUIDE.md)**
 *   **[IDE Integration](docs/IDE_INTEGRATION.md)**
 *   Release Notes are available in `docs/release_notes/`.
