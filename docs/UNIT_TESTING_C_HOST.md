@@ -159,3 +159,114 @@ You can also run these commands from the project root using `make -C test/host <
         *   **Mocking (Advanced):** For more advanced control over dependencies (e.g., verifying calls, setting return values per call), a mocking framework like CMock (which integrates with Unity via Ceedling) would be needed. This is considered a future enhancement if required. For now, focus on testing modules that can be reasonably isolated or tested with simple stubs.
 
 This setup provides a solid foundation for C unit testing on the host. As the project grows, further enhancements like mocking or on-target testing can be considered.
+
+## 7. Mocking Dependencies with CMock
+
+For more effective unit testing, it's often necessary to isolate the unit under test from its dependencies. This project uses **CMock** to generate mock interfaces for C header files, allowing you to control the behavior of dependencies during tests. CMock works seamlessly with the Unity testing framework.
+
+### Prerequisites for Using CMock
+
+*   **Ruby and CMock Gem:** CMock is a Ruby-based tool. To generate mocks locally, you need:
+    1.  A working Ruby installation (e.g., version 2.7 or newer).
+    2.  The CMock gem installed: `gem install cmock`
+    *   The CI environment (GitHub Actions) is automatically configured to install Ruby and CMock.
+
+### How CMock is Integrated
+
+1.  **Mock Generation via Makefile:**
+    *   The `test/host/Makefile` is configured to automatically generate mocks.
+    *   You specify which headers to mock in the `HEADERS_TO_MOCK` list within this Makefile:
+        ```makefile
+        # test/host/Makefile
+        HEADERS_TO_MOCK = \
+            src/peripherals/sensor_reader.h \
+            src/another_module/interface.h # Add other headers here
+        ```
+    *   When you run `make` (or `make all`, `make run_tests`) in the `test/host/` directory, the Makefile will invoke `cmock` for each listed header if the mock files are missing or the original header has changed.
+    *   Generated mocks (e.g., `mock_sensor_reader.c` and `mock_sensor_reader.h`) are placed in `test/host/build/mocks/`. This directory is automatically included in the compiler's include path for tests.
+
+2.  **Linking Mocks:**
+    *   For each test suite (e.g., defined by `test_foo_runner.c`), you need to specify which generated mock C files it depends on. This is done by defining a variable `MOCKS_FOR_foo` in `test/host/Makefile`:
+        ```makefile
+        # test/host/Makefile
+        # For a test suite 'data_processor' (leading to test_data_processor.out)
+        MOCKS_FOR_data_processor = $(MOCKS_OUTPUT_DIR)/mock_sensor_reader.c
+        # If a suite needs multiple mocks:
+        # MOCKS_FOR_another_suite = $(MOCKS_OUTPUT_DIR)/mock_dep1.c $(MOCKS_OUTPUT_DIR)/mock_dep2.c
+        ```
+    *   The Makefile then links only these specified mock C files when building the test executable for that suite.
+
+### Writing Unit Tests with CMock
+
+Here's the typical pattern for using generated mocks in your test file (e.g., `test_data_processor.c` testing `data_processor.c` which uses `sensor_reader.h`):
+
+1.  **Include Headers:**
+    ```c
+    #include "unity.h"
+    #include "mock_sensor_reader.h"      // Include the generated mock header
+    #include "processing/data_processor.h" // The module under test
+    ```
+
+2.  **`setUp()` and `tearDown()`:**
+    *   Initialize the mock for the specific dependency in `setUp()`.
+    *   Verify all mock expectations and clean up the mock in `tearDown()`.
+    ```c
+    void setUp(void) {
+        mock_sensor_reader_Init();
+    }
+
+    void tearDown(void) {
+        mock_sensor_reader_Verify();
+        mock_sensor_reader_Destroy();
+    }
+    ```
+
+3.  **Setting Expectations in Test Cases:**
+    Before calling the function under test, set expectations for any functions from the mocked interface that you anticipate will be called.
+
+    *   **Expect a call and return a value:**
+        ```c
+        // Expect sensor_read_temperature_degrees_c() to be called once, and make it return 250.
+        sensor_read_temperature_degrees_c_ExpectAndReturn(250);
+        ```
+    *   **Expect a call (don't care about arguments, return a value):**
+        ```c
+        sensor_self_test_ExpectAnyArgsAndReturn(true);
+        ```
+    *   **Expect a call and modify an output parameter (pointer argument):**
+        ```c
+        uint8_t expected_result_code = 0x00;
+        // Expect sensor_self_test to be called. When it is, the value of expected_result_code (0x00)
+        // will be copied to the argument passed as 'result_code'.
+        sensor_self_test_ExpectAnyArgsAndReturn(true); // Or _Expect with specific args
+        sensor_self_test_ReturnThruPtr_result_code(&expected_result_code);
+        ```
+    *   **Ignoring calls:**
+        ```c
+        // If sensor_init might be called but you don't care about its return for this test
+        sensor_init_IgnoreAndReturn(true);
+        ```
+    *   **Callbacks:** CMock supports setting up callbacks for more complex argument validation or behavior.
+        ```c
+        // Advanced: define a callback function
+        // uint8_t my_self_test_callback(uint8_t* ptr, int num_calls) {
+        //     *ptr = 0xAA; // Modify the output param
+        //     return true; // Return value for sensor_self_test
+        // }
+        // sensor_self_test_Stub(my_self_test_callback); // Call the stub instead of original
+        // Or: sensor_self_test_ExpectAnyArgs();
+        //     sensor_self_test_AddCallback(my_self_test_callback_wrapper);
+        ```
+
+4.  **Call the Function Under Test:**
+    ```c
+    sensor_system_status_t status = initialize_sensor_system(); // This calls mocked functions
+    ```
+
+5.  **Assert Results:**
+    Use standard Unity assertions to verify the behavior of your function under test, based on the controlled behavior of its mocked dependencies.
+    ```c
+    TEST_ASSERT_EQUAL_INT(SENSOR_STATUS_OK, status);
+    ```
+
+CMock generates many useful expectation functions based on your header file. Refer to the CMock documentation and the generated `mock_*.h` file for the full API available for your mocked module. Common patterns include `_ExpectAndReturn`, `_IgnoreAndReturn`, `_ExpectAnyArgsAndReturn`, `_ReturnThruPtr_<arg_name>`, `_Stub`, `_AddCallback`.
