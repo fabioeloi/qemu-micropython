@@ -10,8 +10,7 @@ The chosen unit testing framework is **Unity**. Unity is a lightweight and simpl
 
 All files related to host-based C unit testing are located within the `test/host/` directory. The Unity framework itself is (or should be) located in `test/frameworks/unity/`.
 
-*   `test/frameworks/unity/`: Contains Unity's source files (`unity.c`, `unity.h`, `unity_internals.h`).
-    *   *Note for contributors: The project might initially contain placeholder Unity files. For full functionality, ensure the official Unity source from [ThrowTheSwitch/Unity](https://github.com/ThrowTheSwitch/Unity) is populated here.*
+*   `test/frameworks/unity/`: Contains Unity's source files (`unity.c`, `unity.h`, `unity_internals.h`). These are currently representative versions of the official files, providing standard macros and functionality.
 *   `test/host/`: This directory contains:
     *   `Makefile`: For building and running host-based tests using `gcc`.
     *   `test_*.c`: Files containing test case functions for a specific C module (e.g., `test_string_utils.c`).
@@ -54,7 +53,7 @@ Unity provides a rich set of assertion macros. Here are some common ones:
 *   `TEST_FAIL_MESSAGE("Failure reason");`
 *   `TEST_IGNORE_MESSAGE("Reason for ignoring this test");` (causes test to be skipped)
 
-*Note: If using the project's initial placeholder Unity files, only a limited set of assertions like `TEST_ASSERT_EQUAL_INT` might be functional. For `TEST_ASSERT_EQUAL_STRING`, you might need to use `TEST_ASSERT_EQUAL_INT(0, strcmp(expected, actual));`.*
+These macros (and many more) are available when using the standard Unity framework.
 
 ### `setUp()` and `tearDown()`
 
@@ -80,21 +79,17 @@ void test_my_feature_description(void);
 void test_another_feature(void);
 // ... more test functions
 
-// If setUp and tearDown are defined in test_my_module.c,
-// they don't need to be redefined here.
-// If they are not in test_my_module.c but RUN_TEST expects them,
-// provide empty stubs here or in test_my_module.c.
-// It's generally best practice to keep setUp/tearDown with their test cases.
-// For the project's placeholder Unity, ensure they are defined somewhere accessible.
-void setUp(void) {}
-void tearDown(void) {}
-
+// setUp() and tearDown() should be defined in your test_my_module.c file if needed.
+// Unity's RUN_TEST macro will call them. If they are not needed, you can
+// define empty ones in test_my_module.c or rely on Unity's weak-symbol defaults
+// if your Unity version provides them (the representative version does).
 
 int main(void) {
     UNITY_BEGIN(); // Call first
 
-    RUN_TEST(test_my_feature_description, __LINE__); // __LINE__ helps locate test in output
-    RUN_TEST(test_another_feature, __LINE__);
+    // Use the RUN_TEST macro from unity.h for each test case
+    RUN_TEST(test_my_feature_description);
+    RUN_TEST(test_another_feature);
     // ... more RUN_TEST calls
 
     return UNITY_END(); // Call last; returns 0 on pass, non-zero on fail

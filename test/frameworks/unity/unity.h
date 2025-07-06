@@ -1,65 +1,131 @@
-// This is a placeholder for Unity's unity.h header file.
-// In a real setup, this would contain all Unity assertion macros and declarations.
-
+/* Standard Unity Header File (Representative Content) */
 #ifndef UNITY_H
 #define UNITY_H
 
-#include <stdint.h> // For intptr_t
+#include <setjmp.h> // For TEST_PROTECT
+#include <stddef.h> // For size_t, NULL
+#include <stdint.h> // For intptr_t etc.
 
-#define TEST_PROTECT() (1) // Simplified version for placeholder
+// Version (Example)
+#define UNITY_VERSION_MAJOR 2
+#define UNITY_VERSION_MINOR 5
+#define UNITY_VERSION_BUILD 2
+#define UNITY_VERSION ((UNITY_VERSION_MAJOR << 16) | (UNITY_VERSION_MINOR << 8) | UNITY_VERSION_BUILD)
 
-// Basic assertion macro (simplified)
-#define TEST_ASSERT_EQUAL_INT(expected, actual) UnityAssertEqualNumber((int)(expected), (int)(actual), NULL, __LINE__)
-#define TEST_ASSERT_EQUAL_STRING(expected, actual) UnityAssertEqualString((const char*)(expected), (const char*)(actual), NULL, __LINE__)
-#define TEST_ASSERT_NOT_NULL(pointer) UnityAssertNotNull((void*)(pointer), NULL, __LINE__)
-#define TEST_ASSERT_NULL(pointer) UnityAssertNull((void*)(pointer), NULL, __LINE__)
-#define TEST_ASSERT_TRUE(condition) UnityAssertTrue((condition), NULL, __LINE__)
-#define TEST_ASSERT_FALSE(condition) UnityAssertFalse((condition), NULL, __LINE__)
+// Standard Macros
+#define UNITY_LINE_TYPE unsigned int
+#define UNITY_COUNTER_TYPE unsigned int
 
-#define TEST_FAIL_MESSAGE(message) UnityFail(message, __LINE__)
-#define TEST_IGNORE_MESSAGE(message) UnityIgnore(message, __LINE__)
+#define UNITY_DISPLAY_STYLE_NORMAL
+// #define UNITY_DISPLAY_STYLE_COMPACT
+
+#ifndef UNITY_UINT_WIDTH
+#define UNITY_UINT_WIDTH 32
+#endif
+#ifndef UNITY_INT_WIDTH
+#define UNITY_INT_WIDTH 32
+#endif
+
+// Test Main
+int UnityMain(int argc, const char* argv[], void (*runAllTests)(void));
+
+// Test Cases
+void UnityTestRunner(void(*SoFar)(void), const char* TestName, void(*Teardown)(void), void(*TestBody)(void), const UNITY_LINE_TYPE NumberOfCalls, const char* FuncName);
+
+// Test Control
+void UnityBegin(const char* filename);
+int UnityEnd(void);
+void UnityConcludeTest(void); // Called at the end of each test case
+void UnitySetTestFile(const char *filename); // Usually called by RUN_TEST
+
+// Test Output
+void UnityPrint(const char* string);
+void UnityPrintLen(const char* string, const UNITY_LINE_TYPE length);
+void UnityPrintMask(const UNITY_LINE_TYPE mask, const UNITY_LINE_TYPE number);
+void UnityPrintNumberByStyle(const UNITY_INT_TYPE number, const UNITY_DISPLAY_STYLE_T style);
+// ... and many more print helpers
+
+// Assertion Macros (a selection)
+#define TEST_ASSERT_MESSAGE(condition, message)                             UnityAssert(((condition) != 0), message, __LINE__)
+#define TEST_ASSERT(condition)                                              UnityAssert(((condition) != 0), NULL, __LINE__)
+#define TEST_FAIL_MESSAGE(message)                                          UnityFail(message, __LINE__)
+#define TEST_FAIL()                                                         UnityFail(NULL, __LINE__)
+#define TEST_IGNORE_MESSAGE(message)                                        UnityIgnore(message, __LINE__)
+#define TEST_IGNORE()                                                       UnityIgnore(NULL, __LINE__)
+#define TEST_ONLY_IF(condition)                                             if (condition)
+
+#define TEST_ASSERT_EQUAL_INT(expected, actual)                             UnityAssertEqualNumber((UNITY_INT_TYPE)(expected), (UNITY_INT_TYPE)(actual), NULL, __LINE__, UNITY_DISPLAY_STYLE_INT)
+#define TEST_ASSERT_EQUAL_INT8(expected, actual)                            UnityAssertEqualNumber((UNITY_INT_TYPE)(UNITY_INT8)(expected), (UNITY_INT_TYPE)(UNITY_INT8)(actual), NULL, __LINE__, UNITY_DISPLAY_STYLE_INT8)
+// ... many other integer types ...
+#define TEST_ASSERT_EQUAL_UINT(expected, actual)                            UnityAssertEqualNumber((UNITY_INT_TYPE)(expected), (UNITY_INT_TYPE)(actual), NULL, __LINE__, UNITY_DISPLAY_STYLE_UINT)
+#define TEST_ASSERT_EQUAL_HEX8(expected, actual)                            UnityAssertEqualNumber((UNITY_INT_TYPE)(UNITY_INT8)(expected), (UNITY_INT_TYPE)(UNITY_INT8)(actual), NULL, __LINE__, UNITY_DISPLAY_STYLE_HEX8)
+
+#define TEST_ASSERT_EQUAL_STRING(expected, actual)                          UnityAssertEqualString((const char*)(expected), (const char*)(actual), NULL, __LINE__)
+#define TEST_ASSERT_EQUAL_STRING_LEN(expected, actual, len)                 UnityAssertEqualStringLen((const char*)(expected), (const char*)(actual), (UNITY_UINT32)(len), NULL, __LINE__)
+#define TEST_ASSERT_EQUAL_MEMORY(expected, actual, len)                     UnityAssertEqualMemory((const void*)(expected), (const void*)(actual), (UNITY_UINT32)(len), 1, NULL, __LINE__)
+
+#define TEST_ASSERT_NULL(pointer)                                           UnityAssertNull((const void*)(pointer), NULL, __LINE__)
+#define TEST_ASSERT_NOT_NULL(pointer)                                       UnityAssertNotNull((const void*)(pointer), NULL, __LINE__)
+
+#define TEST_ASSERT_TRUE(condition)                                         UnityAssert(((condition) != 0), NULL, __LINE__)
+#define TEST_ASSERT_FALSE(condition)                                        UnityAssert(((condition) == 0), NULL, __LINE__)
 
 
-// Test case function macro (simplified)
-#define TEST_CASE(funcName) void funcName(void)
+// Test Runner Macros
+#define UNITY_FIXTURE_SETUP(name)     void setUp(void)
+#define UNITY_FIXTURE_TEARDOWN(name)  void tearDown(void)
 
-// Test runner macros (simplified)
+#define UNITY_TEST_SUITE(name)        void name(void)
+#define UNITY_TEST_CASE               void // For function definition
+
 #define UNITY_BEGIN() UnityBegin(__FILE__)
-#define UNITY_END() UnityEnd()
-#define RUN_TEST(testFunc, linenum_unused) UnityDefaultTestRun(testFunc, #testFunc, (unsigned int)__LINE__)
+#define UNITY_END()   UnityEnd()
+
+// RUN_TEST calls UnityTestRunner
+#define RUN_TEST(testFunc) UnityTestRunner(UnitySoFar, #testFunc, tearDown, testFunc, 1, __FILE__)
+
+// Internal State (simplified access for test runner adaptation)
+typedef struct _Unity UnityType;
+extern UnityType Unity; // Definition in unity.c
+
+struct _Unity {
+    const char* TestFile;
+    const char* CurrentTestName;
+    const char* CurrentDetail1;
+    const char* CurrentDetail2;
+    UNITY_LINE_TYPE CurrentTestLineNumber;
+    UNITY_COUNTER_TYPE NumberOfTests;
+    UNITY_COUNTER_TYPE TestFailures;
+    UNITY_COUNTER_TYPE TestIgnores;
+    UNITY_COUNTER_TYPE CurrentTestFailed;
+    UNITY_COUNTER_TYPE CurrentTestIgnored;
+    jmp_buf AbortFrame;
+};
 
 
-// Setup and Teardown function prototypes (optional)
-void setUp(void);
-void tearDown(void);
-
-// External declarations for placeholder unity.c
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern unsigned int UnityLineNumber;
-extern const char *UnityTestName;
-extern unsigned int UnityTestCount;
-extern unsigned int UnityFailureCount;
-extern unsigned int UnityIgnoreCount;
+// Core functions (prototypes)
+void UnityAssert(const int condition, const char* message, const UNITY_LINE_TYPE line);
+void UnityFail(const char* message, const UNITY_LINE_TYPE line);
+void UnityIgnore(const char* message, const UNITY_LINE_TYPE line);
+void UnityAssertEqualNumber(const UNITY_INT_TYPE expected,
+                            const UNITY_INT_TYPE actual,
+                            const char* message,
+                            const UNITY_LINE_TYPE line,
+                            const UNITY_DISPLAY_STYLE_T style);
+void UnityAssertEqualString(const char* expected,
+                            const char* actual,
+                            const char* message,
+                            const UNITY_LINE_TYPE line);
+// ... many more assertion function prototypes
 
-void UnityBegin(const char* filename);
-int UnityEnd(void); // Returns number of failures
-void UnityAssertEqualNumber(const int expected, const int actual, const char* msg, const unsigned int line);
-void UnityAssertEqualString(const char* expected, const char* actual, const char* msg, const unsigned int line);
-void UnityAssertNotNull(const void* pointer, const char* msg, const unsigned int line);
-void UnityAssertNull(const void* pointer, const char* msg, const unsigned int line);
-void UnityAssertTrue(const int condition, const char* msg, const unsigned int line);
-void UnityAssertFalse(const int condition, const char* msg, const unsigned int line);
-void UnityFail(const char* message, const unsigned int line);
-void UnityIgnore(const char* message, const unsigned int line);
+void UnitySoFar(void); // Dummy for RUN_TEST
 
-void UnityDefaultTestRun(void (*pTestFunc)(void), const char* funcName, const unsigned int funcLine);
-
-// For QEMU target execution
+// For QEMU target execution (if needed by runner)
 void qemu_exit(int code);
-
 
 #ifdef __cplusplus
 }

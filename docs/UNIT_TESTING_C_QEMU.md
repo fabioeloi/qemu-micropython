@@ -171,6 +171,14 @@ The Python script `scripts/run_qemu_c_tests.py` executes a compiled test firmwar
     *   Ensure QEMU command in `run_qemu_c_tests.py` includes `-semihosting-config enable=on,target=native` and `-semihosting`.
     *   Ensure your target firmware (linked with `rdimon.specs`) correctly implements the semihosting `bkpt` instruction for `qemu_exit`.
 
-## 7. Current Unity Placeholder Note
+## 7. Notes on Unity and Parseable Output
 
-The Unity framework files currently in `test/frameworks/unity/` are simplified placeholders. For robust testing and access to all of Unity's features, replace these with the official source files from ThrowTheSwitch/Unity. The `RUN_TEST_WITH_PARSABLE_OUTPUT_QEMU` macro in the example runner is a workaround due to these placeholders; a full Unity setup might allow for more direct custom print formatters.
+The Unity framework files in `test/frameworks/unity/` are representative versions that provide standard macros and functionality. The test runner (e.g., `test_my_module_runner.c`) has been adapted to ensure machine-parseable output for automation:
+
+*   **Individual Test Results:** `TEST(test_name):PASS/FAIL/IGNORE` lines.
+    *   `FAIL` and `IGNORE` lines (including messages and line numbers) are typically printed by Unity's assertion macros or `TEST_IGNORE` itself when they detect a failure or ignore directive.
+    *   `PASS` lines for individual tests are printed by a custom macro (e.g., `MY_RUN_TEST` in the example `test_string_utils_runner.c`) in the runner after confirming the test did not fail or was not ignored. This ensures every test has a clear status line.
+*   **Summary Line:** `UNITY_END()` in the runner prints a final `SUMMARY:Total:Failures:Ignored` line.
+*   **QEMU Exit:** The runner's `main()` function calls `qemu_exit(status_code)` using semihosting to terminate QEMU with an exit code reflecting the overall test suite status.
+
+This setup allows the `scripts/run_qemu_c_tests.py` script to correctly parse results. If using a different version of Unity or a different custom runner, ensure this parseable output format is maintained for compatibility with the automation script.
