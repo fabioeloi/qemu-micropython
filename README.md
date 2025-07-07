@@ -16,26 +16,58 @@ This project provides a virtual development environment for STM32 microcontrolle
 **Current Milestone:** v1.1.0 - Debugging and QEMU Integration (Completed)
 **Roadmap Progress:** [View detailed status](ROADMAP_STATUS.md)
 
-The v1.1.0 milestone, focusing on Debugging and QEMU Integration, is now complete. Key achievements in this milestone include:
-- Added comprehensive GDB integration with MicroPython debugging support
-- Implemented Python-level debugging with stack trace, variable inspection, and exception handling
-- Enhanced breakpoint support with Python function name resolution and memory inspection
-- Added comprehensive exception handling capabilities with type filtering and state inspection
-- Enhanced exception visualization with color-coded output and interactive navigation
-- Created comprehensive documentation for exception handling commands and workflows
-- Completed implementation of custom UART driver for QEMU with simulation features
-- Enhanced network simulation with robust device-to-device communication
-- Added comprehensive debugging guide and documentation
+The v1.1.0 milestone, focusing on **Debugging Capabilities, QEMU Integration, and Foundational Test Infrastructure**, is now complete. Key achievements include:
+
+**I. Advanced GDB Debugging for MicroPython:**
+- Full GDB integration allowing detailed inspection of MicroPython running in QEMU.
+- Python-level call stack tracing (`mpy-bt`, `mpy-except-bt`) with source code context display.
+- Inspection of local variables (`mpy-locals`, `mpy-frame`) for the current or selected stack frame, including argument values (with best-effort name resolution for stack variables).
+- Global variable inspection (`mpy-globals`).
+- Comprehensive exception analysis (`mpy-except-info`):
+    - Detailed display of exception type, value, arguments, and custom attributes (for user-defined exceptions).
+    - Traceback with source context.
+    - History of recent exceptions (`mpy-except-history`).
+- Advanced exception breakpoint control (`mpy-catch`):
+    - Break on specific exception types.
+    *   Filter by `all` occurrences or only `uncaught` exceptions.
+    *   Set conditions based on exception arguments or message content (including regex matching).
+- Visual aids like `mpy-except-visualize`.
+- Support for navigating the live Python call stack (`mpy-frame`).
+
+**II. Enhanced QEMU Environment & Integration:**
+- Refined semihosting integration via the `usemihosting` MicroPython module for guest-host interaction.
+- Analysis of QEMU machine types and consolidated guidance on QEMU usage for STM32F4.
+- Completed implementation of custom UART driver for QEMU with simulation features *(Verify if part of v1.1.0)*.
+- Enhanced network simulation with robust device-to-device communication *(Verify if part of v1.1.0)*.
+
+**III. Comprehensive Testing Framework & CI:**
+- **Host-based C Unit Tests:** Using Unity for assertions and CMock for mocking dependencies.
+- **On-Target C Unit Tests:** Unity-based tests compiled for ARM and executed automatically in QEMU, with results parsed.
+- **Python Unit Tests:** Using the standard `unittest` module for project scripts and tools.
+- **Continuous Integration (CI) Pipeline:** GitHub Actions workflow established for automated builds of firmware and all test types, followed by automated execution of all tests.
+
+**IV. Developer Documentation:**
+- New and updated guides covering: GDB Debugging, Project Architecture, Build System, QEMU Usage, Semihosting, C Unit Testing (Host & Target), Python Unit Testing, and Continuous Integration.
 
 See our [Version History](#version-history) for more details on releases.
 
 ## Features
 
-- QEMU-based emulation of STM32F4 microcontrollers
-- MicroPython firmware with STM32 support
-- Sensor simulation and peripheral emulation
-- IoT connectivity for device telemetry
-- Development workflow from virtual testing to physical deployment
+- **STM32F4 Emulation with QEMU:** Provides a virtual platform for running MicroPython on an emulated STM32F4 Cortex-M4 microcontroller.
+- **MicroPython for STM32:** Utilizes the STM32 port of MicroPython, enabling Python-based embedded development.
+- **Advanced GDB Debugging for MicroPython:**
+    - In-depth inspection of Python execution: call stacks with source code context, local variables (including stack argument values with best-effort name resolution), global variables.
+    - Powerful exception analysis: detailed exception information (type, args, custom attributes), history, and conditional breakpoints (`mpy-catch`).
+    - Live call stack navigation (`mpy-frame`).
+- **Comprehensive Multi-Layered Testing Framework:**
+    - **Host C Unit Tests:** Utilizing Unity and CMock for isolated testing of C modules on the development machine.
+    - **On-Target C Unit Tests:** Running C/Unity tests directly in the QEMU emulated environment, with automated execution and result parsing.
+    - **Python Unit Tests:** Standard `unittest` framework for testing project scripts and Python tools.
+- **Continuous Integration (CI) Pipeline:** Automated builds and execution of all test suites using GitHub Actions, ensuring code quality and stability.
+- **Semihosting Capabilities:** Allows MicroPython applications running in QEMU to interact with the host system (e.g., file I/O, console access) via the custom `usemihosting` module.
+- **Extensive Developer Documentation:** Guides for project architecture, build system, GDB debugging, all testing types, QEMU usage, and application development within the environment.
+- **Helper Scripts:** Streamlined command-line tools for building firmware, running QEMU sessions, and initiating debug sessions.
+- **Foundation for IoT Application Development:** The environment supports development towards IoT applications (e.g., through documented CoAP/MQTT simulation examples and planned features like virtual sensors and network simulation).
 
 ## Directory Structure
 
