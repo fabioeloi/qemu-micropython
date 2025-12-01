@@ -9,6 +9,33 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 ROADMAP_FILE="$PROJECT_DIR/ROADMAP_STATUS.md"
 OUTPUT_FILE="$PROJECT_DIR/test_results/sync_verification_$(date +%Y%m%d_%H%M%S).txt"
 
+# Configurable parameters (can be overridden via environment variables)
+ISSUE_LIMIT="${ISSUE_LIMIT:-100}"
+
+# Detect repository owner and name from git remote
+get_repo_info() {
+    local remote_url
+    remote_url=$(git -C "$PROJECT_DIR" config --get remote.origin.url 2>/dev/null || echo "")
+    
+    if [ -z "$remote_url" ]; then
+        echo ""
+        return
+    fi
+    
+    # Handle both HTTPS and SSH URLs
+    # HTTPS: https://github.com/owner/repo.git
+    # SSH: git@github.com:owner/repo.git
+    if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/.]+)(\.git)?$ ]]; then
+        echo "${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+    else
+        echo ""
+    fi
+}
+
+REPO_INFO=$(get_repo_info)
+REPO_OWNER=$(echo "$REPO_INFO" | cut -d'/' -f1)
+REPO_NAME=$(echo "$REPO_INFO" | cut -d'/' -f2)
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -74,9 +101,10 @@ section "Extracting Progress from ROADMAP_STATUS.md"
 declare -A roadmap_progress
 
 # Parse the roadmap file for progress percentages
+# This looks for table rows with a percentage value (e.g., | ... | 75% | ...)
 while IFS= read -r line; do
-    # Look for lines with progress percentages (format: | Feature | Status | ... | XX% | ...)
-    if [[ $line =~ \|[^|]+\|[^|]+\|[^|]+\|[[:space:]]*([0-9]+)%[[:space:]]*\| ]]; then
+    # Look for lines containing a percentage in any column
+    if [[ $line =~ \|.*[[:space:]]([0-9]+)%[[:space:]]*\| ]]; then
         percentage="${BASH_REMATCH[1]}"
         # Extract feature name (first column after initial |)
         feature=$(echo "$line" | awk -F'|' '{print $2}' | xargs)
@@ -93,6 +121,12 @@ success "Progress extraction complete"
 # Check if GitHub CLI is available
 section "GitHub Integration Check"
 
+# Verify we have repo info
+if [ -z "$REPO_INFO" ]; then
+    warning "Could not determine repository owner/name from git remote"
+    echo "  Make sure you have a GitHub remote configured" >> "$OUTPUT_FILE"
+fi
+
 if command -v gh &> /dev/null; then
     success "GitHub CLI is available"
     
@@ -103,11 +137,15 @@ if command -v gh &> /dev/null; then
         # Fetch issues and compare
         section "Fetching GitHub Issues"
         
-        issues_json=$(gh issue list --limit 100 --json number,title,state,milestone,labels 2>/dev/null || echo "[]")
+        issues_json=$(gh issue list --limit "$ISSUE_LIMIT" --json number,title,state,milestone,labels 2>/dev/null || echo "[]")
         
         if [ "$issues_json" != "[]" ]; then
             issue_count=$(echo "$issues_json" | jq 'length')
-            success "Found $issue_count issues"
+            success "Found $issue_count issues (limit: $ISSUE_LIMIT)"
+            
+            if [ "$issue_count" -eq "$ISSUE_LIMIT" ]; then
+                warning "Issue limit reached. Set ISSUE_LIMIT environment variable for more."
+            fi
             
             # Check for tracking issues
             section "Verifying Issue Progress"
@@ -119,7 +157,12 @@ if command -v gh &> /dev/null; then
             # Check milestone alignment
             section "Milestone Verification"
             
-            milestones=$(gh api repos/:owner/:repo/milestones --jq '.[] | "\(.title)|\(.open_issues)|\(.closed_issues)"' 2>/dev/null || echo "")
+            if [ -n "$REPO_OWNER" ] && [ -n "$REPO_NAME" ]; then
+                milestones=$(gh api "repos/$REPO_OWNER/$REPO_NAME/milestones" --jq '.[] | "\(.title)|\(.open_issues)|\(.closed_issues)"' 2>/dev/null || echo "")
+            else
+                warning "Repository info not available, skipping milestone fetch"
+                milestones=""
+            fi
             
             if [ -n "$milestones" ]; then
                 echo "$milestones" | while IFS='|' read -r title open closed; do
@@ -149,18 +192,36 @@ fi
 # Check documentation consistency
 section "Documentation Consistency Check"
 
+# Function to get file modification time (cross-platform)
+get_file_mtime() {
+    local file="$1"
+    # Try GNU stat first (Linux), then BSD stat (macOS)
+    local mtime
+    mtime=$(stat -c %Y "$file" 2>/dev/null) || mtime=$(stat -f %m "$file" 2>/dev/null) || mtime=""
+    
+    if [ -z "$mtime" ]; then
+        warning "Could not determine modification time for $file"
+        echo "0"
+    else
+        echo "$mtime"
+    fi
+}
+
 # Check if ROADMAP_STATUS.md has recent updates
 if [ -f "$ROADMAP_FILE" ]; then
-    last_modified=$(stat -c %Y "$ROADMAP_FILE" 2>/dev/null || stat -f %m "$ROADMAP_FILE" 2>/dev/null)
+    last_modified=$(get_file_mtime "$ROADMAP_FILE")
     current_time=$(date +%s)
-    days_since_update=$(( (current_time - last_modified) / 86400 ))
     
-    if [ $days_since_update -lt 7 ]; then
-        success "ROADMAP_STATUS.md updated recently (${days_since_update} days ago)"
-    elif [ $days_since_update -lt 30 ]; then
-        warning "ROADMAP_STATUS.md not updated in ${days_since_update} days"
-    else
-        error "ROADMAP_STATUS.md outdated (${days_since_update} days since last update)"
+    if [ "$last_modified" -gt 0 ]; then
+        days_since_update=$(( (current_time - last_modified) / 86400 ))
+        
+        if [ $days_since_update -lt 7 ]; then
+            success "ROADMAP_STATUS.md updated recently (${days_since_update} days ago)"
+        elif [ $days_since_update -lt 30 ]; then
+            warning "ROADMAP_STATUS.md not updated in ${days_since_update} days"
+        else
+            error "ROADMAP_STATUS.md outdated (${days_since_update} days since last update)"
+        fi
     fi
 fi
 

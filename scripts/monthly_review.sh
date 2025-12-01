@@ -13,6 +13,30 @@ CURRENT_DATE=$(date +"%Y-%m-%d")
 CURRENT_MONTH=$(date +"%B %Y")
 REVIEW_FILE="$REVIEW_OUTPUT_DIR/monthly_review_$(date +%Y%m).md"
 
+# Detect repository owner and name from git remote
+get_repo_info() {
+    local remote_url
+    remote_url=$(git -C "$PROJECT_DIR" config --get remote.origin.url 2>/dev/null || echo "")
+    
+    if [ -z "$remote_url" ]; then
+        echo ""
+        return
+    fi
+    
+    # Handle both HTTPS and SSH URLs
+    # HTTPS: https://github.com/owner/repo.git
+    # SSH: git@github.com:owner/repo.git
+    if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/.]+)(\.git)?$ ]]; then
+        echo "${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+    else
+        echo ""
+    fi
+}
+
+REPO_INFO=$(get_repo_info)
+REPO_OWNER=$(echo "$REPO_INFO" | cut -d'/' -f1)
+REPO_NAME=$(echo "$REPO_INFO" | cut -d'/' -f2)
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -46,6 +70,36 @@ error() {
 # Function to display info messages
 info() {
     echo -e "${CYAN}ℹ $1${NC}"
+}
+
+# Function to get file modification time (cross-platform)
+get_file_mtime_date() {
+    local file="$1"
+    # Try GNU date first (Linux), then BSD date (macOS)
+    local mtime
+    if date -r "$file" "+%Y-%m-%d" 2>/dev/null; then
+        return
+    fi
+    # Fallback: use stat
+    local ts
+    ts=$(stat -c %Y "$file" 2>/dev/null) || ts=$(stat -f %m "$file" 2>/dev/null) || ts=""
+    if [ -n "$ts" ]; then
+        date -d "@$ts" "+%Y-%m-%d" 2>/dev/null || echo "Unknown"
+    else
+        echo "Unknown"
+    fi
+}
+
+# Cross-platform sed in-place edit
+sed_inplace() {
+    local pattern="$1"
+    local file="$2"
+    # Try GNU sed first, then BSD sed
+    if sed --version 2>/dev/null | grep -q GNU; then
+        sed -i "$pattern" "$file"
+    else
+        sed -i '' "$pattern" "$file"
+    fi
 }
 
 # Create reviews directory if it doesn't exist
@@ -85,7 +139,12 @@ section "Step 2: Milestone Progress Review"
 if command -v gh &> /dev/null && gh auth status &> /dev/null 2>&1; then
     info "Fetching milestone information from GitHub..."
     
-    milestones=$(gh api repos/:owner/:repo/milestones --jq '.[] | "\(.title)|\(.open_issues)|\(.closed_issues)|\(.due_on // "none")"' 2>/dev/null || echo "")
+    if [ -n "$REPO_OWNER" ] && [ -n "$REPO_NAME" ]; then
+        milestones=$(gh api "repos/$REPO_OWNER/$REPO_NAME/milestones" --jq '.[] | "\(.title)|\(.open_issues)|\(.closed_issues)|\(.due_on // "none")"' 2>/dev/null || echo "")
+    else
+        warning "Could not determine repository info from git remote"
+        milestones=""
+    fi
     
     if [ -n "$milestones" ]; then
         echo ""
@@ -165,13 +224,18 @@ echo "├───────────────────────�
 for doc in "${docs_to_check[@]}"; do
     doc_path="$PROJECT_DIR/$doc"
     if [ -f "$doc_path" ]; then
-        # Get last modified date
-        last_mod=$(date -r "$doc_path" "+%Y-%m-%d" 2>/dev/null || stat -c "%y" "$doc_path" 2>/dev/null | cut -d' ' -f1)
+        # Get last modified date using cross-platform function
+        last_mod=$(get_file_mtime_date "$doc_path")
         
-        # Check age
-        last_mod_ts=$(date -d "$last_mod" +%s 2>/dev/null || stat -f %m "$doc_path" 2>/dev/null)
+        # Check age - get modification timestamp
+        last_mod_ts=$(stat -c %Y "$doc_path" 2>/dev/null) || last_mod_ts=$(stat -f %m "$doc_path" 2>/dev/null) || last_mod_ts=0
         current_ts=$(date +%s)
-        days_old=$(( (current_ts - last_mod_ts) / 86400 ))
+        
+        if [ "$last_mod_ts" -gt 0 ]; then
+            days_old=$(( (current_ts - last_mod_ts) / 86400 ))
+        else
+            days_old=999
+        fi
         
         if [ $days_old -lt 30 ]; then
             status="✓ Current"
@@ -199,12 +263,9 @@ info "Creating review report from template..."
 if [ -f "$TEMPLATES_DIR/monthly_review_template.md" ]; then
     cp "$TEMPLATES_DIR/monthly_review_template.md" "$REVIEW_FILE"
     
-    # Replace placeholders
-    sed -i "s/\[MONTH YEAR\]/$CURRENT_MONTH/g" "$REVIEW_FILE" 2>/dev/null || \
-    sed -i '' "s/\[MONTH YEAR\]/$CURRENT_MONTH/g" "$REVIEW_FILE" 2>/dev/null
-    
-    sed -i "s/\[DATE\]/$CURRENT_DATE/g" "$REVIEW_FILE" 2>/dev/null || \
-    sed -i '' "s/\[DATE\]/$CURRENT_DATE/g" "$REVIEW_FILE" 2>/dev/null
+    # Replace placeholders using cross-platform sed
+    sed_inplace "s/\[MONTH YEAR\]/$CURRENT_MONTH/g" "$REVIEW_FILE"
+    sed_inplace "s/\[DATE\]/$CURRENT_DATE/g" "$REVIEW_FILE"
     
     success "Review report created: $REVIEW_FILE"
 else
