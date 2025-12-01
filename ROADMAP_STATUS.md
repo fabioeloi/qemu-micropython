@@ -170,6 +170,29 @@ The following documents and scripts are available for release preparation:
 - [plan_v1.2.0_milestone.sh](scripts/plan_v1.2.0_milestone.sh) - Script for planning the v1.2.0 milestone, including creating milestone documentation, transition plan, and issue templates
 - [create_v1.2.0_issues.sh](scripts/create_v1.2.0_issues.sh) - Script for creating GitHub issues for the v1.2.0 milestone
 
+## Project Tracking Synchronization
+
+This project uses a regular synchronization process to keep documentation and GitHub issues aligned. For detailed information, see:
+
+- [Synchronization Process Guide](docs/SYNC_PROCESS.md) - Complete guide to the synchronization process
+- [Progress Update Template](docs/templates/progress_update_template.md) - Template for issue progress updates
+- [Monthly Review Template](docs/templates/monthly_review_template.md) - Template for monthly review reports
+- [Commit Tracking Template](docs/templates/commit_tracking_template.md) - Template for significant commit tracking
+
+### Synchronization Scripts
+
+- [verify_sync.sh](scripts/verify_sync.sh) - Verify alignment between documentation and issues
+- [monthly_review.sh](scripts/monthly_review.sh) - Conduct monthly roadmap reviews
+- [update_milestone_progress.sh](scripts/update_milestone_progress.sh) - Update milestone progress tracking
+
+### Automated Workflows
+
+The `.github/workflows/sync-project-tracking.yml` workflow automatically:
+- Analyzes commit changes
+- Updates relevant issues with progress information
+- Checks milestone progress
+- Posts tracking sync reports
+
 ## Project Status Summary
 
 For a comprehensive overview of the project's current status, accomplishments, and future plans, please refer to the following documents:
