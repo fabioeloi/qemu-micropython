@@ -23,6 +23,7 @@ We are currently focusing on improving debugging capabilities and QEMU integrati
 - Added comprehensive exception handling capabilities with type filtering and state inspection
 - Enhanced exception visualization with color-coded output and interactive navigation
 - Created comprehensive documentation for exception handling commands and workflows
+- Implemented ARM semihosting integration for reliable console I/O in QEMU
 - Completed implementation of custom UART driver for QEMU with simulation features
 - Enhanced network simulation with robust device-to-device communication
 - Added comprehensive debugging guide and documentation
@@ -33,6 +34,9 @@ See our [Version History](#version-history) for more details on releases.
 
 - QEMU-based emulation of STM32F4 microcontrollers
 - MicroPython firmware with STM32 support
+- GDB integration with Python-level debugging and exception handling
+- ARM semihosting support for reliable console I/O in QEMU
+- Custom UART driver with simulation capabilities
 - Sensor simulation and peripheral emulation
 - IoT connectivity for device telemetry
 - Development workflow from virtual testing to physical deployment
@@ -189,9 +193,9 @@ The project is organized into several milestone releases:
 
 ### v1.1.0 - Debugging and QEMU Integration (In Progress)
 
-- GDB integration for step-by-step debugging (99% complete)
+- GDB integration for step-by-step debugging (100% complete)
 - Custom UART driver optimized for QEMU (100% complete)
-- Better semihosting integration for reliable output (50% complete)
+- Better semihosting integration for reliable output (90% complete)
 - Exploration of alternative QEMU machine types for STM32F4 (40% complete)
 - Comprehensive unit testing framework (97% complete)
 

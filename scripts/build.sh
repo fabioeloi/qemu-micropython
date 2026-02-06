@@ -20,6 +20,15 @@ fi
 # Create build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
 
+# Initialize and update submodules
+echo "Ensuring submodules are initialized..."
+cd "$MICROPYTHON_DIR"
+git submodule update --init --recursive lib/stm32lib
+
+# Build mpy-cross (required for freezing modules)
+echo "Building mpy-cross..."
+make -C mpy-cross
+
 # Prepare Python files for freezing
 echo "Preparing Python files..."
 "$PROJECT_DIR/scripts/freeze_files.sh" "$BOARD"
@@ -27,11 +36,31 @@ echo "Preparing Python files..."
 # Navigate to the STM32 port directory
 cd "$STM32_PORT_DIR"
 
-# Clean previous build
-make BOARD=$BOARD clean
+# Initialize STM32 submodules
+make submodules
 
-# Build the firmware
-make BOARD=$BOARD -j4
+# Explicitly create the build directory structure
+# MicroPython's build system will generate pins.h automatically during the build
+echo "Preparing build directory structure..."
+mkdir -p "build-$BOARD/genhdr"
+
+# Verify pins.csv exists in the board directory
+BOARD_PINS_CSV="boards/$BOARD/pins.csv"
+if [ ! -f "$BOARD_PINS_CSV" ]; then
+    echo "ERROR: pins.csv not found at $BOARD_PINS_CSV"
+    echo "Available board files:"
+    ls -la "boards/$BOARD/" || echo "Board directory not found!"
+    exit 1
+fi
+
+echo "Found pins.csv, proceeding with build..."
+echo "Board directory contents:"
+ls -la "boards/$BOARD/"
+
+# Build the firmware (reduce parallelism to avoid race conditions)
+# The MicroPython Makefile will automatically generate pins.h as a dependency
+echo "Building firmware (this will generate pins.h automatically)..."
+make BOARD=$BOARD -j2
 
 # Check if build succeeded
 if [ $? -ne 0 ]; then
@@ -49,7 +78,7 @@ if [ -f "build-$BOARD/firmware0.bin" ] && [ -f "build-$BOARD/firmware1.bin" ]; t
     echo "Creating combined firmware for QEMU..."
     cat "build-$BOARD/firmware0.bin" > "$BUILD_DIR/firmware.bin"
     # Padding to 0x20000 (128KB)
-    dd if=/dev/zero bs=1 count=$((0x20000 - $(stat -f%z "build-$BOARD/firmware0.bin"))) >> "$BUILD_DIR/firmware.bin" 2>/dev/null
+    dd if=/dev/zero bs=1 count=$((0x20000 - $(stat -c%s "build-$BOARD/firmware0.bin"))) >> "$BUILD_DIR/firmware.bin" 2>/dev/null
     cat "build-$BOARD/firmware1.bin" >> "$BUILD_DIR/firmware.bin"
     echo "Combined firmware created at $BUILD_DIR/firmware.bin"
 else
