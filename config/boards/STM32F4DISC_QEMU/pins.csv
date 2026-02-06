@@ -1,0 +1,18 @@
+# Pin definitions for STM32F4DISC_QEMU board
+# Basic pin configuration for QEMU emulation
+# Format: Pin,Name,Type,Signal
+
+# UART2 pins (for REPL)
+A2,UART2_TX,UART,UART2_TX
+A3,UART2_RX,UART,UART2_RX
+
+# LED pins
+D12,LED_GREEN,LED,LED1
+
+# GPIO pins for general use
+A0,GPIO_A0,GPIO,
+A1,GPIO_A1,GPIO,
+B0,GPIO_B0,GPIO,
+B1,GPIO_B1,GPIO,
+C0,GPIO_C0,GPIO,
+C1,GPIO_C1,GPIO,

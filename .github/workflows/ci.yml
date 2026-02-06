@@ -59,6 +59,13 @@ jobs:
       run: |
         ./scripts/setup_env.sh
 
+    - name: Set up custom board configuration
+      run: |
+        BOARD_DIR="tools/micropython/ports/stm32/boards/STM32F4DISC_QEMU"
+        mkdir -p "$BOARD_DIR"
+        cp -r config/boards/STM32F4DISC_QEMU/* "$BOARD_DIR/"
+        echo "Board configuration copied to $BOARD_DIR"
+
     - name: Build firmware
       run: |
         ./scripts/build.sh
