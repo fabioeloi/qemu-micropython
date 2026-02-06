@@ -65,7 +65,7 @@ jobs:
         python3 tests/test_gdb_integration.py
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: firmware
         path: |
@@ -87,7 +87,7 @@ jobs:
         symlinks: true  # Handle symlinks properly
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: firmware
 
