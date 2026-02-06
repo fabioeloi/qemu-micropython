@@ -56,7 +56,7 @@ class ExceptionVisualizationTest:
         """Create a test script that generates various exceptions"""
         test_script = """
 def test_zero_division():
-    """Test division by zero exception"""
+    '''Test division by zero exception'''
     print("Testing division by zero...")
     a = 10
     b = 0
@@ -65,7 +65,7 @@ def test_zero_division():
     return result
 
 def test_index_error():
-    """Test index error exception"""
+    '''Test index error exception'''
     print("Testing index error...")
     items = [1, 2, 3]
     # This will raise IndexError
@@ -73,7 +73,7 @@ def test_index_error():
     return item
 
 def test_attribute_error():
-    """Test attribute error exception"""
+    '''Test attribute error exception'''
     print("Testing attribute error...")
     class TestClass:
         def __init__(self):
@@ -84,7 +84,7 @@ def test_attribute_error():
     return obj.nonexistent_attribute
 
 def test_nested_exception():
-    """Test nested exception handling"""
+    '''Test nested exception handling'''
     print("Testing nested exception...")
     
     def inner_function():
@@ -98,7 +98,7 @@ def test_nested_exception():
         return 1 / 0
 
 def test_custom_exception():
-    """Test custom exception handling"""
+    '''Test custom exception handling'''
     print("Testing custom exception...")
     
     class CustomError(Exception):
@@ -111,7 +111,7 @@ def test_custom_exception():
     raise CustomError("This is a custom error", 42)
 
 def main():
-    """Main function"""
+    '''Main function'''
     print("Starting exception visualization tests...")
     
     try:
