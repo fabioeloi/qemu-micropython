@@ -39,10 +39,12 @@ cd "$STM32_PORT_DIR"
 # Initialize STM32 submodules
 make submodules
 
-# Clean previous build
-make BOARD=$BOARD clean
+# Don't clean - this might remove generated headers that we need
+# Instead, let make handle dependencies and regenerate what's needed
+# make BOARD=$BOARD clean
 
 # Build the firmware (reduce parallelism to avoid race conditions)
+# The MicroPython Makefile will generate pins.h as a dependency
 make BOARD=$BOARD -j2
 
 # Check if build succeeded
