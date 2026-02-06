@@ -162,8 +162,6 @@ def initialize_sensors(i2c=None):
 
 def read_temperature():
     """Read temperature from the best available sensor"""
-    global _temperature_sensor
-    
     if _temperature_sensor is None:
         initialize_sensors()
     
@@ -175,8 +173,6 @@ def read_temperature():
 
 def read_humidity():
     """Read humidity from the best available sensor"""
-    global _humidity_sensor
-    
     if _humidity_sensor is None:
         initialize_sensors()
     
@@ -188,8 +184,6 @@ def read_humidity():
 
 def read_pressure():
     """Read pressure from the best available sensor"""
-    global _pressure_sensor
-    
     if _pressure_sensor is None:
         initialize_sensors()
     
