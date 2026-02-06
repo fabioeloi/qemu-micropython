@@ -39,6 +39,15 @@ cd "$STM32_PORT_DIR"
 # Initialize STM32 submodules
 make submodules
 
+# Explicitly generate header files including pins.h before the main build
+# Create the build directory structure first
+echo "Generating board headers (pins.h)..."
+mkdir -p "build-$BOARD/genhdr"
+
+# Use make to generate just the headers/pins without building everything
+# This ensures pins.h and other headers are created before compilation
+make BOARD=$BOARD build-$BOARD/genhdr/pins.h || true
+
 # Don't clean - this might remove generated headers that we need
 # Instead, let make handle dependencies and regenerate what's needed
 # make BOARD=$BOARD clean
