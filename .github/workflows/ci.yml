@@ -65,6 +65,12 @@ jobs:
         mkdir -p "$BOARD_DIR"
         cp -r config/boards/STM32F4DISC_QEMU/* "$BOARD_DIR/"
         echo "Board configuration copied to $BOARD_DIR"
+        echo "Verifying board files:"
+        ls -la "$BOARD_DIR"
+        echo "Checking pins.csv content:"
+        cat "$BOARD_DIR/pins.csv" | head -10
+        echo "Verifying mpconfigboard.mk:"
+        cat "$BOARD_DIR/mpconfigboard.mk"
 
     - name: Build firmware
       run: |
