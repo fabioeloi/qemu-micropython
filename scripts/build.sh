@@ -39,21 +39,27 @@ cd "$STM32_PORT_DIR"
 # Initialize STM32 submodules
 make submodules
 
-# Explicitly generate header files including pins.h before the main build
-# Create the build directory structure first
-echo "Generating board headers (pins.h)..."
+# Explicitly create the build directory structure
+# MicroPython's build system will generate pins.h automatically during the build
+echo "Preparing build directory structure..."
 mkdir -p "build-$BOARD/genhdr"
 
-# Use make to generate just the headers/pins without building everything
-# This ensures pins.h and other headers are created before compilation
-make BOARD=$BOARD build-$BOARD/genhdr/pins.h || true
+# Verify pins.csv exists in the board directory
+BOARD_PINS_CSV="boards/$BOARD/pins.csv"
+if [ ! -f "$BOARD_PINS_CSV" ]; then
+    echo "ERROR: pins.csv not found at $BOARD_PINS_CSV"
+    echo "Available board files:"
+    ls -la "boards/$BOARD/" || echo "Board directory not found!"
+    exit 1
+fi
 
-# Don't clean - this might remove generated headers that we need
-# Instead, let make handle dependencies and regenerate what's needed
-# make BOARD=$BOARD clean
+echo "Found pins.csv, proceeding with build..."
+echo "Board directory contents:"
+ls -la "boards/$BOARD/"
 
 # Build the firmware (reduce parallelism to avoid race conditions)
-# The MicroPython Makefile will generate pins.h as a dependency
+# The MicroPython Makefile will automatically generate pins.h as a dependency
+echo "Building firmware (this will generate pins.h automatically)..."
 make BOARD=$BOARD -j2
 
 # Check if build succeeded
