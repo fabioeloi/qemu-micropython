@@ -8,7 +8,7 @@ This document tracks the implementation status of each roadmap item across relea
 |---------|--------|----------------|----------|----------|-------|
 | GDB integration for step-by-step debugging | Completed | v2025.03.04.17 | 100% | High | Comprehensive GDB integration with MicroPython debugging support fully implemented. All exception handling features complete (mpy-catch, mpy-except-info, mpy-except-bt, mpy-except-vars, mpy-except-navigate, mpy-except-history, mpy-except-visualize). Python-level debugging with full call stack, variable inspection, and exception handling. Enhanced breakpoint support with Python function name resolution. Exception visualization with color-coded output, interactive navigation, and history tracking. IDE integration for VSCode, PyCharm, and Eclipse. Complete documentation and comprehensive test suite. Issue #14 completed. |
 | Custom UART driver optimized for QEMU | Completed | v2025.03.03.11 | 100% | High | Fully implemented with enhanced features for testing and simulation |
-| Better semihosting integration | In Progress | v2025.03.01.8 | 50% | High | Basic integration complete, needs better MicroPython support |
+| Better semihosting integration | In Progress | v2026.02.06 | 90% | High | Core semihosting implementation complete with qemu_console module. ARM semihosting protocol implemented with character and string output. MicroPython bindings provide simple Python API. Test scripts and documentation created. Integration and testing in progress. Issue #3 nearing completion. |
 | Alternative QEMU machine types for STM32F4 | In Progress | v2025.03.01.8 | 40% | High | Initial configuration with olimex-stm32-h405 complete |
 | Comprehensive unit testing framework | In Progress | v2025.03.04.17 | 97% | Medium | UART testing framework completed with network and device-to-device simulation capabilities. Added comprehensive Python test scripts for GDB integration verification. Added exception handling tests and verification. Added exception visualization testing. Added IDE integration testing for exception visualization. Added VSCode extension testing. Created test scripts for exception visualization verification. |
 
@@ -41,14 +41,38 @@ Based on current progress and priorities, the adjusted timeline is:
 
 1. ✅ ~~Complete GDB integration for debugging (v1.1.0)~~ - **COMPLETED**
 2. ✅ ~~Enhance exception handling in GDB integration (v1.1.0)~~ - **COMPLETED (Issue #14)**
-3. Finalize v1.1.0 release (documentation updates, version tagging)
-4. Complete semihosting integration enhancement (v1.1.0 - 50% complete)
-5. Complete alternative QEMU machine types support (v1.1.0 - 40% complete)
+3. 🟡 **IN PROGRESS**: Complete semihosting integration enhancement (v1.1.0 - 90% complete, Issue #3)
+   - Core implementation with ARM semihosting protocol complete
+   - qemu_console Python module implemented
+   - Test scripts and documentation added
+   - Remaining: Build integration and QEMU testing
+4. Finalize v1.1.0 release (documentation updates, version tagging)
+5. Complete alternative QEMU machine types support (v1.1.0 - 40% complete, Issue #4)
 6. Begin planning for v1.2.0 milestone (IoT and Simulation Capabilities)
 7. Extend network simulation capabilities (v1.2.0)
 8. Create detailed implementation plans for network simulation and virtual sensors
 
 ## Recent Progress Updates
+
+### February 2026 Update - Semihosting Integration Enhancement (Issue #3)
+- **Semihosting Core Implementation**:
+  - Implemented ARM semihosting protocol using breakpoint instructions
+  - Created low-level C API for character and string output operations
+  - Added proper register handling for semihosting calls (r0/r1 registers)
+  - Implemented availability checking mechanism
+- **MicroPython Integration**:
+  - Created qemu_console Python module with three main functions
+  - Implemented print_text() for string output via semihosting
+  - Implemented print_char() for character-by-character output
+  - Added available() function to check semihosting support at runtime
+  - Proper error handling with OSError and ValueError exceptions
+- **Testing and Documentation**:
+  - Created comprehensive test script (tests/test_semihosting.py)
+  - Added demonstration examples (src/demo/semihosting_demo.py)
+  - Created detailed user guide (docs/SEMIHOSTING_GUIDE.md)
+  - Documented API reference with practical examples
+  - Added build script for module compilation
+- **Progress**: 50% → 90% (Core implementation complete, integration testing remaining)
 
 ### February 2026 Update
 - **Issue #14 Completion Verification**: Enhanced Exception Handling in GDB Integration
